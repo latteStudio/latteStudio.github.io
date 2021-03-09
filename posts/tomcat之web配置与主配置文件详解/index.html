@@ -1142,6 +1142,17 @@ prestartminSpareThreads 启动excutor是否立刻创建最小空闲个数的线�
 
             
         </div>
+		&lt;% if (theme.busuanzi && theme.busuanzi.enable){ %>
+        
+        <span id="busuanzi_container_site_pv">
+                本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                本站访客数<span id="busuanzi_value_site_uv"></span>人
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  &lt;% } %>
     </footer>
 
 
@@ -1187,7 +1198,7 @@ prestartminSpareThreads 启动excutor是否立刻创建最小空闲个数的线�
             el: '#vcomments',
             appId: '6hqsJkBQS3CRAfdMlpW9GsOJ-9Nh9j0Va',
             appKey: '2CubjtDJ17iVljqrpM0hGyhS',
-            placeholder: '说点什么~',
+            placeholder: 'Leave a comment~',
             path: location.pathname,
             avatar: 'mm',
             meta: ["nick","mail","link"],

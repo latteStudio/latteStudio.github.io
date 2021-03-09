@@ -533,6 +533,17 @@ lvs可以实现基于ip的负载调度（内核的ipvs模块）、基于内容�
 
             
         </div>
+		&lt;% if (theme.busuanzi && theme.busuanzi.enable){ %>
+        
+        <span id="busuanzi_container_site_pv">
+                本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span id="busuanzi_container_site_uv" style='display:none'>
+                本站访客数<span id="busuanzi_value_site_uv"></span>人
+        </span>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  &lt;% } %>
     </footer>
 
 
@@ -578,7 +589,7 @@ lvs可以实现基于ip的负载调度（内核的ipvs模块）、基于内容�
             el: '#vcomments',
             appId: '6hqsJkBQS3CRAfdMlpW9GsOJ-9Nh9j0Va',
             appKey: '2CubjtDJ17iVljqrpM0hGyhS',
-            placeholder: '说点什么~',
+            placeholder: 'Leave a comment~',
             path: location.pathname,
             avatar: 'mm',
             meta: ["nick","mail","link"],
