@@ -14,11 +14,11 @@
 
     <title>mysql程序架构和存储引擎 | latte Studio</title>
 
-    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+    <link rel="stylesheet" href="/css/meme.min.8a81df5e3f7eb67a8efa8e4c7ef0221c34298a277fc9e3d31209eb1eccd22213.css"/>
 
     
     
-        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+        <script src="/js/meme.min.ed0152d13f653ff21bf0e76a728fd6ae9b762c7a7bad8bc4eab82218fb602206.js"></script>
 
     
 
@@ -587,6 +587,22 @@ MariaDB [information_schema]&gt; show tables;
 
 
         
+    
+
+        <div class="load-comments">
+            <div id="load-comments">加载评论</div>
+        </div>
+
+        
+
+        
+            <div id="vcomments"></div>
+        
+
+        
+
+    
+
 
 
     </div>
@@ -621,6 +637,63 @@ MariaDB [information_schema]&gt; show tables;
 
 
 
+
+    
+
+        
+
+        
+            <script>
+    function loadComments() {
+        if (typeof Valine === 'undefined') {
+            var getScript = (options) => {
+                var script = document.createElement('script');
+                script.defer = true;
+                script.crossOrigin = 'anonymous';
+                Object.keys(options).forEach((key) => {
+                    script[key] = options[key];
+                });
+                document.body.appendChild(script);
+            };
+            getScript({
+                src: 'https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js',
+                onload: () => {
+                    newValine();
+                }
+            });
+        } else {
+            newValine();
+        }
+    }
+    function newValine() {
+        new Valine({
+            el: '#vcomments',
+            appId: '6hqsJkBQS3CRAfdMlpW9GsOJ-9Nh9j0Va',
+            appKey: '2CubjtDJ17iVljqrpM0hGyhS',
+            placeholder: 'Just go go',
+            path: location.pathname,
+            avatar: 'mm',
+            meta: ["nick","mail","link"],
+            pageSize:  10 ,
+            lang: 'zh-cn',
+            visitor:  false ,
+            highlight:  true ,
+            avatarForce:  false ,
+            recordIP:  false ,
+            serverURLs: '',
+            emojiCDN: '',
+            emojiMaps: {},
+            enableQQ:  false ,
+            requiredFields: []
+        });
+    }
+</script>
+
+        
+
+        
+
+    
 
 
 
