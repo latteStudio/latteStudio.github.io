@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>k8s之configmap与secret | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="k8s之configmap与secret" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/k8s%E4%B9%8Bconfigmap%E4%B8%8Esecret/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-11-11T14:33:57+00:00",
+        "dateModified": "2020-12-01T15:34:24+08:00",
+        "url": "https://latteStudio.github.io/posts/k8s%E4%B9%8Bconfigmap%E4%B8%8Esecret/",
+        "headline": "k8s之configmap与secret",
+        "description": "k8s之configmap与secret",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  6571 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20201119154855731.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="k8s之configmap与secret" />
+<meta property="og:description" content="k8s之configmap与secret" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/k8s%E4%B9%8Bconfigmap%E4%B8%8Esecret/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20201119154855731.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-11-11T14:33:57&#43;00:00" />
+    <meta property="article:modified_time" content="2020-12-01T15:34:24&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">k8s之configmap与secret</h1>
+
+            
+
+            
+                <div class="post-description p-summary">k8s之configmap与secret</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-11-11T14:33:57&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.11.11</time>
+    
+    
+        
+        <time datetime="2020-12-01T15:34:24&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.12.1</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E5%AE%B9%E5%99%A8%E4%BA%91%E7%B3%BB%E5%88%97/" class="category-link p-category">容器云系列</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;6571</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;14&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:dockerentrypoint和cmd" href="#dockerentrypoint和cmd">docker：entrypoint和cmd</a></li>
+    <li><a id="contents:k8scommand和args" href="#k8scommand和args">k8s：command和args</a></li>
+    <li><a id="contents:示例" href="#示例">示例</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:configmap优势" href="#configmap优势">configmap优势</a></li>
+    <li><a id="contents:configmap创建" href="#configmap创建">configmap创建</a>
+      <ol>
+        <li><a id="contents:基于命令创建" href="#基于命令创建">基于命令创建</a></li>
+        <li><a id="contents:基于文件创建" href="#基于文件创建">基于文件创建</a></li>
+        <li><a id="contents:基于目录创建" href="#基于目录创建">基于目录创建</a></li>
+        <li><a id="contents:使用清单创建" href="#使用清单创建">使用清单创建</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:configmap使用" href="#configmap使用">configmap使用</a>
+      <ol>
+        <li><a id="contents:向pod环境变量传递configmap键值对" href="#向pod环境变量传递configmap键值对">向pod环境变量传递configmap键值对</a></li>
+        <li><a id="contents:envfrom批量导入configmap中所有键" href="#envfrom批量导入configmap中所有键">envfrom批量导入configmap中所有键</a></li>
+        <li><a id="contents:configmap以挂载卷使用" href="#configmap以挂载卷使用">configmap以挂载卷使用</a></li>
+        <li><a id="contents:configmap的动态更新" href="#configmap的动态更新">configmap的动态更新</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:configmap注意事项" href="#configmap注意事项">configmap注意事项</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:secret概述" href="#secret概述">secret概述</a></li>
+    <li><a id="contents:创建secret" href="#创建secret">创建secret</a>
+      <ol>
+        <li><a id="contents:命令式创建" href="#命令式创建">命令式创建</a></li>
+        <li><a id="contents:清单式创建" href="#清单式创建">清单式创建</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:secret以存储卷使用" href="#secret以存储卷使用">secret以存储卷使用</a></li>
+    <li><a id="contents:imagepullsecret" href="#imagepullsecret">imagePullSecret</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="容器化应用配置方式"><a href="#容器化应用配置方式" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:容器化应用配置方式" class="headings">容器化应用配置方式</a></h1>
+<p>​	configMap，secret是k8s上2种特殊的存储卷，功能：被pod挂载，为pod提供非敏感和敏感的配置信息或文件；</p>
+<p>​	针对容器化容器，其配置方式通常有以下5种方式：</p>
+<ol>
+<li>命令行传参：启动容器时，docker run image-name [command...] [args..]</li>
+<li>环境变量传参：启动容器时，docker run xx -e var1=v1 -e var2=v2 ...</li>
+<li>配置文件打入镜像：不像命令行和环境变量传参，直接传递较为简单的kv类型的配置信息，可以传递整个文件</li>
+<li>借助普通存储卷挂在节点上预先放置的配置文件：可传递整个文件，但考虑到pod的动态性，需要集群中每个节点都放置一份配置文件显然不够灵活</li>
+<li>k8s的特殊卷：configmap和secret：借助这2种存储卷，可以将配置文件，证书，密钥等敏感信息都创建为标准k8s资源，从而在pod中引用，以存储卷方式引用，或envFrom字段以环境变量方式引入</li>
+</ol>
+<h1 id="命令行参数配置应用"><a href="#命令行参数配置应用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:命令行参数配置应用" class="headings">命令行参数配置应用</a></h1>
+<h2 id="dockerentrypoint和cmd"><a href="#dockerentrypoint和cmd" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:dockerentrypoint和cmd" class="headings">docker：entrypoint和cmd</a></h2>
+<p>​	制作docker镜像时，entrypoint分别代表，启动为容器时要运行的程序和其参数；</p>
+<h2 id="k8scommand和args"><a href="#k8scommand和args" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:k8scommand和args" class="headings">k8s：command和args</a></h2>
+<p>​	定义pod中containers字段时，其中command和args分别代表，传递给容器的，要其运行的程序和其参数；可覆盖镜像中写好的程序和程序参数</p>
+<p><strong>覆盖关系图示：</strong></p>
+<ul>
+<li>pod中的command和args都定义时，分别覆盖镜像中的entrypoint和cmd</li>
+<li>pod中只定义了commnd时，覆盖镜像中的entrypoint和cmd，只运行定义的command</li>
+<li>pod中只定义了args时，将覆盖镜像中的cmd参数，args作为entrypoint的参数</li>
+<li>pod中的command和args都未定义时，采用镜像中默认的entrypoint和cmd</li>
+</ul>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201119154855731.png" alt="image-20201119154855731"></p>
+<h2 id="示例"><a href="#示例" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:示例" class="headings">示例</a></h2>
+<p>pod中定义了command和args</p>
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+ name: pod1
+spec:
+ containers:
+ - name: b1
+   image: busybox
+   command: 
+   - httpd
+   args: 
+   - -f
+
+httpd -f 覆盖了busybox镜像中定义的/bin/sh -c 
+
+[root@client pod]# kubectl exec pod1 -c b1 -i -t -- /bin/sh -il
+/ # ps -ef
+PID   USER     TIME  COMMAND
+    1 root      0:00 httpd -f
+   35 root      0:00 /bin/sh -il
+   39 root      0:00 ps -ef
+
+</code></pre><p>pod中定义了args</p>
+<pre><code>apiVersion: v1
+kind: Pod
+metadata:
+ name: pod1
+spec:
+ containers:
+ - name: b1
+   image: busybox
+   args: 
+   - httpd
+   - -f
+
+传递的args，作为busybox镜像的entrypoint程序的参数 /bin/sh -c httpd -f
+相当于在shell窗口，执行了httpd -f命令，效果和上面的pod相当
+
+[root@client pod]# kubectl exec pod2 -i -t -- /bin/sh -il
+/ # ps -ef
+PID   USER     TIME  COMMAND
+    1 root      0:00 httpd -f
+    5 root      0:00 /bin/sh -il
+    9 root      0:00 ps -ef
+</code></pre><h1 id="环境变量配置应用"><a href="#环境变量配置应用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:环境变量配置应用" class="headings">环境变量配置应用</a></h1>
+<p>​	定义pod中容器时，可以通过env字段，向其中传递环境变量，<strong>环境变量可以被直接引用，也可以通过entrypoint脚本，将其传递到应用的配置文件中，尤其适合云原生应用在容器中执行；</strong></p>
+<p>语法：</p>
+<pre><code>[root@client pod]# kubectl explain pods.spec.containers.env.
+KIND:     Pod
+VERSION:  v1
+
+   name	&lt;string&gt; -required-
+     Name of the environment variable. Must be a C_IDENTIFIER.
+
+   value	&lt;string&gt;
+     Variable references $(VAR_NAME) are expanded using the previous defined
+     environment variables in the container and any service environment
+     variables. If a variable cannot be resolved, the reference in the input
+     string will be unchanged. The $(VAR_NAME) syntax can be escaped with a
+     double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
+     regardless of whether the variable exists or not. Defaults to &quot;&quot;.
+
+   valueFrom	&lt;Object&gt;
+     Source for the environment variable's value. Cannot be used if value is not
+     empty.
+
+env的值，是对象，列表；
+变量名，必选
+value valuefrom，二选一
+value 直接给定变量值，
+valuefrom是选择从别处引如变量，共四类：configmap，secret，或pod的属性信息，或资源配额的上限和下限，见下方
+---
+[root@client pod]# kubectl explain pods.spec.containers.env.valueFrom.
+
+FIELDS:
+   configMapKeyRef	&lt;Object&gt;
+     Selects a key of a ConfigMap.
+
+   fieldRef	&lt;Object&gt;
+     Selects a field of the pod: supports metadata.name, metadata.namespace,
+     metadata.labels, metadata.annotations, spec.nodeName,
+     spec.serviceAccountName, status.hostIP, status.podIP.
+
+   resourceFieldRef	&lt;Object&gt;
+     Selects a resource of the container: only resources limits and requests
+     (limits.cpu, limits.memory, limits.ephemeral-storage, requests.cpu,
+     requests.memory and requests.ephemeral-storage) are currently supported.
+
+   secretKeyRef	&lt;Object&gt;
+     Selects a key of a secret in the pod's namespace
+
+</code></pre><p>1、定义pod文件</p>
+<p>​	采用直接给定变量值，和引用元数据信息变量2种方式；</p>
+<pre><code>[root@client pod]# cat pod-env.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pod-env
+spec:
+ containers:
+ - name: busybox
+   image: busybox
+   command: 
+   - httpd
+   args:
+   - -f
+   env:
+   - name: k1
+     value: v1
+   - name: node_name
+     valueFrom:
+      fieldRef:
+       fieldPath: spec.nodeName
+   - name: node_ip
+     valueFrom:
+      fieldRef:
+       fieldPath: status.hostIP
+   - name: node_ns
+     valueFrom:
+      fieldRef:
+       fieldPath: metadata.namespace
+
+</code></pre><p>2、打印pod中容器中的环境变量</p>
+<pre><code>[root@client pod]# kubectl exec pod-env printenv
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=pod-env
+k1=v1
+node_name=node2
+node_ip=192.168.80.107
+node_ns=default
+...
+</code></pre><p>3、环境变量传参的缺陷：</p>
+<p>​	是在运行为pod后，根据yaml中定义，将环境变量注入到容器中，即，容器运行中，环境变量无法动态修改；但configmap可以；</p>
+<h1 id="configmap配置应用"><a href="#configmap配置应用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:configmap配置应用" class="headings">configmap配置应用</a></h1>
+<h2 id="configmap优势"><a href="#configmap优势" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:configmap优势" class="headings">configmap优势</a></h2>
+<p>​	对于微服务化的分布式应用，大量的应用模块需要频繁的配置，传统的配置文件方式不适用，<strong>配置和应用代码耦合度高，改配置有时会修改代码，例如；多套环境下，就需要修改代码引用不同的配置文件，</strong></p>
+<p>​	configmap和secret解耦了配置和应用代码，<strong>允许在多套环境中，定义同名的configmap资源，但其内部内容不同，从而pod应用中利用configmap名称调用的configmap，无需做任何修改；</strong></p>
+<p>​	configmap对象，把配置数据，以键值对方式存储其中，pod或其他k8s组件，可以以<strong>环境变量、存储卷挂载</strong>，2种方式引用；</p>
+<h2 id="configmap创建"><a href="#configmap创建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:configmap创建" class="headings">configmap创建</a></h2>
+<p>语法：</p>
+<p><code>kubectl create confimap CONFIG_NAME DADA_SOURCE</code></p>
+<p>data_source是指将要存储到configmap中的数据源，存储形式为键值对，类型有：1、命令行给定kv对，2、指定包含数据的文件，3、指定包含数据文件的目录</p>
+<pre><code>[root@client ~]# kubectl create configmap -h
+Create a configmap based on a file, directory, or specified literal value. 
+
+A single configmap may package one or more key/value pairs. 
+
+When creating a configmap based on a file, the key will default to the basename of the file, and the value will default
+to the file content.  If the basename is an invalid key, you may specify an alternate key. 
+
+When creating a configmap based on a directory, each file whose basename is a valid key in the directory will be
+packaged into the configmap.  Any directory entries except regular files are ignored (e.g. subdirectories, symlinks,
+devices, pipes, etc).
+
+Aliases:
+configmap, cm
+...
+</code></pre><h3 id="基于命令创建"><a href="#基于命令创建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于命令创建" class="headings">基于命令创建</a></h3>
+<p>命令行方式，适合量比较少的kv数据</p>
+<pre><code>  # Create a new configmap named my-config with key1=config1 and key2=config2
+  kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2
+</code></pre><p>1，创建</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@client ~<span class="o">]</span><span class="c1"># kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2</span>
+configmap/my-config created
+
+</code></pre></td></tr></table></div>
+</div>
+</div><p>2，查看</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client ~]# kubectl get cm</span><span class="w">
+</span><span class="w"></span><span class="l">NAME        DATA   AGE</span><span class="w">
+</span><span class="w"></span><span class="l">my-config   2      6s</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client ~]# kubectl get cm -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">items</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w">  </span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">key1</span><span class="p">:</span><span class="w"> </span><span class="l">config1</span><span class="w">
+</span><span class="w">    </span><span class="nt">key2</span><span class="p">:</span><span class="w"> </span><span class="l">config2</span><span class="w">
+</span><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span><span class="w">  </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="ld">2020-11-20T02:31:04Z</span><span class="w">
+</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-config</span><span class="w">
+</span><span class="w">    </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span><span class="w">    </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;428496&#34;</span><span class="w">
+</span><span class="w">    </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="l">/api/v1/namespaces/default/configmaps/my-config</span><span class="w">
+</span><span class="w">    </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l">6fea902e-2ad8-11eb-8f71-000c292d5d7c</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">List</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;&#34;</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><h3 id="基于文件创建"><a href="#基于文件创建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于文件创建" class="headings">基于文件创建</a></h3>
+<p>基于文件创建的方式，configmap中的key默认为文件路径的basename，也可以手动指定其他的值做key，其值就是整个文件的内容，使用于整个配置文件，如nginx.conf</p>
+<p>eg：</p>
+<pre><code>  # Create a new configmap named my-config from the key=value pairs in the file
+  kubectl create configmap my-config --from-file=path/to/bar
+
+</code></pre><p>1、创建</p>
+<pre><code>[root@client ~]# kubectl create configmap cm1 --from-file=/etc/fstab 
+configmap/cm1 created
+
+</code></pre><p>2、查看</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client ~]# kubectl get cm</span><span class="w">
+</span><span class="w"></span><span class="l">NAME        DATA   AGE</span><span class="w">
+</span><span class="w"></span><span class="l">cm1         1      8s</span><span class="w">
+</span><span class="w"></span><span class="l">my-config   2      15m</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client ~]# kubectl get cm cm1 -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">fstab</span><span class="p">:</span><span class="w"> </span><span class="l">|2</span><span class="w">
+</span><span class="w">
+</span><span class="w">    </span><span class="c">#</span><span class="w">
+</span><span class="w">    </span><span class="c"># /etc/fstab</span><span class="w">
+</span><span class="w">    </span><span class="c"># Created by anaconda on Sat Aug  8 11:58:02 2020</span><span class="w">
+</span><span class="w">    </span><span class="c">#</span><span class="w">
+</span><span class="w">    </span><span class="c"># Accessible filesystems, by reference, are maintained under &#39;/dev/disk&#39;</span><span class="w">
+</span><span class="w">    </span><span class="c"># See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info</span><span class="w">
+</span><span class="w">    </span><span class="c">#</span><span class="w">
+</span><span class="w">    </span><span class="l">UUID=046ebf1d-861c-42bb-a48f-9641dfc9afec /                       xfs     defaults        0 0</span><span class="w">
+</span><span class="w">    </span><span class="l">UUID=686c38ff-6d1b-40cd-9baa-9860097e81ec /boot                   xfs     defaults        0 0</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="ld">2020-11-20T02:46:50Z</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm1</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;429926&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="l">/api/v1/namespaces/default/configmaps/cm1</span><span class="w">
+</span><span class="w">  </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l">a4091ae0-2ada-11eb-8f71-000c292d5d7c</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><h3 id="基于目录创建"><a href="#基于目录创建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于目录创建" class="headings">基于目录创建</a></h3>
+<p>​	将所有配置文件放在一个目录，configmap还可以通过--from-file=/path/to/dir来指定一整个目录，一下子为其下包含所有文件，都创建为一个键值对；</p>
+<p>​	实际中，方便一次用一个configmap包含一批配置文件</p>
+<p>eg：</p>
+<pre><code> # Create a new configmap named my-config based on folder bar
+  kubectl create configmap my-config --from-file=path/to/bar
+
+</code></pre><p>1、创建</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@client ~<span class="o">]</span><span class="c1"># mkdir /cmdir/</span>
+<span class="o">[</span>root@client ~<span class="o">]</span><span class="c1"># echo 1.txt &gt;&gt; /cmdir/1.txt</span>
+<span class="o">[</span>root@client ~<span class="o">]</span><span class="c1"># echo 3.txt &gt;&gt; /cmdir/3.txt</span>
+<span class="o">[</span>root@client ~<span class="o">]</span><span class="c1"># echo 2.txt &gt;&gt; /cmdir/2.txt</span>
+<span class="o">[</span>root@client ~<span class="o">]</span><span class="c1"># ll /cmdir/</span>
+total <span class="m">12</span>
+-rw-r--r-- <span class="m">1</span> root root <span class="m">6</span> Nov <span class="m">20</span> 10:54 1.txt
+-rw-r--r-- <span class="m">1</span> root root <span class="m">6</span> Nov <span class="m">20</span> 10:55 2.txt
+-rw-r--r-- <span class="m">1</span> root root <span class="m">6</span> Nov <span class="m">20</span> 10:55 3.txt
+
+
+<span class="o">[</span>root@client ~<span class="o">]</span><span class="c1">#   kubectl create configmap cm2 --from-file=/cmdir/</span>
+configmap/cm2 created
+</code></pre></td></tr></table></div>
+</div>
+</div><p>2、查看</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client ~]# kubectl get cm</span><span class="w">
+</span><span class="w"></span><span class="l">NAME        DATA   AGE</span><span class="w">
+</span><span class="w"></span><span class="l">cm1         1      9m39s</span><span class="w">
+</span><span class="w"></span><span class="l">cm2         3      2s</span><span class="w">
+</span><span class="w"></span><span class="l">my-config   2      25m</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client ~]# kubectl get cm cm2 -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">1.txt</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">    </span><span class="w">    </span><span class="m">1.</span><span class="l">txt</span><span class="w">
+</span><span class="w">  </span><span class="nt">2.txt</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">    </span><span class="w">    </span><span class="m">2.</span><span class="l">txt</span><span class="w">
+</span><span class="w">  </span><span class="nt">3.txt</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">    </span><span class="w">    </span><span class="m">3.</span><span class="l">txt</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="ld">2020-11-20T02:56:27Z</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm2</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;430797&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="l">/api/v1/namespaces/default/configmaps/cm2</span><span class="w">
+</span><span class="w">  </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l">fb9a18b2-2adb-11eb-8f71-000c292d5d7c</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><h3 id="使用清单创建"><a href="#使用清单创建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:使用清单创建" class="headings">使用清单创建</a></h3>
+<p>​	使用清单创建，使用简单的kv类型数据，若数据源来自文件，或目录，倒不如命令行来的直接，<strong>为方便保存，可用命令行创建后，用get cmName -o yaml 输出为yaml文件，保存待用</strong></p>
+<p>​	<code>[root@client cm]# kubectl get cm cm1 -o yaml &gt; cm1.yaml</code></p>
+<pre><code>[root@client cm]# cat cm3.yaml 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: cm3
+data:
+ k3: v3
+ k4: v4
+
+
+[root@client cm]# kubectl get cm
+NAME        DATA   AGE
+cm1         1      30m
+cm2         3      21m
+cm3         2      3s
+my-config   2      46m
+[root@client cm]# kubectl get cm cm3 -o yaml
+apiVersion: v1
+data:
+  k3: v3
+  k4: v4
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {&quot;apiVersion&quot;:&quot;v1&quot;,&quot;data&quot;:{&quot;k3&quot;:&quot;v3&quot;,&quot;k4&quot;:&quot;v4&quot;},&quot;kind&quot;:&quot;ConfigMap&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;name&quot;:&quot;cm3&quot;,&quot;namespace&quot;:&quot;default&quot;}}
+  creationTimestamp: 2020-11-20T03:17:33Z
+  name: cm3
+  namespace: default
+  resourceVersion: &quot;432712&quot;
+  selfLink: /api/v1/namespaces/default/configmaps/cm3
+  uid: ee714da9-2ade-11eb-8f71-000c292d5d7c
+</code></pre><h2 id="configmap使用"><a href="#configmap使用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:configmap使用" class="headings">configmap使用</a></h2>
+<p>​	configMpa在pod中使用方式：</p>
+<pre><code>There are four different ways that you can use a ConfigMap to configure a container inside a Pod:
+
+Inside a container command and args
+Environment variables for a container
+Add a file in read-only volume, for the application to read
+Write code to run inside the Pod that uses the Kubernetes API to read a ConfigMap
+	第4种方式，支持动态更新configmap和跨ns引用configmap
+</code></pre><p>​	configMap配置好后，被pod引用方式：1、通过环境变量<code>pods.spec.containers.env.valueFrom.configMapKeyRef</code>引用；2、通过卷挂载的方式引用；</p>
+<h3 id="向pod环境变量传递configmap键值对"><a href="#向pod环境变量传递configmap键值对" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:向pod环境变量传递configmap键值对" class="headings">向pod环境变量传递configmap键值对</a></h3>
+<p>定义cm，和pod</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client cm]# cat pod-with-cm.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm-busybox</span><span class="w">
+</span><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">httpd_port</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;8080&#34;</span><span class="w">
+</span><span class="w"> </span><span class="nt">httpd_log_level</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;-vv&#34;</span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">pod-with-cm</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">b1</span><span class="w">
+</span><span class="w">   </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span><span class="w">   </span><span class="nt">command</span><span class="p">:</span><span class="w"> 
+</span><span class="w">   </span>- <span class="l">/bin/httpd</span><span class="w">
+</span><span class="w">   </span><span class="nt">args</span><span class="p">:</span><span class="w">
+</span><span class="w">   </span>- -<span class="l">f</span><span class="w">
+</span><span class="w">   </span>- -<span class="l">p</span><span class="w">
+</span><span class="w">   </span>- <span class="l">$(port)</span><span class="w">
+</span><span class="w">   </span>- <span class="l">$(log_level)</span><span class="w">
+</span><span class="w">   </span><span class="nt">env</span><span class="p">:</span><span class="w">
+</span><span class="w">   </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">port</span><span class="w">
+</span><span class="w">     </span><span class="nt">valueFrom</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">configMapKeyRef</span><span class="p">:</span><span class="w">
+</span><span class="w">       </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm-busybox</span><span class="w">
+</span><span class="w">       </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">httpd_port</span><span class="w">
+</span><span class="w">   </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">log_level</span><span class="w">
+</span><span class="w">     </span><span class="nt">valueFrom</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">configMapKeyRef</span><span class="p">:</span><span class="w">
+</span><span class="w">       </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm-busybox</span><span class="w">
+</span><span class="w">       </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">httpd_log_level</span><span class="w">
+</span><span class="w"></span><span class="l">容器启动参数引用了环境变量；</span><span class="w">
+</span><span class="w"></span><span class="l">pod中定义的环境变量，引用了cm-busybox这个cm中的key</span><span class="w">
+</span><span class="w"></span><span class="l">cm-busybox中需事先定义好对应的key</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>查看，可以看到，变量已经被正常传递给pod的容器中进程</p>
+<pre><code>[root@client cm]# kubectl exec pod-with-cm -- ps -ef
+PID   USER     TIME  COMMAND
+    1 root      0:00 /bin/httpd -f -p 8080 -vv
+    5 root      0:00 ps -ef
+
+</code></pre><h3 id="envfrom批量导入configmap中所有键"><a href="#envfrom批量导入configmap中所有键" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:envfrom批量导入configmap中所有键" class="headings">envfrom批量导入configmap中所有键</a></h3>
+<p>​	采用configMapKeyRef一个个引用confimap中定义的键，针对大量键存在时，效率底下，因此可以用envFrom字段，在其中引用configmMapRef，一次导入configmap中所有的key，且可以导入多个configmap一次性，语法如下：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client cm]# kubectl explain pods.spec.containers.envFrom.configMapRef</span><span class="w">
+</span><span class="w"></span><span class="nt">KIND</span><span class="p">:</span><span class="w">     </span><span class="l">Pod</span><span class="w">
+</span><span class="w"></span><span class="nt">VERSION</span><span class="p">:</span><span class="w">  </span><span class="l">v1</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">RESOURCE</span><span class="p">:</span><span class="w"> </span><span class="l">configMapRef &lt;Object&gt;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">DESCRIPTION</span><span class="p">:</span><span class="w">
+</span><span class="w">     </span><span class="l">The ConfigMap to select from</span><span class="w">
+</span><span class="w">
+</span><span class="w">     </span><span class="l">ConfigMapEnvSource selects a ConfigMap to populate the environment</span><span class="w">
+</span><span class="w">     </span><span class="l">variables with. The contents of the target ConfigMap&#39;s Data field will</span><span class="w">
+</span><span class="w">     </span><span class="l">represent the key-value pairs as environment variables.</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>1、编写yaml</p>
+<pre><code>root@client cm]# cat pod-with-cm.yaml 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: cm-busybox
+data:
+ httpd_port: &quot;8080&quot;
+ httpd_log_level: &quot;-vv&quot;
+---
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pod-with-cm
+spec:
+ containers:
+ - name: b1
+   image: busybox
+   command: 
+   - /bin/httpd
+   args:
+   - -f
+   - -p
+   - $(httpd_port)
+   - $(httpd_log_level)
+   envFrom:
+   - configMapRef:
+      name: cm-busybox
+</code></pre><p>2、查看容器中环境变量</p>
+<pre><code>^C[root@client cm]# kubectl exec pod-with-cm -- printenv
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=pod-with-cm
+httpd_log_level=-vv
+httpd_port=8080
+
+</code></pre><h3 id="configmap以挂载卷使用"><a href="#configmap以挂载卷使用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:configmap以挂载卷使用" class="headings">configmap以挂载卷使用</a></h3>
+<p>​	cm中不仅可以存储一般的kv类型的值，也可以存储整个文件的内容，适用于为pod中容器提供配置文件；<strong>其存储方式也是键值，键是文件名，值是整个文件内容；</strong></p>
+<p>使用步骤：</p>
+<ol>
+<li>定义configmap，其中引用一个或多个配置文件，kubectl explain cm.data</li>
+<li>volumes字段引用上步定义好的cm名称， kubectl explain pods.spec.volumes</li>
+<li>容器中引用上步定义好的volumes名称，kubectl explain pods.spec.containers.volumeMounts</li>
+</ol>
+<p>1、挂载cm中所有文件</p>
+<p>​	创建3个文件，模拟3个nginx的虚拟主机的配置文件，默认情况下，引用的confimap中所有的文件都会被挂载到mountPath目录下；</p>
+<pre><code>[root@client cm]# mkdir /tmp/nginx_conf_dir/
+
+[root@client cm]# echo host1.conf &gt; /tmp/nginx_conf_dir/host1.conf
+[root@client cm]# echo host2.conf &gt; /tmp/nginx_conf_dir/host2.conf
+[root@client cm]# echo host3.conf &gt; /tmp/nginx_conf_dir/host3.conf
+
+[root@client cm]# ll /tmp/nginx_conf_dir/
+total 12
+-rw-r--r-- 1 root root 11 Nov 22 12:09 host1.conf
+-rw-r--r-- 1 root root 11 Nov 22 12:09 host2.conf
+-rw-r--r-- 1 root root 11 Nov 22 12:09 host3.conf
+
+</code></pre><p>示例yaml：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client cm]# cat ngx1.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ngx1</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ngx1</span><span class="w">
+</span><span class="w">   </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx:alpine</span><span class="w">
+</span><span class="w">   </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span><span class="w">   </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">     </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/share/nginx/html</span><span class="w">
+</span><span class="w"> </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">   </span><span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm-nginx</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="l">查看容器中挂载的路径；</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client cm]# kubectl exec ngx1 -- ls /usr/share/nginx/html</span><span class="w">
+</span><span class="w"></span><span class="l">host1.conf</span><span class="w">
+</span><span class="w"></span><span class="l">host2.conf</span><span class="w">
+</span><span class="w"></span><span class="l">host3.conf</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>2、指定挂载cm中部分文件</p>
+<p>​	可以利用pods.spec.volumes.configMap.item字段，只挂载cm中部分的文件到mountPath指定的路径下；</p>
+<p>示例yaml：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client cm]# cat ngx1.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ngx1</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ngx1</span><span class="w">
+</span><span class="w">   </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx:alpine</span><span class="w">
+</span><span class="w">   </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span><span class="w">   </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">     </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/share/nginx/html</span><span class="w">
+</span><span class="w"> </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">   </span><span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm-nginx</span><span class="w">
+</span><span class="w">    </span><span class="nt">items</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">host1.conf</span><span class="w">
+</span><span class="w">      </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="m">0644</span><span class="w">
+</span><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">host1.conf</span><span class="w">
+</span><span class="w">    </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">host2.conf</span><span class="w">
+</span><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">newhost2.conf</span><span class="w">
+</span><span class="w"></span><span class="l">key指定引用cm中哪个键，即文件名</span><span class="w">
+</span><span class="w"></span><span class="l">mode设置了文件权限，可选字段</span><span class="w">
+</span><span class="w"></span><span class="l">path设置了挂载到容器中后，文件名叫什么，可与cm中原文件名保持一致，也可不一致</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="l">查看容器中挂载的路径；</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client cm]# kubectl exec ngx1 -- ls /usr/share/nginx/html</span><span class="w">
+</span><span class="w"></span><span class="l">host1.conf</span><span class="w">
+</span><span class="w"></span><span class="l">newhost2.conf</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>3、挂载cm文件时，不覆盖原镜像的文件路径下存在的文件</p>
+<p>​	有时需求会是，挂载cm中文件中时，不覆盖mountPath路径下原有文件，而是添加的方式</p>
+<p>示例yaml：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client cm]# cat ngx1.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ngx1</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">ngx1</span><span class="w">
+</span><span class="w">   </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx:alpine</span><span class="w">
+</span><span class="w">   </span><span class="nt">volumeMounts</span><span class="p">:</span><span class="w">
+</span><span class="w">   </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">     </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/share/nginx/html/newhost1.conf</span><span class="w">
+</span><span class="w">     </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l">host1.conf</span><span class="w">
+</span><span class="w">   </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">     </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="l">/usr/share/nginx/html/newhost2.conf</span><span class="w">
+</span><span class="w">     </span><span class="nt">subPath</span><span class="p">:</span><span class="w"> </span><span class="l">host2.conf</span><span class="w">
+</span><span class="w"> </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span><span class="w">   </span><span class="nt">configMap</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cm-nginx</span><span class="w">
+</span><span class="w"></span><span class="l">mountPath指定，cm中的文件，挂载到容器中后的文件名，要唯一</span><span class="w">
+</span><span class="w"></span><span class="l">subPath指明cm中要挂载的key，即文件名，就不会默认覆盖原有文件</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="l">查看容器中挂载的路径；原有首页文件，和错误页面都还存在</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client cm]# kubectl exec ngx1 -- ls  /usr/share/nginx/html</span><span class="w">
+</span><span class="w"></span><span class="l">50x.html</span><span class="w">
+</span><span class="w"></span><span class="l">index.html</span><span class="w">
+</span><span class="w"></span><span class="l">newhost1.conf</span><span class="w">
+</span><span class="w"></span><span class="l">newhost2.conf</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><h3 id="configmap的动态更新"><a href="#configmap的动态更新" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:configmap的动态更新" class="headings">configmap的动态更新</a></h3>
+<p>步骤：</p>
+<ol>
+<li>更新cm中数据</li>
+<li>容器中进程，重载配置文件</li>
+</ol>
+<p>更新cm：</p>
+<pre><code>[root@client cm]# kubectl edit cm cm-nginx
+configmap/cm-nginx edited
+</code></pre><p>更新了cm之后，还需要容器中进程，重装配置文件才可，如nginx需要<code>nginx -s reload</code> ，容器中若是不支持热重载配置文件的进程仍需要重新启动pod才可更新cm中数据；</p>
+<p><strong>采用subPath挂载的cm中文件不更新动态更新</strong></p>
+<p>​	也非2级软链接方式</p>
+<pre><code>[root@client cm]# kubectl exec ngx1 -- ls -lA  /usr/share/nginx/html/
+total 16
+-rw-r--r--    1 root     root           494 Oct 27 15:48 50x.html
+-rw-r--r--    0 root     root            20 Nov 22 05:40 host1.conf
+-rw-r--r--    0 root     root            11 Nov 22 05:40 host2.conf
+-rw-r--r--    1 root     root           612 Oct 27 15:48 index.html
+
+</code></pre><p><strong>默认挂载方式为2级链接方式，支持动态更新</strong></p>
+<p>​	更新cm时，由..data指向一个新的时间点目录即实现了cm的更新，也即容器内文件更新；</p>
+<pre><code>[root@client cm]# kubectl exec ngx1 -- ls -lA  /usr/share/nginx/html/
+total 0
+drwxr-xr-x    2 root     root            60 Nov 22 05:51 ..2020_11_22_05_51_33.789268335
+lrwxrwxrwx    1 root     root            31 Nov 22 05:51 ..data -&gt; ..2020_11_22_05_51_33.789268335
+lrwxrwxrwx    1 root     root            17 Nov 22 05:51 host1.conf -&gt; ..data/host1.conf
+lrwxrwxrwx    1 root     root            17 Nov 22 05:51 host2.conf -&gt; ..data/host2.conf
+lrwxrwxrwx    1 root     root            17 Nov 22 05:51 host3.conf -&gt; ..data/host3.conf
+</code></pre><h2 id="configmap注意事项"><a href="#configmap注意事项" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:configmap注意事项" class="headings">configmap注意事项</a></h2>
+<ul>
+<li>
+<p>cofigmap是名称空间级别资源，需要同一个ns内部的pod才可引用；</p>
+</li>
+<li>
+<p>以存储卷方式被引用的configmap需要先于pod被创建，同样被引用到的key都要事先创建；否则pod无法正常启动；</p>
+</li>
+<li>
+<p>以环境变量方式被引用的configmap无需先于pod被创建，pod仍可正常启动；</p>
+</li>
+</ul>
+<h1 id="secret配置应用"><a href="#secret配置应用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:secret配置应用" class="headings">secret配置应用</a></h1>
+<h2 id="secret概述"><a href="#secret概述" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:secret概述" class="headings">secret概述</a></h2>
+<p>​	secret和configmap等同，只是secret是用来存储敏感数据，如密码，密钥，证书，令牌等；</p>
+<p>​	secret也是以键值形式，存储数据，且仅仅分发到调用了secret资源的pod所在的节点的内存中，以base64编码，</p>
+<p>用途：</p>
+<ul>
+<li>提供kubelet用于拉取私有仓库时的认证信息</li>
+<li>pod中容器使用的私密信息存储</li>
+<li>tls的证书和key</li>
+</ul>
+<p>secret类型：</p>
+<p>常用的3种：</p>
+<pre><code>[root@client cm]# kubectl create secret -h
+Create a secret using specified subcommand.
+
+Available Commands:
+  docker-registry Create a secret for use with a Docker registry
+  用户私有仓库认证信息的
+  generic         Create a secret from a local file, directory or literal value
+  从命令行，文件，目录中导入数据
+  tls             Create a TLS secret
+  保存tls证书和key的
+
+</code></pre><p>完整类型：https://kubernetes.io/docs/concepts/configuration/secret/</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>Builtin Type</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Opaque</code></td>
+<td>arbitrary user-defined data</td>
+</tr>
+<tr>
+<td><code>kubernetes.io/service-account-token</code></td>
+<td>service account token</td>
+</tr>
+<tr>
+<td><code>kubernetes.io/dockercfg</code></td>
+<td>serialized <code>~/.dockercfg</code> file</td>
+</tr>
+<tr>
+<td><code>kubernetes.io/dockerconfigjson</code></td>
+<td>serialized <code>~/.docker/config.json</code> file</td>
+</tr>
+<tr>
+<td><code>kubernetes.io/basic-auth</code></td>
+<td>credentials for basic authentication</td>
+</tr>
+<tr>
+<td><code>kubernetes.io/ssh-auth</code></td>
+<td>credentials for SSH authentication</td>
+</tr>
+<tr>
+<td><code>kubernetes.io/tls</code></td>
+<td>data for a TLS client or server</td>
+</tr>
+<tr>
+<td><code>bootstrap.kubernetes.io/token</code></td>
+<td>bootstrap token data</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="创建secret"><a href="#创建secret" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:创建secret" class="headings">创建secret</a></h2>
+<h3 id="命令式创建"><a href="#命令式创建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:命令式创建" class="headings">命令式创建</a></h3>
+<p>1、命令行方式创建mysql用户密码</p>
+<pre><code>[root@client cm]# kubectl create secret generic auth-mysql --from-literal=user=root --from-literal=password=mysql
+secret/auth-mysql created
+
+[root@client cm]# kubectl get secrets
+NAME                  TYPE                                  DATA   AGE
+auth-mysql            Opaque                                2      23s
+类型为generic/Opaque，编码为base64，
+
+[root@client cm]# kubectl get secrets auth-mysql -o yaml
+apiVersion: v1
+data:
+  password: bXlzcWw=
+  user: cm9vdA==
+kind: Secret
+metadata:
+  creationTimestamp: 2020-11-22T06:14:52Z
+  name: auth-mysql
+  namespace: default
+  resourceVersion: &quot;477205&quot;
+  selfLink: /api/v1/namespaces/default/secrets/auth-mysql
+  uid: 0851f310-2c8a-11eb-9e9a-000c292d5d7c
+type: Opaque
+
+[root@client cm]# echo bX1zcWw= | base64 -d
+m}sql[root@client cm]# 
+其中base64编码不能起到加密效果；
+
+</code></pre><p>2、命令行方式从文件导入数据</p>
+<pre><code>[root@client cm]# kubectl create secret generic fil1 --from-file=s1=/etc/hosts
+secret/fil1 created
+[root@client cm]# kubectl get secret fil1 -o yaml
+apiVersion: v1
+data:
+  s1: MTI3LjAuMC4xICAgbG9jYWxob3N0IGxvY2FsaG9zdC5sb2NhbGRvbWFpbiBsb2NhbGhvc3Q0IGxvY2FsaG9zdDQubG9jYWxkb21haW40Cjo6MSAgICAgICAgIGxvY2FsaG9zdCBsb2NhbGhvc3QubG9jYWxkb21haW4gbG9jYWxob3N0NiBsb2NhbGhvc3Q2LmxvY2FsZG9tYWluNgoxOTIuMTY4LjgwLjEwMSBtYXN0ZXIKMTkyLjE2OC44MC4xMDYgbm9kZTEKMTkyLjE2OC44MC4xMDcgbm9kZTIKMTkyLjE2OC44MC4xMDggbm9kZTMKMTkyLjE2OC44MC4xMDIgY2xpZW50Cg==
+kind: Secret
+metadata:
+  creationTimestamp: 2020-11-22T06:19:43Z
+  name: fil1
+  namespace: default
+  resourceVersion: &quot;477647&quot;
+  selfLink: /api/v1/namespaces/default/secrets/fil1
+  uid: b5f59d68-2c8a-11eb-9e9a-000c292d5d7c
+type: Opaqu
+</code></pre><p>3、命令行方式，创建tls类型的secrets，存储key和证书</p>
+<p>​	生成证书，私钥</p>
+<pre><code>[root@client cm]# (umask 077;openssl genrsa -out nginx.key 2048)
+Generating RSA private key, 2048 bit long modulus
+.........................................................................................+++
+............................+++
+e is 65537 (0x10001)
+
+[root@client cm]# openssl req -new -x509 -key nginx.key -out nginx.crt -subj /C=CN/ST=Beijing/L=Beijing/O=DevOps/CN=www.ilinux.io
+
+</code></pre><p>​	创建为tls类型的secrets</p>
+<pre><code>Usage:
+  kubectl create secret tls NAME --cert=path/to/cert/file --key=path/to/key/file
+[--dry-run] [options]
+
+Use &quot;kubectl options&quot; for a list of global command-line options (applies to all
+commands).
+
+[root@client cm]# kubectl create secret tls nginx-cert --cert=./nginx.crt --key=./nginx.key secret/nginx-cert created
+[root@client cm]# kubectl get secret
+NAME                  TYPE                                  DATA   AGE
+auth-mysql            Opaque                                2      12m
+default-token-q6vpk   kubernetes.io/service-account-token   3      11d
+fil1                  Opaque                                1      7m18s
+nginx-cert            kubernetes.io/tls                     2      6s
+
+注意：key会统计转为tls.key 和 tls.cert
+</code></pre><h3 id="清单式创建"><a href="#清单式创建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:清单式创建" class="headings">清单式创建</a></h3>
+<p>​	同样secret的清单式创建反到不如命令行来的简便，可以用命令创建后再输出为yaml文件，用于留档使用；</p>
+<pre><code>[root@client secret]# vim s1.yaml
+[root@client secret]# cat s1.yaml 
+apiVersion: v1
+kind: Secret
+metadata:
+ name: s1
+stringData:
+ user: wang
+ pass: linux
+type: Opaque
+
+stringdata和data不同的是，后者只能接收base64编码后的键值数据，用户还需手动编码一下；
+
+[root@client secret]# kubectl apply -f s1.yaml 
+secret/s1 created
+[root@client secret]# kubectl get secret s1
+NAME   TYPE     DATA   AGE
+s1     Opaque   2      8s
+[root@client secret]# kubectl get secret s1 -o yaml
+apiVersion: v1
+data:
+  pass: bGludXg=
+  user: d2FuZw==
+kind: Secret
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {&quot;apiVersion&quot;:&quot;v1&quot;,&quot;kind&quot;:&quot;Secret&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;name&quot;:&quot;s1&quot;,&quot;namespace&quot;:&quot;default&quot;},&quot;stringData&quot;:{&quot;pass&quot;:&quot;linux&quot;,&quot;user&quot;:&quot;wang&quot;},&quot;type&quot;:&quot;Opaque&quot;}
+</code></pre><h2 id="secret以存储卷使用"><a href="#secret以存储卷使用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:secret以存储卷使用" class="headings">secret以存储卷使用</a></h2>
+<p>​	secret可以以环境变量和存储卷方式注入到pod中，<strong>但环境变量方式存在安全隐患，如环境变量可能会打印到日志中，被子进程继承，因此推荐采用存储卷方式：</strong></p>
+<p>1、定义pod</p>
+<pre><code>[root@client secret]# vim nginx-with-ssl.yaml
+[root@client secret]# kubectl apply -f nginx-with-ssl.yaml 
+pod/nginx-with-ssl created
+
+[root@client secret]# cat nginx-with-ssl.yaml 
+apiVersion: v1
+kind: Pod
+metadata: 
+ name: nginx-with-ssl
+spec:
+ containers:
+ - name: n1
+   image: nginx:alpine
+   volumeMounts:
+   - name: cert
+     mountPath: /etc/nginx/conf.d/ssl/
+ volumes:
+ - name: cert
+   secret:
+    secretName: nginx-cert
+</code></pre><p>2、查看</p>
+<pre><code>[root@client secret]# kubectl exec nginx-with-ssl -- ls /etc/nginx/conf.d/ssl
+tls.crt
+tls.key
+
+</code></pre><p>3、之后，在configmap中引用该处的证书和私钥，即可完成nginx的https配置</p>
+<h2 id="imagepullsecret"><a href="#imagepullsecret" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:imagepullsecret" class="headings">imagePullSecret</a></h2>
+<p><strong>提供私有仓库的认证信息方式：</strong></p>
+<ul>
+<li>创建docker-registry类型的secret，在pod中引用；</li>
+<li>创建docker-registry类型的secret，然后在service-account引用，此后，所有以该service-account运行的pod都可通过私有仓库认证；</li>
+</ul>
+<p>​	imagePullsecret字段引用了docker-registry类型的secret，用于拉取私有镜像仓库的镜像时提供的认证信息；</p>
+<p>1、创建docker-registry类型的secret</p>
+<pre><code>[root@client secret]# kubectl create secret docker-registry reg1 --docker-username=wang --docker-password=linux --docker-email=wang@gmail.com
+secret/reg1 created
+[root@client secret]# kubectl get secret reg1 -o yaml
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOnsidXNlcm5hbWUiOiJ3YW5nIiwicGFzc3dvcmQiOiJsaW51eCIsImVtYWlsIjoid2FuZ0BnbWFpbC5jb20iLCJhdXRoIjoiZDJGdVp6cHNhVzUxZUE9PSJ9fX0=
+kind: Secret
+metadata:
+  creationTimestamp: 2020-11-22T07:29:36Z
+  name: reg1
+  namespace: default
+  resourceVersion: &quot;483608&quot;
+  selfLink: /api/v1/namespaces/default/secrets/reg1
+  uid: 78f26a73-2c94-11eb-9e9a-000c292d5d7c
+type: kubernetes.io/dockerconfigjson
+[root@client secret]# kubectl get secret reg1
+NAME   TYPE                             DATA   AGE
+reg1   kubernetes.io/dockerconfigjson   1      21s
+
+</code></pre><p>2、在pod时引用即可</p>
+<pre><code>[root@client secret]# cat nginx-with-ssl.yaml 
+apiVersion: v1
+kind: Pod
+metadata: 
+ name: nginx-with-ssl
+spec:
+ imagePullSecrets:
+ - name: reg1
+</code></pre><h1 id="小结"><a href="#小结" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:小结" class="headings">小结：</a></h1>
+<ul>
+<li>总结了配置容器应用的方式：
+<ul>
+<li>定义pod时，定义启动为容器时命令行传参，command和args字段</li>
+<li>定义pod时，定义env环境变量字段，可有entrypoint脚本注入到配置文件中</li>
+<li>配置文件打入镜像</li>
+<li>将节点预先放置的配置文件以普通存储卷挂载给pod</li>
+<li>configmap和secret</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/k8s%E4%B9%8Bconfigmap%E4%B8%8Esecret/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/k8s之configmap与secret/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-12-01 15:34:24 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-12-01</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-12-01</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8Bkubeadm%E9%83%A8%E7%BD%B2%E9%9B%86%E7%BE%A4/" class="related-link">k8s之kubeadm部署集群</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8Bhelm%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8/" class="related-link">k8s之helm包管理器</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8B%E8%B5%84%E6%BA%90%E6%8C%87%E6%A0%87%E4%B8%8Ehpa%E6%8E%A7%E5%88%B6%E5%99%A8/" class="related-link">k8s之资源指标与hpa控制器</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8B%E7%B3%BB%E7%BB%9F%E6%89%A9%E5%B1%95/" class="related-link">k8s之系统扩展</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8Bpod%E8%B5%84%E6%BA%90%E8%B0%83%E5%BA%A6/" class="related-link">k8s之pod资源调度</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/k8s/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>k8s</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/config%E5%92%8Csecret/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>config和secret</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/k8s%E4%B9%8Bstatefulset%E6%8E%A7%E5%88%B6%E5%99%A8/" rel="prev">&lt; k8s之statefulset控制器</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/k8s%E4%B9%8B%E5%AD%98%E5%82%A8%E5%8D%B7/" rel="next">k8s之存储卷 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>lvs的规则管理工具ipvsadm | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="lvs的规则管理工具ipvsadm" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/lvs%E7%9A%84%E8%A7%84%E5%88%99%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7ipvsadm/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-10-20T10:56:48+00:00",
+        "dateModified": "2020-10-20T15:23:13+08:00",
+        "url": "https://latteStudio.github.io/posts/lvs%E7%9A%84%E8%A7%84%E5%88%99%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7ipvsadm/",
+        "headline": "lvs的规则管理工具ipvsadm",
+        "description": "lvs的规则管理工具ipvsadm",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  3048 ,
+        "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary" />
+
+
+    
+
+
+
+<meta property="og:title" content="lvs的规则管理工具ipvsadm" />
+<meta property="og:description" content="lvs的规则管理工具ipvsadm" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/lvs%E7%9A%84%E8%A7%84%E5%88%99%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7ipvsadm/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://latteStudio.github.io/icons/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-10-20T10:56:48&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-20T15:23:13&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">lvs的规则管理工具ipvsadm</h1>
+
+            
+
+            
+                <div class="post-description p-summary">lvs的规则管理工具ipvsadm</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-10-20T10:56:48&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.10.20</time>
+    
+    
+        
+        <time datetime="2020-10-20T15:23:13&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.20</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E6%9C%8D%E5%8A%A1/" class="category-link p-category">负载均衡服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;3048</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;7&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:ipvsadm安装" href="#ipvsadm安装">ipvsadm安装</a></li>
+    <li><a id="contents:ipvsadm语法" href="#ipvsadm语法">ipvsadm语法</a></li>
+    <li><a id="contents:fwm多集群绑定" href="#fwm多集群绑定">FWM多集群绑定</a></li>
+    <li><a id="contents:持久连接" href="#持久连接">持久连接</a></li>
+    <li><a id="contents:ipvs规则持久化" href="#ipvs规则持久化">ipvs规则持久化</a></li>
+    <li><a id="contents:ldirectd健康检测" href="#ldirectd健康检测">ldirectd健康检测</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="用户空间管理工具"><a href="#用户空间管理工具" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:用户空间管理工具" class="headings">用户空间管理工具</a></h1>
+<h2 id="ipvsadm安装"><a href="#ipvsadm安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:ipvsadm安装" class="headings">ipvsadm安装</a></h2>
+<p><strong>yum安装</strong></p>
+<pre><code>[root@host2 ~]# yum install -y ipvsadm
+
+[root@host2 ~]# rpm -ql ipvsadm
+/etc/sysconfig/ipvsadm-config
+#服务脚本参数文件
+/usr/lib/systemd/system/ipvsadm.service
+#服务脚本，开机，加载生效，ipvs规则文件中规则的，文件是：/etc/sysconfig/ipvsadm
+/usr/sbin/ipvsadm
+#规则管理工具
+/usr/sbin/ipvsadm-restore
+#规则恢复工具
+/usr/sbin/ipvsadm-save
+#规则保存工具
+/usr/share/doc/ipvsadm-1.27
+/usr/share/doc/ipvsadm-1.27/README
+/usr/share/man/man8/ipvsadm-restore.8.gz
+/usr/share/man/man8/ipvsadm-save.8.gz
+/usr/share/man/man8/ipvsadm.8.gz
+
+</code></pre><p><strong>编译安装</strong></p>
+<pre><code>1，下载源码包
+ wget http://www.linuxvirtualserver.org/software/kernel-2.6/ipvsadm-1.26.tar.gz
+ 
+2，安装依赖包，共6个
+[root@host3 ipvsadm-1.26]# yum install -y libnl* popt*
+...
+Installed:
+  libnl.x86_64 0:1.1.4-3.el7                    libnl-devel.x86_64 0:1.1.4-3.el7           
+  libnl3-devel.x86_64 0:3.2.28-4.el7            libnl3-doc.x86_64 0:3.2.28-4.el7           
+  popt-devel.x86_64 0:1.13-16.el7               popt-static.x86_64 0:1.13-16.el7
+  
+3，两步走
+[root@host3 ipvsadm-1.26]# make &amp;&amp; make install
+
+4，生成的3个程序文件，1个服务脚本
+和yum安装的相同，少了帮助文档，不影响
+[root@host3 ipvsadm-1.26]# ll /usr/sbin/ipvs*
+-rwxr-xr-x 1 root root 104960 Sep  7 16:36 /usr/sbin/ipvsadm
+-rwxr-xr-x 1 root root    621 Sep  7 16:36 /usr/sbin/ipvsadm-restore
+-rwxr-xr-x 1 root root    791 Sep  7 16:36 /usr/sbin/ipvsadm-save
+[root@host3 ipvsadm-1.26]# ll /etc/init.d/ipvsadm 
+-rwxr-xr-x 1 root root 2423 Sep  7 16:36 /etc/init.d/ipvsadm
+</code></pre><h2 id="ipvsadm语法"><a href="#ipvsadm语法" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:ipvsadm语法" class="headings">ipvsadm语法</a></h2>
+<pre><code>[root@host2 ~]# man ipvsadm
+[root@host2 ~]# ipvsadm --help 
+man手册更详细些
+
+[root@host2 ~]# ipvsadm -h
+ipvsadm v1.27 2008/5/15 (compiled with popt and IPVS v1.2.1)
+Usage:
+  ipvsadm -A|E -t|u|f service-address [-s scheduler] [-p [timeout]] [-M netmask] [--pe persistence_engine] [-b sched-flags]
+  # 添加、修改，tcp|udp|防火墙标记集群，对外地址，调度算法
+  # eg：ipvsadm -A -t 192.168.80.100:80 -s rr
+  
+  ipvsadm -D -t|u|f service-address
+  # 删除一个对外服务
+  ipvsadm -C # 删除 
+  ipvsadm -R # 从文件恢复，等同于ipvsadm-restore
+  ipvsadm -S [-n] # 规则导出到文件，等同于ipvsadm-save
+  ipvsadm -a|e -t|u|f service-address -r server-address [options]
+  # 从某一个对外服务，添加或编译一个后端节点
+  # eg: ipvsadm -a -t 192.168.80.100:80 -r 192.168.80.101:80 -m 
+  
+  ipvsadm -d -t|u|f service-address -r server-address
+  从某个对外服务中，删除一个后端节点
+  ipvsadm -L|l [options]
+  列出当前信息
+  ipvsadm -Z [-t|u|f service-address]
+  ipvsadm --set tcp tcpfin udp
+  ipvsadm --start-daemon state [--mcast-interface interface] [--syncid sid]
+  ipvsadm --stop-daemon state
+  ipvsadm -h
+...
+</code></pre><p>重点选项，参数</p>
+<pre><code>service-address 是lvs对外放开的服务，ip:port
+server-address 是后端节点的地址，ip:port
+
+service-address包含一个或多个server-address
+</code></pre><pre><code>A 添加
+E 修改
+C 删除
+大写操作的是service-address
+a 添加
+e 修改
+c 删除
+小写操作对象是server-address
+</code></pre><p>指定调度算法的选项：10选1</p>
+<pre><code>--scheduler    -s scheduler         one of rr|wrr|lc|wlc|lblc|lblcr|dh|sh|sed|nq,
+</code></pre><p>指定lvs工作模式的选项，三选一：</p>
+<pre><code> --gatewaying   -g                   gatewaying (direct routing) (default)
+  --ipip         -i                   ipip encapsulation (tunneling)
+  --masquerading -m                   masquerading (NAT)
+
+g 默认的直接路由，vs/dr
+i ip隧道，vs/tun
+m nat网络地址转换，vs/nat
+</code></pre><h2 id="fwm多集群绑定"><a href="#fwm多集群绑定" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:fwm多集群绑定" class="headings">FWM多集群绑定</a></h2>
+<p>​	firewall mask，可以给特定的报文流量，打上指定的标签；定义ipvs集群规则时，可以引用该标签，多种报文打上相同的标签，这样引用一个标签，就实现了多个集群的调度规则绑定；</p>
+<p>1、实现httpd的ssl加密</p>
+<pre><code>[root@rs1 ~]# !rpm
+rpm -ql mod_ssl
+/etc/httpd/conf.d/ssl.conf
+/etc/httpd/conf.modules.d/00-ssl.conf
+/usr/lib64/httpd/modules/mod_ssl.so
+/usr/libexec/httpd-ssl-pass-dialog
+/var/cache/httpd/ssl
+[root@rs1 ~]# yum install -y mod_ssl
+# 安装mod_ssl模块，利用其包含的配置文件，模块，自签名证书，实现httpd的ssl加密
+# 安装模块后，直接重启，即可
+
+
+[root@router ~]# curl -k https://192.168.80.102
+rs1:192.168.80.102
+[root@router ~]# curl -k https://192.168.80.103
+rs2:192.168.80.103
+# 浏览器访问
+</code></pre><p>2、没有fwm情况下</p>
+<pre><code>[root@client ~]# curl -k https://192.168.80.200:443
+rs1:192.168.80.102
+[root@client ~]# curl -k https://192.168.80.200:443
+rs2:192.168.80.103
+[root@client ~]# curl 192.168.80.200
+rs2:192.168.80.103
+[root@client ~]# curl 192.168.80.200
+rs1:192.168.80.102
+
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.80.200:80 wlc
+  -&gt; 192.168.80.102:80            Route   1      0          0         
+  -&gt; 192.168.80.103:80            Route   1      0          0         
+TCP  192.168.80.200:443 wlc
+  -&gt; 192.168.80.102:443           Route   1      0          0         
+  -&gt; 192.168.80.103:443           Route   1      0          0     
+  
+  
+# 客户端访问80和443的http以及https，分别需要在lvs上配置2套集群规则，
+# 因为dr模型下，端口无法做映射，客户端访问http的80，只能转给rs的80，同样访问https的443，只能转给rs的443，
+# 因此必须配置2套集群调度规则
+
+</code></pre><p>3、利用FireWallMask实现多集群绑定</p>
+<pre><code># 针对上述请况，可以根据iptables在不同的报文上打上相同的标签，
+# 在ipvs配置集群时，引用此标签，就实现了多个目标端口集群的绑定，用一套ipvs规则即可实现
+# 打标签语法如下
+# mangle表的prerouting链，Number是数字型的标签，自定义
+iptables -t mangle -A PREROUTING -d $vip -p $proto --dport $port -j MARK --set-mark NUMBER 
+</code></pre><pre><code>
+# 对http和https2个端口的流量打上9的标签
+[root@lvs ~]# iptables -t mangle -A PREROUTING -d 192.168.80.200 -p tcp --dport 80 -j MARK --set-mark 9
+[root@lvs ~]# iptables -t mangle -A PREROUTING -d 192.168.80.200 -p tcp --dport 443 -j MARK --set-mark 9
+
+# 定义对外集群服务时，引用标签9定义
+[root@lvs ~]# ipvsadm -A -f 9 
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+FWM  9 wlc
+
+# 添加后端节点，只需要ip即可，端口不用特意指定，因为dr的端口一定是一一对应，后端服务端口确保80和443端口监听即可
+[root@lvs ~]# ipvsadm -a -f 9 -r 192.168.80.102
+[root@lvs ~]# ipvsadm -a -f 9 -r 192.168.80.103
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+FWM  9 wlc
+  -&gt; 192.168.80.102:0             Route   1      0          0         
+  -&gt; 192.168.80.103:0             Route   1      0          0    
+
+</code></pre><p>4、客户端测试</p>
+<pre><code>[root@client ~]# while true;do curl 192.168.80.200;curl -k https://192.168.80.200;sleep 1;done
+rs2:192.168.80.103
+rs1:192.168.80.102
+rs2:192.168.80.103
+rs2:192.168.80.103
+
+#看到，不管是http还是https，可以通过带标签的一套ipvs集群规则实现调度！
+</code></pre><h2 id="持久连接"><a href="#持久连接" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:持久连接" class="headings">持久连接</a></h2>
+<p>​	在不考虑sh调度算法的情况下，lvs是对每连接进行调度的，在rr算法下，即便同一个客户端过来的连接，都会被轮询调度，这样不利于会话的保持，</p>
+<p>​	因此，lvs设置了持久连接，无论使用哪种调度算法，哪怕算法采用的是wrr轮询，只要设置了持久连接，那么在一段时间内，默认360s，相同客户端再发来的连接，不会按照wrr调度，而是会调度到同一台rs上，方便会话保持，</p>
+<p>port Affinity：
+每端口持久：每个端口对应定义为一个集群服务，每集群服务单独调度；
+每防火墙标记持久：基于防火墙标记定义集群服务；可实现将多个端口上的应用统一调度，即所谓的port Affinity；
+每客户端持久：基于0端口定义集群服务，即将客户端对所有应用的请求统统调度至后端主机，必须定义为持久模式；</p>
+<p>1、配置会话保持规则</p>
+<pre><code>[root@lvs ~]# ipvsadm -A -t 192.168.80.200:443
+[root@lvs ~]# ipvsadm -E -t 192.168.80.200:443 -p
+# 加个-p选项即可，默认是360s
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.80.200:443 wlc persistent 360
+
+</code></pre><p>2、添加后端节点</p>
+<pre><code>[root@lvs ~]# ipvsadm -a -t 192.168.80.200:443 -r 192.168.80.102:443 
+[root@lvs ~]# ipvsadm -a -t 192.168.80.200:443 -r 192.168.80.103:443 
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.80.200:443 wlc persistent 360
+  -&gt; 192.168.80.102:443           Route   1      0          0         
+  -&gt; 192.168.80.103:443           Route   1      0          0      
+</code></pre><p>3、客户端访问，发现360s后，访问才变，</p>
+<pre><code>[root@client ~]# while true;do curl -k https://192.168.80.200;sleep 1;done
+rs2:192.168.80.103
+rs2:192.168.80.103
+rs2:192.168.80.103
+... 360s后
+rs1:192.168.80.102
+
+</code></pre><h2 id="ipvs规则持久化"><a href="#ipvs规则持久化" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:ipvs规则持久化" class="headings">ipvs规则持久化</a></h2>
+<p>通过ipvsadm命令行配置的ipvs默认重启后会丢失，持久化需要保存到配置文件当中：过程如下：</p>
+<p>1、保存到配置文件</p>
+<pre><code>ipvsadm -S /path/to/file
+ipvsadm-save &gt; /path/to/file
+# 2者等效，文件路径，建议/etc/sysconfig/ipvsadm，在enable了ipvsadm服务脚本后，会自动读取该配置文件，实现ipvs开机加载规则
+
+ipvsadm -R /path/to/file
+ipvsadm-restore &lt; /path/to/file
+# 手动恢复，
+</code></pre><p>2、enable ipvsadm的服务脚本</p>
+<pre><code>systemctl enable ipvsadm.service
+</code></pre><p>3、重启后，发现规则仍然存在，</p>
+<pre><code>[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.80.200:443 wrr
+  -&gt; 192.168.80.102:443           Route   1      0          0         
+  -&gt; 192.168.80.103:443           Route   1      0          0         
+
+</code></pre><h2 id="ldirectd健康检测"><a href="#ldirectd健康检测" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:ldirectd健康检测" class="headings">ldirectd健康检测</a></h2>
+<p>​	lvs默认不会监测后端节点的健康性，并进行动态的摘除，或恢复上线，因此需要结合其他工具，辅助完成后端节点的健康性监测，实现方法有：</p>
+<ul>
+<li>自定义脚本，<strong>如脚本循环探测后端web的某页面，发现失败时，调用ipvsadm命令进行节点的摘除，恢复时，进行节点的重新上线</strong></li>
+<li>ldirectd程序，Daemon to monitor remote services and control Linux Virtual Server. ldirectord is a daemon to monitor and administer real servers in a cluster of load balanced virtual servers. ldirectord typically is started from heartbeat but can also be run from the command line.</li>
+</ul>
+<p>1、下载rpm包</p>
+<pre><code>[root@lvs ~]# wget  http://download.opensuse.org/repositories/network:/ha-clustering:/Stable/CentOS_CentOS-7/x86_64/ldirectord-3.9.6-0rc1.1.2.x86_64.rpm
+
+[root@lvs ~]# yum localinstall -y ldirectord-3.9.6-0rc1.1.2.x86_64.rpm 
+
+会安装一些依赖包
+</code></pre><p>2、包中文件</p>
+<pre><code>[root@lvs ~]# rpm -qpl ldirectord-3.9.6-0rc1.1.2.x86_64.rpm 
+warning: ldirectord-3.9.6-0rc1.1.2.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID 17280ddf: NOKEY
+/etc/ha.d
+/etc/ha.d/resource.d
+/etc/ha.d/resource.d/ldirectord # 配置文件
+/etc/logrotate.d/ldirectord
+/usr/lib/ocf/resource.d/heartbeat/ldirectord 
+/usr/lib/systemd/system/ldirectord.service # 服务脚本
+/usr/sbin/ldirectord # 主程序
+/usr/share/doc/ldirectord-3.9.6
+/usr/share/doc/ldirectord-3.9.6/COPYING
+/usr/share/doc/ldirectord-3.9.6/ldirectord.cf # 配置模版
+/usr/share/man/man8/ldirectord.8.gz
+
+[root@lvs ~]# cp /usr/share/doc/ldirectord-3.9.6/ldirectord.cf /etc/ha.d/
+[root@lvs ~]# 
+# 将模版配置文件，放在配置目录下
+</code></pre><p>3、lvs准备sorry server页面</p>
+<p>​	用于所有rs挂掉时，响应的错误页面，可以单独准备，也可以lvs自己准备</p>
+<pre><code>
+[root@lvs ~]# yum install -y httpd
+[root@lvs ~]# echo &quot;sorry server&quot; &gt; /var/www/html/index.html
+[root@lvs ~]# systemctl start httpd
+</code></pre><p>4、修改配置文件</p>
+<pre><code>[root@lvs ~]# vim /etc/ha.d/ldirectord.cf
+...
+virtual=192.168.80.200:80
+        real=192.168.80.102:80 gate
+        real=192.168.80.103:80 gate
+        fallback=127.0.0.1:80 gate
+        service=http
+        scheduler=rr
+        #persistent=600
+        #netmask=255.255.255.255
+        protocol=tcp
+        checktype=negotiate
+        checkport=80
+        request=&quot;index.html&quot;
+ # 在模版基础之上，修改即可，会根据信息，自动生成ipvs规则，
+ # 但lvs的vip仍需要手动配置
+ 
+ [root@lvs ~]# ipvsadm -C
+ [root@lvs ~]# ip addr add 192.168.80.200/32 dev lo:1
+# 清除所有规则，lvs的vip还需要手动配置
+
+[root@lvs ~]# systemctl start ldirectord
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.80.200:80 rr
+  -&gt; 192.168.80.102:80            Route   1      0          3         
+  -&gt; 192.168.80.103:80            Route   1      0          15 
+# 启动ldirectd，查看生成的ipvs规则
+</code></pre><p>5、访问测试</p>
+<pre><code>[root@rs1 ~]# systemctl stop httpd
+# rs1停止之后，调度自动切换，只调度到rs2上
+
+[root@client ~]# while true;do curl http://192.168.80.200;sleep 1;done
+rs2:192.168.80.103
+rs1:192.168.80.102
+rs2:192.168.80.103
+rs1:192.168.80.102
+rs2:192.168.80.103
+rs2:192.168.80.103
+
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.80.200:80 rr
+  -&gt; 192.168.80.103:80            Route   1      0          10   
+ # ipvs规则，自动将rs1摘除
+ # 重新启动
+ 
+ 
+ # 2个都停止，这时sorry server就会提供服务；
+ rs1:192.168.80.102
+rs2:192.168.80.103
+curl: (7) Failed connect to 192.168.80.200:80; Connection refused
+rs2:192.168.80.103
+rs2:192.168.80.103
+rs2:192.168.80.103
+rs2:192.168.80.103
+rs2:192.168.80.103
+curl: (7) Failed connect to 192.168.80.200:80; Connection refused
+sorry server
+sorry server
+sorry server
+</code></pre>
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/lvs%E7%9A%84%E8%A7%84%E5%88%99%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7ipvsadm/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/lvs的规则管理工具ipvsadm/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-20 15:23:13 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-20</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-20</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/keepalived%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0lvs%E9%AB%98%E5%8F%AF%E7%94%A8/" class="related-link">keepalived配置实现lvs高可用</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0/" class="related-link">lvs的四种工作模型实现</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E7%9A%8410%E7%A7%8D%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" class="related-link">lvs的10种调度算法</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/" class="related-link">lvs的四种工作模型介绍</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E4%B8%8E%E9%9B%86%E7%BE%A4%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5%E4%BB%8B%E7%BB%8D/" class="related-link">lvs与集群相关概念介绍</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/lvs/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>lvs</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/ipvsadm/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>ipvsadm</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0/" rel="prev">&lt; lvs的四种工作模型实现</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/lvs%E7%9A%8410%E7%A7%8D%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" rel="next">lvs的10种调度算法 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>lvs的四种工作模型实现 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="lvs的四种工作模型实现" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-10-20T14:40:49+00:00",
+        "dateModified": "2020-10-20T15:28:38+08:00",
+        "url": "https://latteStudio.github.io/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0/",
+        "headline": "lvs的四种工作模型实现",
+        "description": "lvs的四种工作模型实现",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  9103 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20200908142343845.png","https://gitee.com/boogie96/img/raw/master/img/image-20200909110638440.png","https://gitee.com/boogie96/img/raw/master/img/image-20200909180855803.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="lvs的四种工作模型实现" />
+<meta property="og:description" content="lvs的四种工作模型实现" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20200908142343845.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-10-20T14:40:49&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-20T15:28:38&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">lvs的四种工作模型实现</h1>
+
+            
+
+            
+                <div class="post-description p-summary">lvs的四种工作模型实现</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-10-20T14:40:49&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.10.20</time>
+    
+    
+        
+        <time datetime="2020-10-20T15:28:38&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.20</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E6%9C%8D%E5%8A%A1/" class="category-link p-category">负载均衡服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;9103</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;19&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:实验环境" href="#实验环境">实验环境</a></li>
+    <li><a id="contents:准备配置" href="#准备配置">准备配置</a></li>
+    <li><a id="contents:配置vsnat" href="#配置vsnat">配置vs/nat</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:arp相关内核参数" href="#arp相关内核参数">arp相关内核参数</a>
+      <ol>
+        <li><a id="contents:arp_ingore" href="#arp_ingore">arp_ingore</a></li>
+        <li><a id="contents:arp_announce" href="#arp_announce">arp_announce</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:vipdiprip同网段" href="#vipdiprip同网段">vip、dip、rip同网段</a>
+      <ol>
+        <li><a id="contents:简单总结" href="#简单总结">简单总结</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:vipdiprip不同网段" href="#vipdiprip不同网段">vip、dip、rip不同网段</a>
+      <ol>
+        <li><a id="contents:注意点" href="#注意点">注意点</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:vs和rs配置参考脚本" href="#vs和rs配置参考脚本">vs和rs配置参考脚本</a></li>
+    <li><a id="contents:arp抓包分析" href="#arp抓包分析">arp抓包分析</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:dr时" href="#dr时">dr时</a></li>
+    <li><a id="contents:tun时" href="#tun时">tun时</a></li>
+    <li><a id="contents:总结" href="#总结">总结</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="vsnat"><a href="#vsnat" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:vsnat" class="headings">vs/nat</a></h1>
+<h2 id="实验环境"><a href="#实验环境" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:实验环境" class="headings">实验环境</a></h2>
+<ul>
+<li>客户端：
+<ul>
+<li>cip：192.168.10.100：eth1</li>
+</ul>
+</li>
+<li>lvs：
+<ul>
+<li>vip：192.168.10.101：eth1</li>
+<li>dip：192.168.80.101：eth0</li>
+</ul>
+</li>
+<li>rs1：
+<ul>
+<li>rip：192.168.80.102：eth0</li>
+</ul>
+</li>
+<li>rs2：
+<ul>
+<li>rip：192.168.80.103：eth0</li>
+</ul>
+</li>
+</ul>
+<p>lvs共计2块网卡，一块对外，和客户端处于一个局域网，一块对内，和2个realserver组成一个局域网；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200908142343845.png" alt="image-20200908142343845"></p>
+<h2 id="准备配置"><a href="#准备配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:准备配置" class="headings">准备配置</a></h2>
+<ol>
+<li>lvs对客户端和对realserver都能通信，</li>
+<li>先配置客户端和2个realserver可以通过指向网关为lvs，实现通信</li>
+<li>客户端和2个realserver不能直接相互访问</li>
+</ol>
+<p>1、lvs对客户端和对realserver都能通信</p>
+<p>​	添加对应网卡后，保持默认即可，lvs有2块网卡分别和2个不同局域网通信；</p>
+<p>2、先配置客户端和2个realserver可以通过指向网关为lvs，实现通信</p>
+<p><strong>lvs连接2个网段，开启转发功能后，使得变成路由器的角色，而两端又配置了去往对方网段的路由，本例是将默认路由指向了lvs，lvs负责2个网段的转发，数据包有去有回，从而实现了互通</strong></p>
+<p>rs1和rs2添加默认路由，指向lvs的80.101地址</p>
+<pre><code>[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+#默认是有一条指向vmvare workstation的网关路由；
+
+[root@rs2 ~]# route add default gw 192.168.80.101
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+# 添加指向101地址的路由
+
+
+#rs1同理
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs1 ~]# route add default gw 192.168.80.101
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+</code></pre><p>客户端添加默认路由指向lvs的10.101，</p>
+<pre><code>[root@client ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.10.101  0.0.0.0         UG    0      0        0 eth1
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+[root@client ~]# route add default gw 192.168.10.101
+
+</code></pre><p>lvs上开启路由转发，</p>
+<pre><code>[root@lvs ~]# echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+</code></pre><p>客户端此时，能访问rs1和rs2，rs也能访问客户端</p>
+<pre><code>[root@client ~]# ping 192.168.80.103
+PING 192.168.80.103 (192.168.80.103) 56(84) bytes of data.
+64 bytes from 192.168.80.103: icmp_seq=5 ttl=63 time=0.987 ms
+64 bytes from 192.168.80.103: icmp_seq=6 ttl=63 time=1.20 ms
+
+</code></pre><p>3、客户端和2个realserver不能直接相互访问</p>
+<p>客户端，和rs分别删除默认路由；此时2端分别只能访问自己本网段地址，非本网段的由于没有对应的路由信息，和默认路由，<strong>一律网络不可达</strong></p>
+<pre><code>[root@client ~]# route del default gw 192.168.10.101
+[root@client ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+[root@client ~]# ping 192.168.80.103
+connect: Network is unreachable
+# 客户端
+
+[root@rs2 ~]# route del default gw 192.168.80.101
+[root@rs2 ~]# route del default gw 192.168.80.2
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs2 ~]# ping 192.168.10.100
+connect: Network is unreachable
+# rs2
+
+
+[root@rs1 ~]# route del default gw 192.168.80.101
+[root@rs1 ~]# route del default gw 192.168.80.2
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs1 ~]# ping 192.168.10.100
+connect: Network is unreachable
+# rs1
+
+</code></pre><p>此时客户端无法直接访问rs了，只有10本网段的地址可达，此时客户端只能访问lvs的地址</p>
+<pre><code>[root@client ~]# ping 192.168.80.103
+connect: Network is unreachable
+[root@client ~]# ping 192.168.80.102
+connect: Network is unreachable
+
+[root@client ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+
+</code></pre><h2 id="配置vsnat"><a href="#配置vsnat" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:配置vsnat" class="headings">配置vs/nat</a></h2>
+<ol>
+<li>lvs服务器：
+<ol>
+<li>启用ipvs模块，（默认已启用）</li>
+<li>安装ipvsadm管理命令</li>
+<li><strong>lvs服务器上开启ip_forward</strong></li>
+</ol>
+</li>
+<li>rs服务器
+<ol>
+<li>安装httpd</li>
+<li>写入不同主页，并启动</li>
+<li><strong>网关指向lvs的dip地址，</strong></li>
+</ol>
+</li>
+<li>lvs服务器
+<ol>
+<li>配置ipvs规则，</li>
+<li>对外开放10.101的80端口服务</li>
+<li>添加后端2个rs节点，做realsever</li>
+</ol>
+</li>
+<li>客户端访问lvs的10.101的80端口</li>
+</ol>
+<p><strong>1、检查ipvs模块是否启用，安装ipvsadm命令</strong></p>
+<p>yum install -y ipvsadm即可
+也可编译安装，参见ipvsadm编译安装</p>
+<pre><code>[root@lvs ~]# ll /usr/lib/modules/3.10.0-862.el7.x86_64/kernel/net/netfilter/ipvs/
+total 112
+-rw-r--r--. 1 root root  2160 Apr 21  2018 ip_vs_dh.ko.xz
+-rw-r--r--. 1 root root  4084 Apr 21  2018 ip_vs_ftp.ko.xz
+-rw-r--r--. 1 root root 59100 Apr 21  2018 ip_vs.ko.xz
+-rw-r--r--. 1 root root  3952 Apr 21  2018 ip_vs_lblc.ko.xz
+-rw-r--r--. 1 root root  4740 Apr 21  2018 ip_vs_lblcr.ko.xz
+-rw-r--r--. 1 root root  1728 Apr 21  2018 ip_vs_lc.ko.xz
+-rw-r--r--. 1 root root  1752 Apr 21  2018 ip_vs_nq.ko.xz
+-rw-r--r--. 1 root root  2972 Apr 21  2018 ip_vs_pe_sip.ko.xz
+-rw-r--r--. 1 root root  1928 Apr 21  2018 ip_vs_rr.ko.xz
+-rw-r--r--. 1 root root  1740 Apr 21  2018 ip_vs_sed.ko.xz
+-rw-r--r--. 1 root root  2532 Apr 21  2018 ip_vs_sh.ko.xz
+-rw-r--r--. 1 root root  1760 Apr 21  2018 ip_vs_wlc.ko.xz
+-rw-r--r--. 1 root root  2508 Apr 21  2018 ip_vs_wrr.ko.xz
+#ipvs模块位置；
+
+[root@lvs ~]# rpm -ql ipvsadm
+/etc/sysconfig/ipvsadm-config
+/usr/lib/systemd/system/ipvsadm.service
+/usr/sbin/ipvsadm
+/usr/sbin/ipvsadm-restore
+/usr/sbin/ipvsadm-save
+/usr/share/doc/ipvsadm-1.27
+/usr/share/doc/ipvsadm-1.27/README
+/usr/share/man/man8/ipvsadm-restore.8.gz
+/usr/share/man/man8/ipvsadm-save.8.gz
+/usr/share/man/man8/ipvsadm.8.gz
+#ipvsadm软件包文件列表
+</code></pre><p><strong>2、准备rs</strong></p>
+<pre><code>  159  yum install -y httpd
+  160  echo rs2:192.168.80.103 &gt; /var/www/html/index.html
+  161  systemctl start httpd
+  
+  
+  501  yum install -y httpd
+  502  echo rs1:192.168.80.102 &gt; /var/www/html/index.html 
+  504  systemctl start httpd
+  
+  
+[root@lvs ~]# curl 192.168.80.102
+rs1:192.168.80.102
+[root@lvs ~]# curl 192.168.80.103
+rs2:192.168.80.103
+#lvs访问测试成功
+</code></pre><p><strong>3、配置ipvs规则</strong></p>
+<pre><code>
+[root@lvs ~]# ipvsadm -C
+# 清空规则，防止干扰
+[root@lvs ~]# ipvsadm -A -t 192.168.10.101:80 -s wrr
+# 添加一个对外服务，算法选择为wrr，加权轮询，服务在本机vip地址的80端口
+
+[root@lvs ~]# ipvsadm -L
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  lvs:http wrr
+# 看到已经添加了一个tcp的http的服务，算法为wrr
+
+
+[root@lvs ~]# ipvsadm -a -t 192.168.10.101:80 -r 192.168.80.102:80 -m -w 2
+[root@lvs ~]# ipvsadm -a -t 192.168.10.101:80 -r 192.168.80.103:80 -m -w 3
+# 添加2个rs，
+# a为添加 t是tcp协议 m是nat模式，w指定权重
+
+[root@lvs ~]# ipvsadm -L
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  lvs:http wrr
+  -&gt; 192.168.80.102:http          Masq    2      0          0         
+  -&gt; 192.168.80.103:http          Masq    3      0          0    
+# 可以看到一个对外服务，及其后端真实的rs服务器
+</code></pre><p><strong>注意：</strong></p>
+<ol>
+<li>实验时：lvs上忘记了开启ip_forward</li>
+<li>rs上忘记了配置网关为lvs的dip</li>
+<li>所以客户端访问不通！<strong>因为vs/nat需要lvs做nat，转发，rs处理后需要将数据发给网关即lvs的dip地址</strong></li>
+<li>补充如下：</li>
+</ol>
+<pre><code>[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs2 ~]# route add default gw 192.168.80.101
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs1 ~]# route add default gw 192.168.80.101
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+[root@lvs ~]# echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+[root@lvs ~]# cat /proc/sys/net/ipv4/ip_forward
+1
+</code></pre><p><strong>4、客户端访问</strong></p>
+<pre><code>[root@client ~]# curl 192.168.10.101
+rs1:192.168.80.102
+[root@client ~]# curl 192.168.10.101
+rs2:192.168.80.103
+[root@client ~]# curl 192.168.10.101
+rs1:192.168.80.102
+[root@client ~]# curl 192.168.10.101
+rs2:192.168.80.103
+[root@client ~]# curl 192.168.10.101
+rs2:192.168.80.103
+[root@client ~]# curl 192.168.10.101
+rs1:192.168.80.102
+#成功实现调度，比例约为2:3
+</code></pre><p><strong>查看lvs状态信息</strong></p>
+<pre><code>[root@lvs ~]# ipvsadm -Ln --stats
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port               Conns   InPkts  OutPkts  InBytes OutBytes
+  -&gt; RemoteAddress:Port
+TCP  192.168.10.101:80                  15       84       48     5496     5712
+  -&gt; 192.168.80.102:80                   6       31       20     2050     2380
+  -&gt; 192.168.80.103:80                   9       53       28     3446     3332
+
+</code></pre><p><strong>vs/nat实现！</strong></p>
+<h1 id="vstun"><a href="#vstun" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:vstun" class="headings">vs/tun</a></h1>
+<h1 id="vsdr"><a href="#vsdr" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:vsdr" class="headings">vs/dr</a></h1>
+<h2 id="arp相关内核参数"><a href="#arp相关内核参数" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:arp相关内核参数" class="headings">arp相关内核参数</a></h2>
+<p>​	arp过程中，请求方请求一个ip对应的mac，同时包中填入自己的源ip和源mac，这一对，会被接收方缓存，接收方收到后，发现自己有对方所请求的ip，于是，将自己的ip和mac填入响应包，单播给请求端，<strong>想当然的以为，ip和mac一定对应，即ip所在的接口和接口mac一对一对应，其实不然，ip和mac不必对应，尤其是一台主机有多个接口，多个ip，还有lo接口的情况下</strong></p>
+<p>​	<strong>arp_ingore决定了回应arp包时，用自己的哪个ip，哪个mac填包，</strong></p>
+<p>​	<strong>arp_announce决定了发arp请求时，用自己的哪个ip，哪个mac填包</strong></p>
+<p>​	dr模型下，lvs和rs同处于一个物理网段，在lvs和多个rs都配置了vip的情况下，同个网段多个vip，那么arp广播时，就会导致冲突！</p>
+<p>​	解决办法：</p>
+<ul>
+<li>前端如router静态绑定，将lvs的某个接口mac和vip静态绑定，写在router的arp表里，但不够灵活</li>
+<li>每个rs上，使用arptables</li>
+<li>每个rs上，修改内核参数，使得rs对vip这个地址，的arp回应和通告做一定限制（常用）</li>
+</ul>
+<h3 id="arp_ingore"><a href="#arp_ingore" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:arp_ingore" class="headings">arp_ingore</a></h3>
+<ul>
+<li>默认是0；</li>
+<li>改为1，表示，仅在arp请求的ip，正好配置在该arp广播进来的接口上时，才回应；
+<ul>
+<li>eg：rs2从eth0接口收到了arp广播，发现请求的是80.200，但是80.200配置的是自己的lo接口，</li>
+<li>所以不回应该arp广播</li>
+<li>其他rs一样</li>
+<li>此时只有lvs可以回应，解决了多个vip冲突问题</li>
+</ul>
+</li>
+</ul>
+<h3 id="arp_announce"><a href="#arp_announce" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:arp_announce" class="headings">arp_announce</a></h3>
+<ul>
+<li>默认是0</li>
+<li>尽量避免将接口信息向非直连网络进行通告</li>
+<li>必须避免将接口信息向非本网络进行通告</li>
+</ul>
+<p>一般rs上：arp_ingore设置为1，arp_announce设置为2，还原时，重新设置为0即可</p>
+<pre><code>ip neigh flush all 
+清理所有arp缓存
+
+[root@router ~]# ll /proc/sys/net/ipv4/conf/
+total 0
+dr-xr-xr-x 1 root root 0 Sep  9 15:23 all
+dr-xr-xr-x 1 root root 0 Sep  9 15:23 default
+dr-xr-xr-x 1 root root 0 Sep  9 15:27 eth0
+dr-xr-xr-x 1 root root 0 Sep  9 15:27 eth1
+dr-xr-xr-x 1 root root 0 Sep  9 15:27 lo
+[root@router ~]# 
+all和lo接口都要同时设置
+</code></pre><h2 id="vipdiprip同网段"><a href="#vipdiprip同网段" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:vipdiprip同网段" class="headings">vip、dip、rip同网段</a></h2>
+<p>1、准备实验拓扑如下，准备基础网络环境</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200909110638440.png" alt="image-20200909110638440"></p>
+<p>根据网络拓扑，配置基础路由，ip</p>
+<pre><code>#client:
+[root@client ~]# route add default gw 192.168.10.101
+[root@client ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.10.101  0.0.0.0         UG    0      0        0 eth1
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+
+
+#router
+# 连接2个网段，开启路由转发，充当router
+[root@router ~]# cat /proc/sys/net/ipv4/ip_forward
+0
+[root@router ~]# echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+[root@router ~]# cat /proc/sys/net/ipv4/ip_forward
+1
+[root@router ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+
+# rs1
+# rs都删除默认的vnet8的默认路由，并指向80.101为默认路由
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs1 ~]# route del default gw 192.168.80.2
+[root@rs1 ~]# route add default gw 192.168.80.101
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+
+# rs2
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs2 ~]# route del default gw 192.168.80.2
+[root@rs2 ~]# route add default gw 192.168.80.101
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+# lvs
+# lvs只有一个dip，目前，网关也指向了router的80.101
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@lvs ~]# route del default gw 192.168.80.2
+[root@lvs ~]# route add default gw 192.168.80.101
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+</code></pre><p>2、lvs配置vip</p>
+<pre><code>[root@lvs ~]# ip addr add 192.168.80.200/32 dev eth0
+
+
+[root@lvs ~]# ip a
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 00:0c:29:55:b3:ea brd ff:ff:ff:ff:ff:ff
+    inet 192.168.80.104/24 brd 192.168.80.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 192.168.80.200/32 scope global eth0
+       valid_lft forever preferred_lft forever
+
+
+# router可以ping通此时lvs上的vip
+[root@router ~]# ping 192.168.80.200
+PING 192.168.80.200 (192.168.80.200) 56(84) bytes of data.
+64 bytes from 192.168.80.200: icmp_seq=1 ttl=64 time=0.915 ms
+
+</code></pre><p>3、2个rs配置vip，arp相关参数，</p>
+<p>​	配置脚本如下：</p>
+<pre><code>根据需求，修改vip即可，start是启用，stop直接清空配置
+此脚本，可方便实现rs的上线、下线
+
+[root@rs2 ~]# cat lvs 
+#!/bin/bash
+#
+vip=192.168.80.200
+mask='255.255.255.255'
+case $1 in
+start)
+	echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+	echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+	echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+	echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+	ifconfig lo:0 $vip netmask $mask broadcast $vip up
+	route add -host $vip dev lo:0
+	;;
+stop)
+	ifconfig lo:0 down
+	echo 0 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+	echo 0 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+	echo 0 &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+	echo 0 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+	;;
+*) 
+	echo &quot;Usage $(basename $0) start|stop&quot;
+	exit 1
+	;;
+esac
+</code></pre><p>4、lvs配置ipvs规则</p>
+<pre><code>[root@lvs ~]# ipvsadm -C
+[root@lvs ~]# ipvsadm -A -t 192.168.80.200:80 -g
+Illegal 'forwarding-method' option with the 'add-service' command
+[root@lvs ~]# ipvsadm -A -t 192.168.80.200:80
+[root@lvs ~]# ipvsadm -L
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  lvs:http wlc
+[root@lvs ~]# ipvsadm -a -t 192.168.80.200:80 -r 192.168.80.102:80 -g
+[root@lvs ~]# ipvsadm -a -t 192.168.80.200:80 -r 192.168.80.103:80 -g
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  192.168.80.200:80 wlc
+  -&gt; 192.168.80.102:80            Route   1      0          0         
+  -&gt; 192.168.80.103:80            Route   1      0          0         
+
+</code></pre><p>5、客户端访问测试</p>
+<pre><code># 一开始失败，用客户端直接ping rs时不通，排查发现有去程的默认路由，router也开启了转发，再排查到rs，发现rs没有了回10网段的路由，默认路由又重新指向了vnet8的80.2
+# 同时多了一条主机ip路由80.200指向自己的环回口，
+# 应该是配置vip到自己的lo接口时影响了默认路由？
+# 重新指向80.101后，成功，此时客户端能ping通rs直接，
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+192.168.80.200  0.0.0.0         255.255.255.255 UH    0      0        0 lo
+[root@rs2 ~]# route add default gw 192.168.80.101
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+192.168.80.200  0.0.0.0         255.255.255.255 UH    0      0        0 lo
+
+# 再次向lvs的vip请求
+# 成功
+[root@client ~]# curl 192.168.80.200
+rs1:192.168.80.102
+[root@client ~]# curl 192.168.80.200
+rs2:192.168.80.103
+[root@client ~]# curl 192.168.80.200
+rs1:192.168.80.102
+[root@client ~]# curl 192.168.80.200
+rs2:192.168.80.103
+</code></pre><p><strong>注意点：</strong></p>
+<p>​	lvs要配置网关，且可以指定一个同网段，不存在的地址，</p>
+<p>​	原因</p>
+<pre><code>[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+...
+rs2:192.168.80.103
+curl: (7) Failed connect to 192.168.80.200:80; Connection timed out
+# 没有网关时，客户端是curl不通vip的，循环会中断
+
+
+[root@lvs ~]# route add default gw 192.168.80.222
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.222  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@client ~]# while true; do curl 192.168.80.200;  sleep 1;done;
+rs2:192.168.80.103
+rs1:192.168.80.102
+
+# 有网关时，客户端curl才通，循环继续
+
+
+# 原因：lvs看似只接收客户端的建立连接的握手包，但是，若没有默认网关，当它接收到来自10网段的数据包时，比对路由信息，发现自己只有本80网段的路由，对10网段一无所知，没有相关路由，也没有默认路由，就认为自己处理不了，于是直接丢弃，不再处理，于是客户端无法curl通；
+# 所以一定给lvs配置一个默认网关，指向相同网段，即便是一个不存在的地址
+</code></pre><h3 id="简单总结"><a href="#简单总结" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:简单总结" class="headings">简单总结</a></h3>
+<ol>
+<li>完成网络拓扑的构建，基础路由，ip的规划，实际中网络结构一般由网络工程师完成</li>
+<li>lvs上：
+<ol>
+<li>配置vip，dip，</li>
+<li>vip一般就配置在lo接口或lo别名接口，32位掩码，lo接口必须是32位掩码</li>
+<li>vip也可配置在物理接口上，32位或和dip同位掩码都可以</li>
+<li>无需arp相关参数设置</li>
+<li>无需ip_forward开启</li>
+<li>lvs也要配置合适的路由；</li>
+</ol>
+</li>
+<li>rs上：
+<ol>
+<li>vip配置在lo接口，或lo接口的别名接口，</li>
+<li>vip是32位掩码</li>
+<li>/proc/sys/net/ipv4/conf/{all,lo}/arp_ingore设置为1，还原是设置为0</li>
+<li>/proc/sys/net/ipv4/conf/{all,lo}/arp_announce设置为2，还原是设置为0</li>
+<li>指向自己的默认网关，不执向lvs</li>
+</ol>
+</li>
+<li>lvs配置规则</li>
+<li>客户端访问</li>
+</ol>
+<h2 id="vipdiprip不同网段"><a href="#vipdiprip不同网段" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:vipdiprip不同网段" class="headings">vip、dip、rip不同网段</a></h2>
+<p>1、准备网络拓扑环境如下图，配置基础路由，ip信息</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200909180855803.png" alt="image-20200909180855803"></p>
+<p><strong>客户端</strong></p>
+<pre><code>root@client ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.10.101  0.0.0.0         UG    0      0        0 eth1
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+# 只剩直连10网段的路由，默认路由指向10.101
+</code></pre><p><strong>router</strong></p>
+<pre><code>[root@router ~]# route del default gw 192.168.80.2
+[root@router ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+[root@router ~]# echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+# 只剩下2个网络的直连路由，
+# 开启ip_forward
+</code></pre><p><strong>lvs</strong></p>
+<pre><code>[root@lvs ~]# route del default gw 192.168.80.2
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+# 目前只有dip，一条直连路由
+</code></pre><p><strong>rs1、rs2：</strong></p>
+<pre><code>[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+0.0.0.0         192.168.80.2    0.0.0.0         UG    102    0        0 eth2
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth2
+[root@rs1 ~]# ifconfig eth1 donw
+^C
+[root@rs1 ~]# ifconfig eth1 down
+[root@rs1 ~]# ifconfig eth1 down
+[root@rs1 ~]# ifconfig eth2 down
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs1 ~]# route del default gw 192.168.80.2
+[root@rs1 ~]# route add default gw 192.168.80.101
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs1 ~]# 
+
+# 删除原来默认路由，添加一条默认路由指向80.101
+# 禁用其他无关网卡，
+# 只剩下80网段的直连路由，和指向80.101的默认路由
+
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs2 ~]# ifconfig eth1 down
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs2 ~]# route del default gw 192.168.80.2
+[root@rs2 ~]# route del default gw 192.168.80.101
+SIOCDELRT: No such process
+[root@rs2 ~]# route add default gw 192.168.80.101
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+# 同rs1
+
+</code></pre><p>2、lvs配置vip</p>
+<pre><code>[root@lvs ~]# ip addr add 10.0.0.100/8 dev eth0
+[root@lvs ~]# ip a
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 00:0c:29:55:b3:ea brd ff:ff:ff:ff:ff:ff
+    inet 192.168.80.104/24 brd 192.168.80.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.100/8 scope global eth0
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.0.0.0       U     0      0        0 eth0
+
+# lvs的eth0上，加上10.0.0.100/8的vip，和dip不同网段；
+# 配置后，多出一条直连路由
+</code></pre><p>3、rs配置vip和arp内核参数</p>
+<pre><code># 修改rs配置脚本，改一下vip和掩码，和lvs的vip一致
+[root@rs1 ~]# cat lvs-dr-rs 
+#!/bin/bash
+#
+vip=10.0.0.100
+mask='255.0.0.0'
+case $1 in
+start)
+	echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+	echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+	echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+	echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+	ifconfig lo:0 $vip netmask $mask broadcast $vip up
+	route add -host $vip dev lo:0
+	;;
+stop)
+	ifconfig lo:0 down
+	echo 0 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+	echo 0 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+	echo 0 &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+	echo 0 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+	;;
+*) 
+	echo &quot;Usage $(basename $0) start|stop&quot;
+	exit 1
+	;;
+esac
+
+# 每个rs上，执行脚本，
+# 发现vip已经配置在了还回口，arp参数已经修改
+[root@rs2 ~]# sh lvs-dr-rs start
+[root@rs2 ~]# ip a
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.100/8 brd 10.0.0.100 scope global lo:0
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+
+[root@rs1 ~]# sh lvs-dr-rs start
+[root@rs1 ~]# ip a
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.100/8 brd 10.0.0.100 scope global lo:0
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+
+
+
+# 执行脚本后，对路由的影响
+# 加了一条主机路由，
+# 默认路由又指向了80.2，一会要再改，否则客户端不通、
+# 见下方，curl vip不通的情况
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+10.0.0.100      0.0.0.0         255.255.255.255 UH    0      0        0 lo
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+</code></pre><p>4、lvs配置ipvs规则</p>
+<pre><code>[root@lvs ~]# ipvsadm -C
+[root@lvs ~]# ipvsadm -A -t 10.0.0.100:80 
+[root@lvs ~]# ipvsadm -a -t 10.0.0.100:80 -r 192.168.80.102:80 
+[root@lvs ~]# ipvsadm -a -t 10.0.0.100:80 -r 192.168.80.103:8088 
+[root@lvs ~]# ipvsadm -Ln
+IP Virtual Server version 1.2.1 (size=4096)
+Prot LocalAddress:Port Scheduler Flags
+  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn
+TCP  10.0.0.100:80 wlc
+  -&gt; 192.168.80.102:80            Route   1      0          0         
+  -&gt; 192.168.80.103:80            Route   1      0          0       
+ # dr不支持端口映射，故意写成8088也无效
+</code></pre><p>5、客户端访问测试</p>
+<p>​	vip不通解决；</p>
+<pre><code>root@client ~]# ping 10.0.0.100
+PING 10.0.0.100 (10.0.0.100) 56(84) bytes of data.
+From 192.168.10.101 icmp_seq=1 Destination Net Unreachable
+From 192.168.10.101 icmp_seq=2 Destination Net Unreachable
+^C
+--- 10.0.0.100 ping statistics ---
+2 packets transmitted, 0 received, +2 errors, 100% packet loss, time 1000ms
+# 客户端ping vip时，不通
+
+排查：
+1，此时router没有10.0.0.0/8网段的路由，router这就不知道往哪里转发
+因此，给router加一个10.0.0.101/8的地址，多了一条直连路由，
+[root@router ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+[root@router ~]# ip addr add 10.0.0.101/8 dev eth0
+[root@router ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.0.0.0       U     0      0        0 eth0
+192.168.10.0    0.0.0.0         255.255.255.0   U     101    0        0 eth1
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+# 此时还不通
+
+2，再看lvs路由，没有192.168.10段回程路由，有去无回，所以不通
+加条默认路由，甩给router
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.0.0.0       U     0      0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+[root@lvs ~]# route add default gw 192.168.80.101 
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+10.0.0.0        0.0.0.0         255.0.0.0       U     0      0        0 eth0
+10.0.0.0        0.0.0.0         255.0.0.0       U     102    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+
+3，此时通了
+~]# ping 10.0.0.100
+PING 10.0.0.100 (10.0.0.100) 56(84) bytes of data.
+64 bytes from 10.0.0.100: icmp_seq=1 ttl=63 time=0.892 ms
+64 bytes from 10.0.0.100: icmp_seq=2 ttl=63 time=2.07 ms
+
+</code></pre><p>​	vip通过，lvs调度不通解决</p>
+<pre><code>[root@client ~]# curl 10.0.0.100
+
+^C
+[root@client ~]# 
+# 此时ping vip通，但是访问80端口服务不同，
+# 问题出在，客户端和rs的通信上
+
+# 排查2个rs，发现默认路由指向，又成了80.2，客户端能和lvs的vip通信了，但除了请求连接的包，后续的数据通信都是直接和rs通信的，rs没有192.168.10.0的回程路由，所以问题是客户端和rs不通，
+# 给rs修改默认路由，指向80.101
+
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+10.0.0.100      0.0.0.0         255.255.255.255 UH    0      0        0 lo
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs1 ~]# route add default gw 192.168.80.101
+[root@rs1 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+10.0.0.100      0.0.0.0         255.255.255.255 UH    0      0        0 lo
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+# 再测，通了
+[root@client ~]# curl 10.0.0.100
+rs2:192.168.80.103
+[root@client ~]# curl 10.0.0.100
+rs1:192.168.80.102
+[root@client ~]# curl 10.0.0.100
+rs2:192.168.80.103
+[root@client ~]# curl 10.0.0.100
+rs1:192.168.80.102
+</code></pre><p>6、lvs更换网关为router的10.0.0.101</p>
+<pre><code>[root@lvs ~]# route add default gw 10.0.0.101
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.101      0.0.0.0         UG    0      0        0 eth0
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+10.0.0.0        0.0.0.0         255.0.0.0       U     0      0        0 eth0
+10.0.0.0        0.0.0.0         255.0.0.0       U     102    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+[root@lvs ~]# route del default gw 192.168.80.101
+[root@lvs ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.101      0.0.0.0         UG    0      0        0 eth0
+10.0.0.0        0.0.0.0         255.0.0.0       U     0      0        0 eth0
+10.0.0.0        0.0.0.0         255.0.0.0       U     102    0        0 eth0
+192.168.80.0    0.0.0.0         255.255.255.0   U     102    0        0 eth0
+
+此时仍然通，lvs找网关10.0.0.101时，通过10.0.0.0/8的路由可以出去，
+</code></pre><p>7、rs更换网关为router的10.0.0.101</p>
+<pre><code>[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+10.0.0.100      0.0.0.0         255.255.255.255 UH    0      0        0 lo
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+[root@rs2 ~]# route add default gw 10.0.0.101
+[root@rs2 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.101      0.0.0.0         UG    0      0        0 lo
+0.0.0.0         192.168.80.101  0.0.0.0         UG    0      0        0 eth0
+0.0.0.0         192.168.80.2    0.0.0.0         UG    100    0        0 eth0
+10.0.0.100      0.0.0.0         255.255.255.255 UH    0      0        0 lo
+192.168.80.0    0.0.0.0         255.255.255.0   U     100    0        0 eth0
+
+此时就不通了，因为rs找网关10.0.0.101的时候，没有路由可以找到它
+</code></pre><h3 id="注意点"><a href="#注意点" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:注意点" class="headings">注意点</a></h3>
+<p>​	dr模型，客户端和lvs，客户端和每个rs的路由可达问题，客户端在连接建立、连接断开阶段的数据包是和lvs通信；其他的数据通信阶段都是和rs直接通信，<strong>一定注意！排查客户端和lvs，客户端和rs之间的路由可达问题！！！</strong></p>
+<h2 id="vs和rs配置参考脚本"><a href="#vs和rs配置参考脚本" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:vs和rs配置参考脚本" class="headings">vs和rs配置参考脚本</a></h2>
+<pre><code>VS的配置脚本：
+	#!/bin/bash
+	#
+	vip='10.1.0.5'
+	iface='eno16777736:0'
+	mask='255.255.255.255'
+	port='80'
+	rs1='10.1.0.7'
+	rs2='10.1.0.8'
+	scheduler='wrr'
+	type='-g'
+	case $1 in
+	start)
+		ifconfig $iface $vip netmask $mask broadcast $vip up
+		iptables -F
+		
+		ipvsadm -A -t ${vip}:${port} -s $scheduler
+		ipvsadm -a -t ${vip}:${port} -r ${rs1} $type -w 1
+		ipvsadm -a -t ${vip}:${port} -r ${rs2} $type -w 1
+		;;
+	stop)
+		ipvsadm -C
+		ifconfig $iface down
+		;;
+	*)
+		echo &quot;Usage $(basename $0) start|stop&quot;
+		exit 1
+		;;
+	esac	
+    
+    
+
+根据需求，修改vip即可，start是启用，stop直接清空配置
+此脚本，可方便实现rs的上线、下线
+
+[root@rs2 ~]# cat lvs 
+#!/bin/bash
+#
+vip=192.168.80.200
+mask='255.255.255.255'
+case $1 in
+start)
+	echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+	echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+	echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+	echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+	ifconfig lo:0 $vip netmask $mask broadcast $vip up
+	route add -host $vip dev lo:0
+	;;
+stop)
+	ifconfig lo:0 down
+	echo 0 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+	echo 0 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+	echo 0 &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+	echo 0 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+	;;
+*) 
+	echo &quot;Usage $(basename $0) start|stop&quot;
+	exit 1
+	;;
+esac
+</code></pre><h2 id="arp抓包分析"><a href="#arp抓包分析" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:arp抓包分析" class="headings">arp抓包分析</a></h2>
+<p>一个结论：lvs的vip会回应，其他rs也回回应，但是回应的都是lvs上某个接口的mac，抓包发现的</p>
+<pre><code># lvs在eth0上，配置了32位的192.168.80.200的vip后，
+
+# router 开始ping vip
+[root@router ~]# ping 192.168.80.200
+PING 192.168.80.200 (192.168.80.200) 56(84) bytes of data.
+64 bytes from 192.168.80.200: icmp_seq=1 ttl=64 time=1.14 ms
+64 bytes from 192.168.80.200: icmp_seq=2 ttl=64 time=0.841 ms
+64 bytes from 192.168.80.200: icmp_seq=3 ttl=64 time=0.934 ms
+
+# lvs在eth0上抓arp包
+# 看到lvs回复了，回应的mac是b3:ea，查看此为eth0上的mac
+
+[root@lvs ~]# tcpdump -i eth0 -nn arp
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+...
+11:25:07.684940 ARP, Request who-has 192.168.80.200 tell 192.168.80.101, length 46
+11:25:07.684955 ARP, Reply 192.168.80.200 is-at 00:0c:29:55:b3:ea, length 28
+
+# router上的arp缓存，200对应的正在lvs上，eth0的mac地址
+[root@router ~]# arp -n
+Address                  HWtype  HWaddress           Flags Mask            Iface
+192.168.80.200           ether   00:0c:29:55:b3:ea   C                     eth0
+
+
+# rs上也配置vip，且配置arp相关内核参数
+# rs抓包，发现不回应，
+# 只有lvs的vip回应，
+# router ping仍然正常
+# 把lvs的vip拿掉后，router的ping会中断，因为此时只有rs有vip，但由设置了arp内核参数，是不会回应router的arp广播的，
+</code></pre><p>实验现象：rs会将lvs的vip所在的mac回应给router？why</p>
+<pre><code>
+[root@rs1 ~]# tcpdump -i eth0 -nn arp
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+
+12:55:22.885770 ARP, Request who-has 192.168.80.200 tell 192.168.80.101, length 46
+12:55:22.885893 ARP, Reply 192.168.80.200 is-at 00:0c:29:55:b3:ea, length 46
+
+[root@rs2 ~]# tcpdump -i eth0 -nn arp
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+
+12:54:33.665591 ARP, Request who-has 192.168.80.200 tell 192.168.80.101, length 46
+12:54:33.665604 ARP, Reply 192.168.80.200 is-at 00:0c:29:55:b3:ea, length 46
+
+rs1和2都是，回复的mac：b3：ea是lvs上配置了vip的eth0网卡的mac
+[root@lvs ~]# ip a
+...
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 00:0c:29:55:b3:ea brd ff:ff:ff:ff:ff:ff
+    inet 192.168.80.104/24 brd 192.168.80.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 192.168.80.200/32 scope global eth0
+
+</code></pre><p>现象：将lvs上eth0上的vip删除，后router就ping不通vip了，此时尽管2个rs上的lo接口有vip，但因为设置了arp-ingore，不会应答关于vip的 arp的请求包</p>
+<pre><code>[root@lvs ~]# ip addr del 192.168.80.200/32 dev eth0
+[root@lvs ~]# ip a
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 00:0c:29:55:b3:ea brd ff:ff:ff:ff:ff:ff
+    inet 192.168.80.104/24 brd 192.168.80.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::6247:1fa9:b7d7:84b9/64 scope link tentative dadfailed 
+       valid_lft forever preferred_lft forever
+
+
+[root@router ~]# ping 192.168.80.200
+PING 192.168.80.200 (192.168.80.200) 56(84) bytes of data.
+^C
+--- 192.168.80.200 ping statistics ---
+5 packets transmitted, 0 received, 100% packet loss, time 3999ms
+
+
+# rs上，收到了关于vip200的请求，但不回应，因为arp_ingore内核参数的设置
+[root@rs1 ~]# tcpdump -i eth0 -nn arp
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+13:01:47.706964 ARP, Request who-has 192.168.80.200 tell 192.168.80.101, length 46
+13:01:48.708097 ARP, Request who-has 192.168.80.200 tell 192.168.80.101, length 46
+13:01:49.710453 ARP, Request who-has 192.168.80.200 tell 192.168.80.101, length 46
+
+</code></pre><p>实验结果：</p>
+<p>​	1、将80.200/32设置在lo接口，vip仍然起作用，且回复arp是用的eth0的mac</p>
+<p>​	2、vip配置为24位时，（位数根据实际情况，即和dip同网段即可），物理接口行，lo接口不行会断开网络，<strong>一般设置lo接口并32位就行了</strong>，当是32位时，设置在物理接口和lo接口都可以，</p>
+<p>​	3、<strong>rs的vip一般设置在lo接口，且是32位</strong></p>
+<pre><code>[root@lvs ~]# ip add add 192.168.80.200/24 dev lo
+不行
+
+[root@lvs ~]# ip add add 192.168.80.200/24 dev eth0
+行
+
+[root@lvs ~]# ip add add 192.168.80.200/32 dev eth0
+行
+
+[root@lvs ~]# ip add add 192.168.80.200/32 dev lo
+行
+</code></pre><h1 id="dr和tunrs上vip的作用"><a href="#dr和tunrs上vip的作用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:dr和tunrs上vip的作用" class="headings">dr和tun，rs上vip的作用</a></h1>
+<h2 id="dr时"><a href="#dr时" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:dr时" class="headings">dr时</a></h2>
+<p>收：</p>
+<p>​	lvs转发时只修改了二层mac，ip层，还是cip-》vip，rs根据修改的mac收到二层包，拆到三层发现目的是vip，而自己的lo接口有vip，于是收下该包，进行处理，</p>
+<p>发：</p>
+<p>​	发响应包，ip封包是，vip-cip，vip此处还有填充源ip的作用；</p>
+<h2 id="tun时"><a href="#tun时" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tun时" class="headings">tun时</a></h2>
+<p>收：</p>
+<p>​	lvs转发时，修改了原包的ip头部，原来的cip-vip，之前又加了一个头部dip-某个rip，<strong>tun时，lvs还不需要开启ip_forward</strong>，rs是靠着外部ip头，dip-rip接收到包，且靠ip寻址，自然可以跨网段，跨广域网，这里收包先是靠着自己的rip收到，进行隧道拆分时，发现原始的头部，再看cip-vip，目的还是自己，自己的接口上还是有vip，<strong>所以此处vip还是用来收包之用的</strong></p>
+<p>发：</p>
+<p>​	发响应包时，ip封包，是vip-vip，vip此处用来填充源ip</p>
+<h2 id="总结"><a href="#总结" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:总结" class="headings">总结</a></h2>
+<p>​	dr和tun模式，rs上配置的vip都有确认收下数据包之用，只不过，tun模式，分2两次，第一次靠的是rs上的rip收下的，第二层头部，才是靠自己接口的vip收下的，也都用发响应包时，填充源ip之用，</p>
+<p>​	tun模式，跨网段，甚至跨广域网，应该不用考虑arp问题了吧？</p>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/lvs的四种工作模型实现/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-20 15:28:38 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-20</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-20</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E7%9A%84%E5%9B%9B%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B%E4%BB%8B%E7%BB%8D/" class="related-link">lvs的四种工作模型介绍</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/keepalived%E9%85%8D%E7%BD%AE%E5%AE%9E%E7%8E%B0lvs%E9%AB%98%E5%8F%AF%E7%94%A8/" class="related-link">keepalived配置实现lvs高可用</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E7%9A%84%E8%A7%84%E5%88%99%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7ipvsadm/" class="related-link">lvs的规则管理工具ipvsadm</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E7%9A%8410%E7%A7%8D%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/" class="related-link">lvs的10种调度算法</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/lvs%E4%B8%8E%E9%9B%86%E7%BE%A4%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5%E4%BB%8B%E7%BB%8D/" class="related-link">lvs与集群相关概念介绍</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/lvs/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>lvs</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/lvs4%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>lvs4种工作模型</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/keepalived%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%89%E8%A3%85/" rel="prev">&lt; keepalived简介与安装</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/lvs%E7%9A%84%E8%A7%84%E5%88%99%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7ipvsadm/" rel="next">lvs的规则管理工具ipvsadm &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

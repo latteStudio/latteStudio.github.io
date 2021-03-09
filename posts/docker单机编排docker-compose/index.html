@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>docker单机编排docker-compose | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="docker单机编排docker-compose" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/docker%E5%8D%95%E6%9C%BA%E7%BC%96%E6%8E%92docker-compose/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-10-25T15:55:04+00:00",
+        "dateModified": "2020-11-05T18:26:19+08:00",
+        "url": "https://latteStudio.github.io/posts/docker%E5%8D%95%E6%9C%BA%E7%BC%96%E6%8E%92docker-compose/",
+        "headline": "docker单机编排docker-compose",
+        "description": "docker单机编排docker-compose",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  2942 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20201104160130881.png","https://gitee.com/boogie96/img/raw/master/img/image-20201105170406977.png","https://gitee.com/boogie96/img/raw/master/img/image-20201105170356963.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="docker单机编排docker-compose" />
+<meta property="og:description" content="docker单机编排docker-compose" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/docker%E5%8D%95%E6%9C%BA%E7%BC%96%E6%8E%92docker-compose/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20201104160130881.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-10-25T15:55:04&#43;00:00" />
+    <meta property="article:modified_time" content="2020-11-05T18:26:19&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">docker单机编排docker-compose</h1>
+
+            
+
+            
+                <div class="post-description p-summary">docker单机编排docker-compose</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-10-25T15:55:04&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.10.25</time>
+    
+    
+        
+        <time datetime="2020-11-05T18:26:19&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.11.5</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E5%AE%B9%E5%99%A8%E4%BA%91%E7%B3%BB%E5%88%97/" class="category-link p-category">容器云系列</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;2942</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;6&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:yum安装" href="#yum安装">yum安装</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:语法格式" href="#语法格式">语法格式</a></li>
+    <li><a id="contents:docker-compose管理单个容器" href="#docker-compose管理单个容器">docker-compose管理单个容器</a></li>
+    <li><a id="contents:docker-compose管理多个容器" href="#docker-compose管理多个容器">docker-compose管理多个容器</a></li>
+    <li><a id="contents:docker-compose定义存储卷" href="#docker-compose定义存储卷">docker-compose定义存储卷</a></li>
+    <li><a id="contents:docker-compose常用命令" href="#docker-compose常用命令">docker-compose常用命令</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:准备镜像" href="#准备镜像">准备镜像</a>
+      <ol>
+        <li><a id="contents:haproxy镜像" href="#haproxy镜像">haproxy镜像</a></li>
+        <li><a id="contents:nginx镜像" href="#nginx镜像">nginx镜像</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:编辑docker-composeyml" href="#编辑docker-composeyml">编辑docker-compose.yml</a></li>
+    <li><a id="contents:启动并验证" href="#启动并验证">启动并验证</a>
+      <ol>
+        <li><a id="contents:遇到的问题" href="#遇到的问题">遇到的问题</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="简介"><a href="#简介" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:简介" class="headings">简介</a></h1>
+<p><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">官方文档介绍</a></p>
+<p>​	docker-compose为单机版的容器编排工具。</p>
+<p>​	在容器较多的情况下，手动一个个docker run就比较繁琐，且命令行方式无法复用，此时就需要用docker-compse这种编排工具管理多个容器，</p>
+<p>​	docker-compse为单机版管理，即只能管理一台docker host上的容器，跨主机即集群级别的编排容器，就需要用到docker-swarm，或kubernetes；</p>
+<p>​	docker-compse采用yml文件定义容器的状态，然后dokcer-compose解析文件，并依据其定义运行容器，相比于命令行，可重用性好；</p>
+<p>​	habor的组件容器，就是通过docker-compose以及一个yml文件定义的；</p>
+<h1 id="安装"><a href="#安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装" class="headings">安装</a></h1>
+<p><a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener">https://docs.docker.com/compose/install/</a></p>
+<h2 id="yum安装"><a href="#yum安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:yum安装" class="headings">yum安装</a></h2>
+<p>​	配置epel源，yum直接安装即可；</p>
+<pre><code>[root@host2 ~]# yum install -y docker-compose
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirrors.aliyun.com
+ * extras: mirrors.aliyun.com
+ * updates: mirrors.aliyun.com
+Package docker-compose-1.18.0-4.el7.noarch already installed and latest version
+Nothing to do
+
+[root@host2 ~]# rpm -ql docker-compose
+
+
+[root@host2 ~]# 
+[root@host2 ~]# docker-compose --version
+docker-compose version 1.18.0, build 8dd22a9
+</code></pre><h1 id="docker-compose管理容器"><a href="#docker-compose管理容器" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:docker-compose管理容器" class="headings">docker-compose管理容器</a></h1>
+<h2 id="语法格式"><a href="#语法格式" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:语法格式" class="headings">语法格式</a></h2>
+<pre><code>[root@host3 ~]# docker-compose --help
+Define and run multi-container applications with Docker.
+
+Usage:
+  docker-compose [-f &lt;arg&gt;...] [options] [COMMAND] [ARGS...]
+  docker-compose -h|--help
+
+Options:
+  -f, --file FILE             Specify an alternate compose file (default: docker-compose.yml)
+  -p, --project-name NAME     Specify an alternate project name (default: directory name)
+  --verbose                   Show more output
+  --no-ansi                   Do not print ANSI control characters
+  -v, --version               Print version and exit
+  -H, --host HOST             Daemon socket to connect to
+......
+
+# 一般创建一个单独目录，docker-compose会寻找该目录下的docker-compose.yml进行解析处理；-f选项可以指定其他文件名
+# 项目名，默认为目录名
+</code></pre><h2 id="docker-compose管理单个容器"><a href="#docker-compose管理单个容器" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:docker-compose管理单个容器" class="headings">docker-compose管理单个容器</a></h2>
+<ol>
+<li>
+<p>定义docker-compose文件</p>
+<pre><code>[root@host3 compose-test]# cat docker-compose.yml 
+web1:
+ image: nginx
+ expose:
+  - 80
+  - 443
+ ports:
+  - &quot;80:80&quot;
+  - &quot;443:443&quot;
+   
+web1为标识符，标识定义一个容器的配置段；
+一个yml文件中，可以有多个；
+</code></pre></li>
+<li>
+<p>前台运行</p>
+<pre><code>[root@host3 compose-test]# docker-compose up
+Pulling web1 (nginx:latest)...
+latest: Pulling from library/nginx
+bb79b6b2107f: Pulling fs layer
+...
+   
+默认在前台运行
+   
+</code></pre></li>
+<li>
+<p>后台运行</p>
+<pre><code>[root@host3 compose-test]# docker-compose up -d
+Creating composetest_web1_1 ... done
+   
+# -d选项，后台运行；
+</code></pre></li>
+<li>
+<p>访问测试</p>
+<pre><code># 80和443端口也被映射到宿主机
+[root@host3 ~]# ss -nlt
+State      Recv-Q Send-Q Local Address:Port                Peer Address:Port              
+LISTEN     0      128                *:22                             *:*                  
+LISTEN     0      100        127.0.0.1:25                             *:*                  
+LISTEN     0      128               :::80                            :::*                  
+LISTEN     0      128               :::22                            :::*                  
+LISTEN     0      100              ::1:25                            :::*                  
+LISTEN     0      128               :::443                           :::*    
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201104160130881.png" alt="image-20201104160130881"></p>
+</li>
+<li>
+<p>查看容器进程</p>
+<pre><code>[root@host3 compose-test]# docker-compose ps
+       Name                     Command               State               Ports             
+--------------------------------------------------------------------------------------------
+composetest_web1_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:443-&gt;443/tcp,         
+                                                              0.0.0.0:80-&gt;80/tcp   
+</code></pre></li>
+</ol>
+<h2 id="docker-compose管理多个容器"><a href="#docker-compose管理多个容器" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:docker-compose管理多个容器" class="headings">docker-compose管理多个容器</a></h2>
+<ol>
+<li>
+<p>编辑docker-compse文件</p>
+<pre><code>[root@host3 compose-test]# cat docker-compose.yml 
+web1:
+ image: nginx
+ expose:
+  - 80
+  - 443
+ ports:
+  - &quot;80:80&quot;
+  - &quot;443:443&quot;
+   
+web2:
+ image: nginx
+ expose:
+  - 80
+  - 443
+ ports:
+  - &quot;81:80&quot;
+  - &quot;8443:443&quot;
+# 再继续定义容器即可
+</code></pre></li>
+<li>
+<p>运行</p>
+<pre><code>[root@host3 compose-test]# docker-compose up -d
+Starting composetest_web1_1 ... 
+Starting composetest_web2_1 ... done
+[root@host3 compose-test]# docker-compose ps
+       Name                     Command               State               Ports             
+--------------------------------------------------------------------------------------------
+composetest_web1_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:443-&gt;443/tcp,         
+                                                              0.0.0.0:80-&gt;80/tcp            
+composetest_web2_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8443-&gt;443/tcp,        
+                                                              0.0.0.0:81-&gt;80/tcp     
+</code></pre></li>
+</ol>
+<h2 id="docker-compose定义存储卷"><a href="#docker-compose定义存储卷" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:docker-compose定义存储卷" class="headings">docker-compose定义存储卷</a></h2>
+<ol>
+<li>
+<p>准备本地存储卷目录</p>
+<pre><code>[root@host3 compose-test]# mkdir /data/nginx -pv
+mkdir: created directory ‘/data’
+mkdir: created directory ‘/data/nginx’
+[root@host3 compose-test]# echo volume-test &gt; /data/nginx/index.html
+</code></pre></li>
+<li>
+<p>编辑docker-compose文件，用volumes字段定义存储卷</p>
+<pre><code>[root@host3 compose-test]# cat docker-compose.yml 
+web1:
+ image: nginx
+ expose:
+  - 80
+  - 443
+ ports:
+  - &quot;80:80&quot;
+  - &quot;443:443&quot;
+   
+web2:
+ image: nginx
+ expose:
+  - 80
+  - 443
+ volumes:
+  - /data/nginx:/usr/share/nginx/html
+ ports:
+  - &quot;81:80&quot;
+  - &quot;8443:443&quot;
+   
+</code></pre></li>
+<li>
+<p>运行</p>
+<pre><code>   
+   
+[root@host3 compose-test]# curl 192.168.80.102:81
+volume-test
+   
+</code></pre></li>
+</ol>
+<h2 id="docker-compose常用命令"><a href="#docker-compose常用命令" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:docker-compose常用命令" class="headings">docker-compose常用命令</a></h2>
+<ol>
+<li>
+<p>停止</p>
+<pre><code>[root@host3 compose-test]# docker-compose stop
+</code></pre></li>
+<li>
+<p>启动</p>
+<pre><code>[root@host3 compose-test]# docker-compose start
+# 必须是已经启动的容器，若是第一次需要用up
+</code></pre></li>
+<li>
+<p>重启</p>
+<pre><code>[root@host3 compose-test]# docker-compose restart
+</code></pre></li>
+<li>
+<p>指定某个容器启停</p>
+<pre><code># 命令行中，指定需要启停的容器名称即可，
+不加，默认是docker-compose文件中所有容器
+[root@host3 compose-test]# docker-compose ps
+       Name                     Command               State               Ports             
+--------------------------------------------------------------------------------------------
+composetest_web1_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:443-&gt;443/tcp,         
+                                                              0.0.0.0:80-&gt;80/tcp            
+composetest_web2_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8443-&gt;443/tcp,        
+                                                              0.0.0.0:81-&gt;80/tcp            
+[root@host3 compose-test]# docker-compose stop web2
+Stopping composetest_web2_1 ... done
+</code></pre></li>
+<li>
+<p>up和down，start和stop的区别</p>
+<pre><code>[root@host3 compose-test]# docker-compose up -d
+Creating composetest_web1_1 ... done
+[root@host3 compose-test]# docker-compose ps
+       Name                     Command               State               Ports             
+--------------------------------------------------------------------------------------------
+composetest_web1_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:443-&gt;443/tcp,         
+                                                              0.0.0.0:80-&gt;80/tcp            
+[root@host3 compose-test]# docker-compose stop
+Stopping composetest_web1_1 ... done
+[root@host3 compose-test]# docker-compose ps
+       Name                     Command               State    Ports
+--------------------------------------------------------------------
+composetest_web1_1   /docker-entrypoint.sh ngin ...   Exit 0        
+[root@host3 compose-test]# docker-compose start
+Starting web1 ... done
+[root@host3 compose-test]# docker-compose ps
+       Name                     Command               State               Ports             
+--------------------------------------------------------------------------------------------
+composetest_web1_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:443-&gt;443/tcp,         
+                                                              0.0.0.0:80-&gt;80/tcp            
+[root@host3 compose-test]# docker-compose down
+Stopping composetest_web1_1 ... done
+Removing composetest_web1_1 ... done
+[root@host3 compose-test]# docker-compose ps
+Name   Command   State   Ports
+------------------------------
+   
+up会创建并运行容器，适合第一次运行的docker-compoes.yaml文件
+down与up相反，停止容器，并彻底删除
+   
+start和stop只是启停已经创建好的容器；
+start是启动处于exited状态的容器，尚未创建的容器无法start，必须先up
+stop是停止正在运行中的容器；
+</code></pre></li>
+</ol>
+<h1 id="docker-compose实现单机hanginxtomcat"><a href="#docker-compose实现单机hanginxtomcat" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:docker-compose实现单机hanginxtomcat" class="headings">docker-compose实现单机ha+nginx+tomcat</a></h1>
+<h2 id="准备镜像"><a href="#准备镜像" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:准备镜像" class="headings">准备镜像</a></h2>
+<h3 id="haproxy镜像"><a href="#haproxy镜像" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:haproxy镜像" class="headings">haproxy镜像</a></h3>
+<ol>
+<li>
+<p>准备dockerfile工作目录</p>
+</li>
+<li>
+<p>编辑haproxy镜像的dokcerfile文件</p>
+</li>
+<li>
+<p>准备haproxy.cfg，源码包，容器入口脚本</p>
+</li>
+<li>
+<p>构建镜像</p>
+</li>
+<li>
+<p>准备dockerfile工作目录</p>
+<pre><code>[root@host3 ~]# mkdir /dockerfile/web -pv
+mkdir: created directory ‘/dockerfile’
+mkdir: created directory ‘/dockerfile/web’
+[root@host3 ~]# cd /dockerfile/web/
+[root@host3 web]# mkdir nginx
+[root@host3 web]# mkdir tomcat
+[root@host3 web]# mkdir haproxy
+[root@host3 web]# ll
+total 0
+drwxr-xr-x 2 root root 6 Nov  5 10:47 haproxy
+drwxr-xr-x 2 root root 6 Nov  5 10:47 nginx
+drwxr-xr-x 2 root root 6 Nov  5 10:47 tomcat
+</code></pre></li>
+<li>
+<p>编辑haproxy镜像的dokcerfile文件</p>
+<pre><code>[root@host3 haproxy]# cat Dockerfile 
+# haproxy image build
+from centos:7.2.1511
+maintainer wang@gmail.com
+   
+add haproxy-1.7.12.tar.gz /usr/local/src
+run rm -rf /etc/yum.repos.d/*
+run curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+run yum install -y gcc gcc++ pcre pcre-devel
+   
+run rpm --rebuilddb &amp;&amp; yum install -y systemd-devel zlib-devel openssl-devel
+run rpm --rebuilddb &amp;&amp; yum install -y make
+run cd /usr/local/src/haproxy-1.7.12/ &amp;&amp; make TARGET=linux2628 USE_PCRE=1 USE_ZLIB=1 USE_SYSTEMD=1 ARCh=x86_64 prefix=/usr/local/haproxy &amp;&amp; make install PREFIX=/usr/local/haproxy
+   
+add haproxy.cfg  /etc/haproxy/
+run mkdir /var/lib/haproxy &amp;&amp; touch /var/lib/haproxy
+copy run_ha.sh /etc/haproxy/
+expose 80 9999
+   
+cmd /etc/haproxy/run_ha.sh
+</code></pre></li>
+<li>
+<p>准备haproxy.cfg，源码包，容器入口脚本</p>
+<pre><code>[root@host3 haproxy]# wget https://www.haproxy.org/download/1.7/src/haproxy-1.7.12.tar.gz
+   
+[root@host3 haproxy]# pwd
+/dockerfile/web/haproxy
+[root@host3 haproxy]# ll
+total 1732
+-rw-r--r-- 1 root root     735 Nov  5 10:54 Dockerfile
+-rw-r--r-- 1 root root 1760527 Oct 25  2019 haproxy-1.7.12.tar.gz
+-rw-r--r-- 1 root root    1988 Nov  5 10:55 haproxy.cfg
+-rw-r--r-- 1 root root      80 Nov  5 10:54 run_ha.sh
+[root@host3 haproxy]# cat run_ha.sh 
+   
+/usr/local/haproxy/sbin/haproxy -f /etc/haproxy/haproxy.cfg
+tail -f /etc/hosts
+[root@host3 haproxy]
+   
+---
+[root@host3 haproxy]# cat haproxy.cfg 
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    # to have these messages end up in /var/log/haproxy.log you will
+    # need to:
+    #
+    # 1) configure syslog to accept network log events.  This is done
+    #    by adding the '-r' option to the SYSLOGD_OPTIONS in
+    #    /etc/sysconfig/syslog
+    #
+    # 2) configure local2 events to go to the /var/log/haproxy.log
+    #   file. A line like the following can be added to
+    #   /etc/sysconfig/syslog
+    #
+    #    local2.*                       /var/log/haproxy.log
+    #
+    log         127.0.0.1 local2
+     
+    chroot      /var/lib/haproxy
+   
+    pidfile     /var/run/haproxy.pid
+   
+    maxconn     4000
+    
+ uid 99
+ gid 99
+   
+ daemon
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+   
+   
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 3
+    timeout http-request    10s
+    timeout queue           1m
+    timeout connect         10s
+    timeout client          1m
+    timeout server          1m
+    timeout http-keep-alive 10s
+    timeout check           10s
+    maxconn                 3000
+   
+   
+listen stats
+ mode http
+ bind *:9999
+ stats enable
+ log global
+ stats uri /ha-status
+ stats auth admin:admin
+   
+listen web1
+ bind *:80
+ mode http
+ log global
+ balance roundrobin
+ server web1 192.168.80.101:8080 check inter 3000 fall 2 rise 5
+ server web2 192.168.80.101:8081 check inter 3000 fall 2 rise 5
+</code></pre></li>
+<li>
+<p>构建镜像</p>
+<pre><code>[root@host3 haproxy]# docker build -t notechbb/haproxy:centos7.2 .
+   
+[root@host3 haproxy]# docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+notechbb/haproxy    centos7.2           3dd465ba4172        39 seconds ago      606MB
+</code></pre></li>
+</ol>
+<h3 id="nginx镜像"><a href="#nginx镜像" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:nginx镜像" class="headings">nginx镜像</a></h3>
+<ol>
+<li>
+<p>编辑nginx的dockerfile文件</p>
+</li>
+<li>
+<p>准备nginx源码包，配置文件</p>
+</li>
+<li>
+<p>构建镜像</p>
+</li>
+<li>
+<p>编辑nginx的dockerfile文件</p>
+<pre><code>[root@host3 nginx]# cat Dockerfile 
+# 将编译安装nginx的步骤，写为dockerfile指令即可；
+# Dockerfile需要D大写
+# 创建目录，用于dockerfile的编写
+   
+   
+# dockerfile compile nginx
+From centos:7.2.1511
+maintainer wang@qq.com
+# 基础镜像为centos，作者信息；
+   
+   
+run rm -rf /etc/yum.repos.d/*
+run curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+   
+run yum install -y lrzsz gcc gcc-c++ pcre-devel openssl-devel zlib-devel
+# 配置yum源，安装基础包
+   
+run rpm --rebuilddb &amp;&amp;  yum install -y make
+   
+add nginx-1.14.2.tar.gz /usr/local/src
+# run tar -xf /usr/local/src/nginx-1.14.2.tar.gz -C /usr/local/src
+# 将源码包，复制到容器内的文件系统目录中，注意：不需要解压，会自动解压！
+   
+   
+run useradd nginx
+run cd /usr/local/src/nginx-1.14.2/ &amp;&amp; ./configure --prefix=/usr/local/nginx --user=nginx --group=nginx --with-http_ssl_module --with-http_v2_module --with-http_dav_module --with-http_stub_status_module --with-threads --with-file-aio --with-stream_realip_module --with-stream_ssl_module --with-stream --with-pcre --with-http_gzip_static_module --with-http_realip_module
+# 添加用户，进入目录，configure
+   
+   
+run cd /usr/local/src/nginx-1.14.2/ &amp;&amp; make &amp;&amp; make install
+# 根据实验中报错，再安装make包，编译，和安装
+   
+   
+add nginx.conf /usr/local/nginx/conf
+run ln -sv /usr/local/nginx/sbin/nginx /usr/sbin/nginx
+run echo &quot;dockerfile bianyi nginx&quot; &gt; /usr/local/nginx/html/index.html
+# 复制配置文件、做主程序软链接，自定义主页文件
+   
+expose 80
+cmd [&quot;/usr/sbin/nginx&quot;]
+# 暴露80端口，定义运行为容器时，执行的命令
+</code></pre></li>
+<li>
+<p>准备nginx源码包，配置文件</p>
+<pre><code>[root@host3 nginx]# wget http://nginx.org/download/nginx-1.14.2.tar.gz
+   
+[root@host3 nginx]# tar -xf nginx-1.14.2.tar.gz -C /root/
+   
+[root@host3 nginx]# cp /root/nginx-1.14.2/conf/nginx.conf .
+[root@host3 nginx]# ll
+total 1000
+-rw-r--r-- 1 root root    1604 Nov  5 11:17 Dockerfile
+-rw-r--r-- 1 root root 1015384 Dec  4  2018 nginx-1.14.2.tar.gz
+-rw-r--r-- 1 root root    2656 Nov  5 11:19 nginx.conf
+   
+# 修改为前台运行
+[root@host3 nginx]# vim nginx.conf 
+   
+[root@host3 nginx]# grep dae nginx.conf 
+daemon off;
+</code></pre></li>
+<li>
+<p>构建镜像</p>
+<pre><code>[root@host3 nginx]# docker build -t notechbb/nginx:v1.14.2 .
+   
+[root@host3 nginx]# docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+notechbb/nginx      v1.14.2             6d3c38cfd4f1        10 minutes ago      555MB
+</code></pre></li>
+</ol>
+<h2 id="编辑docker-composeyml"><a href="#编辑docker-composeyml" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:编辑docker-composeyml" class="headings">编辑docker-compose.yml</a></h2>
+<p>1、编写yml文件</p>
+<pre><code>[root@host3 compose]# cat docker-compose.yml 
+
+nginx1:
+ image: notechbb/nginx:v1.14.2
+ container_name: n1
+ expose:
+  - 80
+ volumes:
+  - /data/n1.html:/usr/local/nginx/html/index.html
+nginx2:
+ image: notechbb/nginx:v1.14.2
+ container_name: n2
+ expose:
+  - 80
+ volumes:
+  - /data/n2.html:/usr/local/nginx/html/index.html
+haproxy:
+ image: notechbb/haproxy:centos7.2
+ ports:
+  - &quot;9999:9999&quot;
+  - &quot;80:80&quot;
+ container_name: ha1
+ links:
+  - nginx1
+  - nginx2
+ volumes:
+  - /data/haproxy.cfg:/etc/haproxy/haproxy.cfg
+
+</code></pre><p>2、准备要挂载的数据卷文件；</p>
+<pre><code>[root@host3 compose]# echo n1-index &gt; /data/n1.html
+[root@host3 compose]# echo n2-index &gt; /data/n2.html
+
+[root@host3 compose]# ll /data/
+total 12
+-rw-r--r-- 1 root root 1960 Nov  5 16:57 haproxy.cfg
+-rw-r--r-- 1 root root    9 Nov  5 16:54 n1.html
+-rw-r--r-- 1 root root    9 Nov  5 16:54 n2.html
+</code></pre><h2 id="启动并验证"><a href="#启动并验证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:启动并验证" class="headings">启动并验证</a></h2>
+<p>1、启动，查看容器进程</p>
+<pre><code>[root@host3 compose]# docker-compose up -d
+
+[root@host3 compose]# docker-compose ps
+Name              Command               State                     Ports                   
+------------------------------------------------------------------------------------------
+ha1    /bin/sh -c /etc/haproxy/ru ...   Up      0.0.0.0:80-&gt;80/tcp, 0.0.0.0:9999-&gt;9999/tcp
+n1     /usr/sbin/nginx                  Up      80/tcp                                    
+n2     /usr/sbin/nginx                  Up      80/tcp   
+
+---
+[root@host3 compose]# ss -nlt
+State      Recv-Q Send-Q Local Address:Port                Peer Address:Port              
+LISTEN     0      128                *:22                             *:*                  
+LISTEN     0      100        127.0.0.1:25                             *:*                  
+LISTEN     0      128               :::9999                          :::*                  
+LISTEN     0      128               :::80                            :::*                  
+LISTEN     0      128               :::22                            :::*                  
+LISTEN     0      100              ::1:25                            :::*   
+</code></pre><p>2、浏览器访问</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201105170406977.png" alt="image-20201105170406977"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201105170356963.png" alt="image-20201105170356963"></p>
+<h3 id="遇到的问题"><a href="#遇到的问题" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:遇到的问题" class="headings">遇到的问题</a></h3>
+<ul>
+<li>haproxy容器启动后即退出；原因：入口脚本，执行权限没加，docker-compose前台调试发现</li>
+<li>docker-compose.yml中定义顺序问题，haproxy用links引用了nginx的名称，因此nginx定义需要在前；</li>
+</ul>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/docker%E5%8D%95%E6%9C%BA%E7%BC%96%E6%8E%92docker-compose/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/docker单机编排docker-compose/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-11-05 18:26:19 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-11-05</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-11-05</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/docker%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86/" class="related-link">docker存储管理</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/docker%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B/" class="related-link">docker网络模型</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/docker%E9%95%9C%E5%83%8F%E4%B8%8Edockerfile/" class="related-link">docker镜像与dockerfile</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/docker%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8/" class="related-link">docker基础命令使用</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/docker%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" class="related-link">docker介绍与安装</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/docker/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>docker</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/docker-compose/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>docker-compose</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/k8s%E4%B9%8Bpod%E7%AE%A1%E7%90%86/" rel="prev">&lt; k8s之pod管理</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/ansible%E4%B9%8Bplaybook%E4%B8%8Eroles/" rel="next">ansible之playbook与roles &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

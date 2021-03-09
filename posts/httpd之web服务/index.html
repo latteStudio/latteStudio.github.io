@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>httpd之web服务 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="httpd做web服务的相关配置" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/httpd%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-10-15T16:05:55+00:00",
+        "dateModified": "2020-10-16T12:52:42+08:00",
+        "url": "https://latteStudio.github.io/posts/httpd%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/",
+        "headline": "httpd之web服务",
+        "description": "httpd做web服务的相关配置",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  4778 ,
+        "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary" />
+
+
+    
+
+
+
+<meta property="og:title" content="httpd之web服务" />
+<meta property="og:description" content="httpd做web服务的相关配置" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/httpd%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://latteStudio.github.io/icons/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-10-15T16:05:55&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-16T12:52:42&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">httpd之web服务</h1>
+
+            
+
+            
+                <div class="post-description p-summary">httpd做web服务的相关配置</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-10-15T16:05:55&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.10.15</time>
+    
+    
+        
+        <time datetime="2020-10-16T12:52:42&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.16</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/web%E6%9C%8D%E5%8A%A1/" class="category-link p-category">web服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;4778</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;10&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:基于ip" href="#基于ip">基于ip</a></li>
+    <li><a id="contents:基于port" href="#基于port">基于port</a></li>
+    <li><a id="contents:基于主机头" href="#基于主机头">基于主机头</a></li>
+    <li><a id="contents:状态页" href="#状态页">状态页</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:htpasswd" href="#htpasswd">htpasswd</a></li>
+    <li><a id="contents:认证相关指令" href="#认证相关指令">认证相关指令</a></li>
+    <li><a id="contents:require指令" href="#require指令">Require指令</a></li>
+    <li><a id="contents:基于用户认证" href="#基于用户认证">基于用户认证</a></li>
+    <li><a id="contents:基于组认证" href="#基于组认证">基于组认证</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:customlog访问日志" href="#customlog访问日志">customlog访问日志</a></li>
+    <li><a id="contents:errorlog错误日志" href="#errorlog错误日志">errorlog错误日志</a></li>
+    <li><a id="contents:日志轮替" href="#日志轮替">日志轮替</a>
+      <ol>
+        <li><a id="contents:rotatelogs" href="#rotatelogs">rotatelogs</a></li>
+        <li><a id="contents:cronolog" href="#cronolog">cronolog</a></li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:处理顺序" href="#处理顺序">处理顺序</a></li>
+    <li><a id="contents:路径映射aliasaliasmatch" href="#路径映射aliasaliasmatch">路径映射、alias、aliasmatch</a></li>
+    <li><a id="contents:重定向redirectredirectmatch" href="#重定向redirectredirectmatch">重定向、redirect、redirectmatch</a></li>
+    <li><a id="contents:location和aliasredirect的搭配" href="#location和aliasredirect的搭配">location和alias、redirect的搭配</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:mod_ssl实现" href="#mod_ssl实现">mod_ssl实现</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="虚拟主机配置"><a href="#虚拟主机配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:虚拟主机配置" class="headings">虚拟主机配置</a></h1>
+<p><strong>虚拟主机配置步骤：</strong></p>
+<pre><code>1，单独创建一个虚拟主机目录，一个虚拟主机一个配置文件，在主配置文件中Include引入；
+[root@host2 conf]# pwd
+/usr/local/apache/conf
+[root@host2 conf]# mkdir vhosts
+[root@host2 conf]# ll
+drwxr-xr-x 2 root root   313 Aug 31 19:47 extra
+-rw-r--r-- 1 root root 18417 Sep  1 15:52 httpd.conf
+-rw-r--r-- 1 root root 18385 Sep  1 10:22 httpd.conf.bak
+-rw-r--r-- 1 root root 13077 Aug 31 19:47 magic
+-rw-r--r-- 1 root root 60855 Aug 31 19:47 mime.types
+drwxr-xr-x 3 root root    37 Aug 31 19:47 original
+drwxr-xr-x 2 root root     6 Sep  1 15:52 vhosts
+[root@host2 conf]# vim vhosts/pc.conf
+
+2，directory指定一个将要存放某虚拟主机网页文件的目录、并用Require指令放开文件系统授权，以及进程用户对目录的权限
+3，定义虚拟主机配置段，指定documentroot为上步directory中指定目录；
+[root@host2 conf]# cat vhosts/pc.conf 
+&lt;Directory &quot;/data/pc&quot;&gt;
+	Require all granted
+&lt;/Directory&gt;
+
+&lt;VirtualHost *:80&gt;
+	ServerName www.pc.com
+	DocumentRoot &quot;/data/pc&quot;
+&lt;/VirtualHost&gt;
+
+
+4，主配置中引入
+[root@host2 conf]# tail -1 httpd.conf
+Include conf/vhosts/*.conf
+
+
+
+5，创建对应目录，如有需要改为apache属主，一般只读权限也够了
+[root@host2 conf]# httpd -t
+AH00112: Warning: DocumentRoot [/data/pc] does not exist
+Syntax OK
+
+[root@host2 conf]# mkdir /data/pc -pv
+mkdir: created directory ‘/data’
+mkdir: created directory ‘/data/pc’
+[root@host2 conf]# httpd -t
+Syntax OK
+[root@host2 conf]# vim /data/pc/index.html
+[root@host2 conf]# httpd -k restart
+
+6，客户端改hosts文件，访问测试；
+[root@host1 ~]# curl www.pc.com
+pc-index page
+</code></pre><p>如下：基于主机头的虚拟主机</p>
+<pre><code>[root@host3 ~]# cat /etc/httpd/conf.d/vhosts.conf 
+# 先用directory指令放开文件系统的访问
+# apache用户对文件系统的权限
+# 定义虚拟主机配置段
+
+&lt;Directory &quot;/data/host3/www1&quot;&gt;
+	Require all granted
+&lt;/Directory&gt;
+
+&lt;Directory &quot;/data/host3/www2&quot;&gt;
+	Require all granted
+&lt;/Directory&gt;
+
+&lt;VirtualHost *:80&gt;
+	ServerName www1.host3.com
+	DocumentRoot &quot;/data/host3/www1&quot;
+	
+&lt;/VirtualHost&gt;
+&lt;VirtualHost *:80&gt;
+	ServerName www2.host3.com
+	DocumentRoot &quot;/data/host3/www2&quot;
+	
+&lt;/VirtualHost&gt;
+</code></pre><h2 id="基于ip"><a href="#基于ip" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于ip" class="headings">基于ip</a></h2>
+<pre><code>---
+编辑vhosts配置文件，include到主配置文件中，默认就有
+[root@localhost httpd]# cat conf.d/vhosts.conf 
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.a.com
+	DocumentRoot /var/www/html/html/a.com
+&lt;/VirtualHost&gt;
+&lt;VirtualHost 192.168.10.101:80&gt;
+	ServerName www.b.com
+	DocumentRoot /var/www/html/html/b.com
+&lt;/VirtualHost&gt;
+
+# Load config files in the &quot;/etc/httpd/conf.d&quot; directory, if any.
+IncludeOptional conf.d/*.conf
+
+---注意：
+&lt;VirtualHost 192.168.80.101:80&gt;
+        ServerName www.a.com
+        DocumentRoot html/a.com
+&lt;/VirtualHost&gt;
+利用相对路径写法时，在serverroot和documentroot都建立了对应目录，都不行，最后写成绝对路径才行！
+
+---
+创建对应目录文件，
+  226  mkdir /var/www/html/html/{a.com,b.com} -pv
+  227  echo a.com &gt; /var/www/html/html/a.com/index.html
+  229  echo b.com &gt; /var/www/html/html/b.com/index.html
+  
+---
+调试配置文件，然后重启httpd
+[root@localhost httpd]# httpd -S -f /etc/httpd/conf/httpd.conf 
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using localhost.localdomain. Set the 'ServerName' directive globally to suppress this message
+VirtualHost configuration:
+192.168.10.101:80      www.b.com (/etc/httpd/conf.d/vhosts.conf:5)
+192.168.80.101:80      www.a.com (/etc/httpd/conf.d/vhosts.conf:1)
+ServerRoot: &quot;/etc/httpd&quot;
+Main DocumentRoot: &quot;/var/www/html&quot;
+Main ErrorLog: &quot;/etc/httpd/logs/error_log&quot;
+Mutex authdigest-opaque: using_defaults
+Mutex proxy-balancer-shm: using_defaults
+Mutex rewrite-map: using_defaults
+Mutex authdigest-client: using_defaults
+Mutex proxy: using_defaults
+Mutex authn-socache: using_defaults
+Mutex default: dir=&quot;/run/httpd/&quot; mechanism=default 
+Mutex mpm-accept: using_defaults
+PidFile: &quot;/run/httpd/httpd.pid&quot;
+Define: _RH_HAS_HTTPPROTOCOLOPTIONS
+Define: DUMP_VHOSTS
+Define: DUMP_RUN_CFG
+User: name=&quot;apache&quot; id=48
+Group: name=&quot;apache&quot; id=48
+
+
+
+---
+测试
+[root@localhost ~]# curl 192.168.10.101
+b.com
+[root@localhost ~]# curl 192.168.80.101
+a.com
+</code></pre><h2 id="基于port"><a href="#基于port" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于port" class="headings">基于port</a></h2>
+<pre><code>---
+多加一个listen端口；
+[root@localhost httpd]# grep Listen conf/httpd.conf 
+# Listen: Allows you to bind Apache to specific IP addresses and/or
+# Change this to Listen on specific IP addresses as shown below to 
+#Listen 12.34.56.78:80
+Listen 80
+Listen 8080
+
+虚拟主机，改成ip相同，端口不同；重启测试；
+[root@localhost httpd]# cat conf.d/vhosts.conf 
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.a.com
+	DocumentRoot /var/www/html/html/a.com
+&lt;/VirtualHost&gt;
+&lt;VirtualHost 192.168.80.101:8080&gt;
+	ServerName www.b.com
+	DocumentRoot /var/www/html/html/b.com
+&lt;/VirtualHost&gt;
+
+
+
+---
+[root@localhost ~]# curl 192.168.80.101:80
+a.com
+[root@localhost ~]# curl 192.168.80.101:8080
+b.com
+
+</code></pre><h2 id="基于主机头"><a href="#基于主机头" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于主机头" class="headings">基于主机头</a></h2>
+<p>​	web服务器对外提供的ip和port只有一份，但是拆包到http头的时候，根据请求头部的主机名不同，可转发给不同的虚拟主机段进行处理；虚拟主机必须指定自己独有的ServerName，没指定时，就继承所在主机的FQDN；</p>
+<pre><code>---
+改成ip，port都一样，靠servername区分；
+listen改为只有一个80；重启；
+
+[root@localhost httpd]# cat conf.d/vhosts.conf 
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.b.com
+	DocumentRoot /var/www/html/html/b.com
+&lt;/VirtualHost&gt;
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.a.com
+	DocumentRoot /var/www/html/html/a.com
+&lt;/VirtualHost&gt;
+
+---
+另一台主机测试：
+
+[root@localhost ~]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.80.101 www.a.com www.b.com www.c.com
+
+
+[root@localhost ~]# curl www.a.com
+a.com
+[root@localhost ~]# curl www.b.com
+b.com
+[root@localhost ~]# curl www.c.com
+a.com
+对于没有定义的主机头www.c.com，会被排第一位的虚拟主机匹配并处理，交换2虚拟主机定义位置后，再访问www.com就成了b.com的结果；
+
+[root@localhost ~]# curl www.b.com
+b.com
+[root@localhost ~]# curl www.a.com
+a.com
+[root@localhost ~]# curl www.c.com
+b.com
+
+</code></pre><h2 id="状态页"><a href="#状态页" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:状态页" class="headings">状态页</a></h2>
+<pre><code>---
+setHandler结合
+开启状态页
+&lt;Location &quot;/server-status&quot;&gt;
+	SetHandler server-status
+	Require all granted
+&lt;/Location&gt;
+同样，location支持正则
+</code></pre><h1 id="网页身份认证"><a href="#网页身份认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:网页身份认证" class="headings">网页身份认证</a></h1>
+<p><strong>访问控制可根据来源ip和来源用户身份</strong></p>
+<h2 id="htpasswd"><a href="#htpasswd" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:htpasswd" class="headings">htpasswd</a></h2>
+<p>​	用于创建用户和密码，用作用户认证的依据文件，一般为.开头的隐藏文件，并设置合理的权限，保证安全；</p>
+<pre><code>htpasswd -h
+
+[root@localhost conf.d]# htpasswd -bc ht.pass wang wang
+Adding password for user wang
+
+b 不用提示符，直接命令行就输入密码，没有b会提示交互式输入密码；
+c 是新建一个passfile，每次用c都会新建，和之前的passfile相同名字会冲掉之前内容；
+D 是删除用户
+n 不输出到文件，输出到控制台；
+
+n和c不同时用；
+
+
+
+[root@localhost conf.d]# htpasswd -b ht.pass li li
+Adding password for user li
+[root@localhost conf.d]# cat ht.pass 
+wang:$apr1$xW9RSLyU$o0sJmbQdw4whjzxlrq4lD1
+li:$apr1$Ql.LAGAT$N7di3x5IfUmQcF4sqd3KI/
+[root@localhost conf.d]# htpasswd -D ht.pass wang
+Deleting password for user wang
+[root@localhost conf.d]# cat ht.pass 
+li:$apr1$Ql.LAGAT$N7di3x5IfUmQcF4sqd3KI/
+
+
+---
+改加密算法，默认md5
+[root@localhost conf.d]# htpasswd -bns wang wang
+wang:{SHA}w2n5nCHTE/Xp7iuVe5PMcMOwIE0=
+
+[root@localhost conf.d]# htpasswd -bnm wang wang
+wang:$apr1$sESRKDad$ZKJU.gPwOZcwxbe71E1w61
+
+[root@localhost conf.d]# htpasswd -bnp wang wang
+Warning: storing passwords as plain text might just not work on this platform.
+wang:wang
+</code></pre><h2 id="认证相关指令"><a href="#认证相关指令" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:认证相关指令" class="headings">认证相关指令</a></h2>
+<p>提供认证功能的相关模块</p>
+<pre><code>[root@localhost modules]# ll |grep auth
+-rwxr-xr-x 1 root root  15336 Apr  2 21:14 mod_auth_basic.so
+-rwxr-xr-x 1 root root  36088 Apr  2 21:14 mod_auth_digest.so
+-rwxr-xr-x 1 root root  11160 Apr  2 21:14 mod_authn_anon.so
+-rwxr-xr-x 1 root root  15376 Apr  2 21:14 mod_authn_core.so
+-rwxr-xr-x 1 root root  15272 Apr  2 21:14 mod_authn_dbd.so
+-rwxr-xr-x 1 root root  11200 Apr  2 21:14 mod_authn_dbm.so
+-rwxr-xr-x 1 root root  11176 Apr  2 21:14 mod_authn_file.so
+-rwxr-xr-x 1 root root  19552 Apr  2 21:14 mod_authn_socache.so
+-rwxr-xr-x 1 root root  23752 Apr  2 21:14 mod_authz_core.so
+-rwxr-xr-x 1 root root  15304 Apr  2 21:14 mod_authz_dbd.so
+-rwxr-xr-x 1 root root  11216 Apr  2 21:14 mod_authz_dbm.so
+-rwxr-xr-x 1 root root  11200 Apr  2 21:14 mod_authz_groupfile.so
+-rwxr-xr-x 1 root root  11200 Apr  2 21:14 mod_authz_host.so
+-rwxr-xr-x 1 root root  11144 Apr  2 21:14 mod_authz_owner.so
+-rwxr-xr-x 1 root root   7040 Apr  2 21:14 mod_authz_user.so
+[root@localhost modules]# pwd
+/etc/httpd/modules
+# 不同的模块提供不同类型的认证功能
+</code></pre><ul>
+<li>AuthType
+<ul>
+<li>none basic digest form 常用的是basic，即密码文件认证；</li>
+</ul>
+</li>
+<li>AuthName
+<ul>
+<li>认证提示信息；</li>
+</ul>
+</li>
+<li>AuthUserFile file-path
+<ul>
+<li>密码文件路径，htpasswd生成</li>
+</ul>
+</li>
+<li>AuthGroupFile file-path
+<ul>
+<li>组认证密码文件，文件格式：mygroup: wang li lu</li>
+<li>相对路径相对于ServerRoot</li>
+</ul>
+</li>
+</ul>
+<h2 id="require指令"><a href="#require指令" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:require指令" class="headings">Require指令</a></h2>
+<p>认证相关模块，可提供require指令一些功能；</p>
+<pre><code>mod_authz_user.so提供
+Require user user1 ...
+
+mod_authz_groupfile.so提供
+Require group group1 ...
+
+ mod_authz_host.so提供
+Require host ...
+Require ip ...
+
+
+
+Require expr exprssion...
+表达式为真才允许访问
+Require method method...
+允许特定的访问方法访问
+Require env envvalue...
+环境变量值定义了才能访问
+</code></pre><h2 id="基于用户认证"><a href="#基于用户认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于用户认证" class="headings">基于用户认证</a></h2>
+<pre><code>---
+创建用户密码文件，在ServerRoot目录下；
+
+  329  htpasswd -bc pass.user wang wang
+  330  htpasswd -b pass.user li li
+  331  htpasswd -b pass.user lu lu
+  332  htpasswd -b pass.user yang yang
+
+[root@localhost httpd]# cat conf.d/vhosts.conf 
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.b.com
+	DocumentRoot /var/www/html/html/b.com
+	&lt;Directory &quot;/var/www/html/html/b.com&quot;&gt;
+		AllowOverride Authconfig # 开启basic认证必须配置
+		AuthType Basic # 认证类型basic
+		AuthName &quot;enter your name &amp; password&quot; # 提示字符串
+		AuthUserFile pass.user # 认证文件，采用ServerRoot的相对路径
+		Require user wang lu # 设置哪些用户可以认证
+
+	&lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.a.com
+	DocumentRoot /var/www/html/html/a.com
+&lt;/VirtualHost&gt;
+
+---
+重启，访问测试；
+</code></pre><h2 id="基于组认证"><a href="#基于组认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于组认证" class="headings">基于组认证</a></h2>
+<pre><code>---
+在ServerRoot目录下：创建组文件；再把li yang用户加入group1，
+echo &quot;group1:li yang&quot; &gt; pass.group
+
+[root@localhost httpd]# cat conf.d/vhosts.conf 
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.b.com
+	DocumentRoot /var/www/html/html/b.com
+	&lt;Directory &quot;/var/www/html/html/b.com&quot;&gt;
+		AllowOverride Authconfig
+		AuthType Basic
+		AuthName &quot;enter your name &amp; password&quot;
+		AuthUserFile pass.user
+		Require user wang lu
+		# 授权group1可以方式，此时li yang用户也可认证访问b.com了；
+		AuthGroupFile pass.group
+		Require group group1
+
+	&lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+&lt;VirtualHost 192.168.80.101:80&gt;
+	ServerName www.a.com
+	DocumentRoot /var/www/html/html/a.com
+&lt;/VirtualHost&gt;
+
+---
+重启测试；
+</code></pre><h1 id="日志"><a href="#日志" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:日志" class="headings">日志</a></h1>
+<p>httpd日志有2种：<strong>访问日志（http访问相关）、错误日志（进程相关信息）</strong></p>
+<p>httpd.conf的主配置文件：默认有日志级别、访问日志格式定义和引用、错误日志格式定义和引用；</p>
+<p>各个虚拟主机可以在自己配置内，自定义日志格式或日志路径，或继承主配置文件的；默认会继承；</p>
+<h2 id="customlog访问日志"><a href="#customlog访问日志" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:customlog访问日志" class="headings">customlog访问日志</a></h2>
+<pre><code>CustomLog file|pipe format|nickname [env=[!]environment-variable| expr=expression]
+file或管道，
+	file指定日志文件名
+	pipe结合日志处理程序用
+format
+	直接写日志格式定义
+nickname
+	调用上面定义好的日志格式的名字，如combined，common
+env=
+expr=
+	环境变量或表达式为真或为加的时候，对应日志才记录生效；
+eg：
+SetEnvIf Request_URI \.gif$ gif-req
+CustomLog &quot;gif-req.log&quot; common env=gif-req
+CustomLog &quot;no-gif-req.log&quot; common env=!gif-req
+含义为，gif的请求单独记录一个日志，其他的记录另一个日志；
+</code></pre><p><strong>日志相关变量</strong></p>
+<pre><code>LogFormat &quot;%h %l %u %t \&quot;%r\&quot; %&gt;s %b \&quot;%{Referer}i\&quot; \&quot;%{User-Agent}i\&quot;&quot; combined
+
+192.168.80.1 - wang [14/Aug/2020:12:50:58 +0800] &quot;GET /favicon.ico HTTP/1.1&quot; 404 209 &quot;http://192.168.80.101/&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36&quot;
+对比得出：
+%h 客户端ip
+%l remote logname，前提要开启一个模块，不然就是空，表现为短横线；
+%u 需要认证的网页，被认证后访问了，就记录用户名；
+%t 时间
+%r 请求方法
+\&quot; \&quot; 会内容之外加个冒号；
+%&gt;s final stauts of request 状态码
+%b 响应的字节大小，包括响应头
+Referer 和 User-agent都是请求头里的，依赖处理头部的模块来获得的，是变量；格式需要加%{var_name}i
+前端是代理时，如nginx，并开启了透传，httpd在设置接收透传的ip时，也要采取这种方式；
+</code></pre><h2 id="errorlog错误日志"><a href="#errorlog错误日志" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:errorlog错误日志" class="headings">errorlog错误日志</a></h2>
+<pre><code>https://httpd.apache.org/docs/2.4/mod/core.html#errorlogformat
+
+</code></pre><h2 id="日志轮替"><a href="#日志轮替" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:日志轮替" class="headings">日志轮替</a></h2>
+<h3 id="rotatelogs"><a href="#rotatelogs" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:rotatelogs" class="headings">rotatelogs</a></h3>
+<p>​	httpd自带的日志工具；可基于时间、大小来轮替日志文件，可截断；</p>
+<p>​	默认启动进程时，不会立刻创建日志文件，直到第一个请求到达，-f选项会改变这一行为，启动就立刻创建；</p>
+<p>​	基于时间或大小到轮替的时候，突然没请求了，默认也不轮替，直到有请求到底，-c选项改变这行为；</p>
+<pre><code>Usage: rotatelogs [-v] [-l] [-L linkname] [-p prog] [-f] [-t] [-e] [-c] [-n number] &lt;logfile&gt; {&lt;rotation time in seconds&gt;|&lt;rotation size&gt;(B|K|M|G)} [offset minutes from UTC]
+
+
+
+-n选项
+-n number-of-files
+              Use  a circular list of filenames without timestamps. With -n 3, the series
+              of log files opened would  be  &quot;logfile&quot;,  &quot;logfile.1&quot;,  &quot;logfile.2&quot;,  then
+              overwriting &quot;logfile&quot;.
+
+
+  rotationtime
+              The  time between log file rotations in seconds. The rotation occurs at the
+              beginning of this interval. For example, if the rotation time is 3600,  the
+              log  file  will  be rotated at the beginning of every hour; if the rotation
+              time is 86400, the log file will be rotated every night at midnight. (If no
+              data is logged during an interval, no file will be created.)
+
+man 8 rotatelogs，查看更多用法；
+
+eg：
+分别是按照时间轮替，日志文件加上时间后缀，按大小轮替
+CustomLog &quot;|/usr/sbin/rotatelogs /var/logs/logfile 86400&quot; common
+CustomLog &quot;/usr/sbin/rotatelogs /var/logs/logfile.%Y.%m.%d 86400&quot; common
+CustomLog &quot;|/usr/sbin/rotatelogs /var/logs/logfile 5M&quot; common
+
+</code></pre><p>时间修饰符：</p>
+<pre><code>常用的有年月日，时分秒；
+
+</code></pre><h3 id="cronolog"><a href="#cronolog" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:cronolog" class="headings">cronolog</a></h3>
+<pre><code>1，配置epel源
+
+2，yum安装即可
+yum install -y cronolog
+
+3，直接在CustomLog定义引用命令即可
+
+eg：
+CustomLog &quot;|/usr/sbin/cronolog logs/%Y/%m/%d/acccess.log&quot; combined
+采用相对serverroot的路径，和rotatelogs不同的是，用带年月日的目录，区别日志轮替的文件；到了轮替的时间点了，但没有请求到达，是不创建新文件的；
+
+不支持截断日志文件功能；
+
+有符合链接功能，轮替的文件自动更新链接，访问方便；
+eg：
+CustomLog &quot;|/usr/sbin/cronolog --symlink=/var/logs/logfile logs/%Y/%m/%d/%h/%m/%s&quot; combined
+
+假设时间现在是2020、08、15，定义了cronolog的日志轮替格式为年月日；每日一轮替；
+1st：
+	先建立不存在的2020文件夹；
+	再建立不存在的08文件夹；
+	再建立不存在的15文件夹；
+	建立access.log
+2st：
+	2020，不用建立了
+	08不用建立了
+	16要建立
+	建立access.log
+以此类推；
+
+
+cronolog没有请求时，即便根据时间轮替到时间了，也不建立新文件，以一天一轮替单位来说，
+15号有请求，后面3天没请求，第4天有请求了，那么就略过3天的文件，不建立了；
+
+</code></pre><h1 id="路径映射重定向"><a href="#路径映射重定向" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:路径映射重定向" class="headings">路径映射、重定向</a></h1>
+<h2 id="处理顺序"><a href="#处理顺序" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:处理顺序" class="headings">处理顺序</a></h2>
+<p><strong>重定向，优于路径映射处理</strong>，相同类型的按照先后顺序匹配处理；匹配到处理后就略过后面的；由mod_alias模块提供；</p>
+<p>scriptalias和alias一样，只是专用于做cgi程序路径的映射；</p>
+<ol>
+<li>redirect、redirectmatch</li>
+<li>alias、aliasmatch</li>
+</ol>
+<h2 id="路径映射aliasaliasmatch"><a href="#路径映射aliasaliasmatch" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:路径映射aliasaliasmatch" class="headings">路径映射、alias、aliasmatch</a></h2>
+<p>alias路径映射作用：<strong>将访问的uri映射到httpd所在主机的文件系统路径</strong></p>
+<p>alias语法：alias uri 本地文件系统路径，</p>
+<pre><code>alias将url路径映射到本地根文件系统的路径；不受documentroot的局限；注意放开目录的限制：一、dirctory定义；二、httpd启动用户对文件的实际权限；
+
+eg1：
+Alias &quot;/image&quot; &quot;/data/html/image&quot;
+
+eg2:
+AliasMatch &quot;^/image(.*)&quot; &quot;/data/html/image$1&quot;
+
+末尾加了/的，要相互匹配
+eg3：
+Alias &quot;/image/&quot; &quot;/data/html/image/&quot;
+
+---
+配置路径映射后，对相应目录的放行，[以及httpd用户的访问权限，要不用chmod等]
+Alias &quot;/image&quot; &quot;/data/html/image&quot;
+&lt;Directory &quot;/data/html/image&quot;&gt;
+	Require all granted
+&lt;/Directory&gt;
+
+---
+若是在location中做映射如下，location中就是url路径，再加个被映射到的路径即可：
+&lt;Location &quot;/image&quot;&gt;
+	Alias &quot;/data/html/image&quot;
+&lt;/Location&gt;
+
+</code></pre><h2 id="重定向redirectredirectmatch"><a href="#重定向redirectredirectmatch" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:重定向redirectredirectmatch" class="headings">重定向、redirect、redirectmatch</a></h2>
+<p>redirect重定向作用：<strong>当网页资源发生变动时，将旧的uri重定向到新的uri</strong>，重定向分为内部重定向和外部重定向；</p>
+<p>当资源发生变动时，客户端请求却发来的仍是旧的url路径，此时就要发回资源重定向响应，让客户端去请求新的url路径，【既然是新的url路径，就不局限于主机，自然是只要是url都可重定向，互联网其他url都可以重定向】</p>
+<p>Redirect [status] old-url new-url</p>
+<p>2个url都必须是/开头的绝对路径，new-url还可以是完整的域名路径；</p>
+<pre><code>eg1：
+Redirect &quot;/image&quot; &quot;https://www.baidu.com&quot;
+重定向到别的完整域名的网站；
+
+eg2:
+Redirect &quot;/image&quot; &quot;/img&quot;
+重定向到本机的url的/img路径；
+
+---
+没指定status参数，默认是302，临时重定向；
+
+permanent 301 永久重定向
+temp 302 临时重定向，默认的
+gone 410 表示资源被永久删除，new-url参数不生效；
+seeother 303 表资源已经被替代
+
+
+---
+在location里面，只需指定new-url，因为location自带old-url
+&lt;Location &quot;/img&quot;&gt;
+	Redirect permanent &quot;https://www.baidu.com&quot;
+&lt;/Location&gt;
+&lt;Location &quot;/gif&quot;&gt;
+	Redirect 302 &quot;/png&quot;
+&lt;/Location&gt;
+&lt;LocationMatch &quot;/png/(.*)&quot;&gt;
+	Redirect permanent &quot;/gif/(.*)&quot;
+&lt;/LocationMatch&gt;
+</code></pre><h2 id="location和aliasredirect的搭配"><a href="#location和aliasredirect的搭配" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:location和aliasredirect的搭配" class="headings">location和alias、redirect的搭配</a></h2>
+<p>alias语法：</p>
+<p>​	alias uri路径 本地文件系统路径</p>
+<p>redirect语法：</p>
+<p>​	redirect 状态码 旧的uri路径 新的uri路径</p>
+<p>**当结合location时：**第一个uri路径都移动到了location内部；</p>
+<p>alias：</p>
+<pre><code>&lt;location &quot;uri路径&quot;&gt;
+	alias 本地文件系统路径
+&lt;/location&gt;
+</code></pre><p>redirect：</p>
+<pre><code>&lt;location &quot;旧的uri路径&quot;&gt;
+	redirect 状态码 新的uri路径
+&lt;/location&gt;
+</code></pre><h1 id="https加密配置"><a href="#https加密配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:https加密配置" class="headings">https加密配置</a></h1>
+<p>参考文档：http://httpd.apache.org/docs/2.4/ssl/</p>
+<h2 id="mod_ssl实现"><a href="#mod_ssl实现" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mod_ssl实现" class="headings">mod_ssl实现</a></h2>
+<pre><code>[root@host3 ~]# curl https://192.168.80.102
+curl: (7) Failed connect to 192.168.80.102:443; Connection refused
+
+# 默认不支持https访问
+# 安装mod_ssl包，其中包括，共享库文件、配置文件，一套自签名密钥文件，证书
+# 重启后，即可实现https加密
+[root@host3 ~]# yum install -y mod_ssl
+
+[root@host3 ~]# rpm -ql mod_ssl
+/etc/httpd/conf.d/ssl.conf
+/etc/httpd/conf.modules.d/00-ssl.conf
+/usr/lib64/httpd/modules/mod_ssl.so
+/usr/libexec/httpd-ssl-pass-dialog
+/var/cache/httpd/ssl
+
+[root@host3 ~]# systemctl restart httpd
+[root@host3 ~]# curl https://192.168.80.102
+curl: (60) Issuer certificate is invalid.
+More details here: http://curl.haxx.se/docs/sslcerts.html
+</code></pre>
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/httpd%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/httpd之web服务/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-16 12:52:42 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-16</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-16</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8Blamp%E7%8E%AF%E5%A2%83/" class="related-link">httpd之LAMP环境</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" class="related-link">httpd之七层代理服务</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E4%B8%89%E7%A7%8Dmpm%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B/" class="related-link">httpd之三种mpm工作模型</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E4%B8%8E%E9%9D%99%E6%80%81web%E7%BB%93%E5%90%88%E9%85%8D%E7%BD%AE/" class="related-link">tomcat之与静态web结合</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="related-link">httpd之安装与配置</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/httpd/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>httpd</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" rel="prev">&lt; httpd之七层代理服务</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/httpd%E4%B9%8B%E4%B8%89%E7%A7%8Dmpm%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B/" rel="next">httpd之三种mpm工作模型 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>gitlab之git基础 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="gitlab之git基础" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/gitlab%E4%B9%8Bgit%E5%9F%BA%E7%A1%80/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-12-02T10:56:55+00:00",
+        "dateModified": "2020-12-07T16:40:58+08:00",
+        "url": "https://latteStudio.github.io/posts/gitlab%E4%B9%8Bgit%E5%9F%BA%E7%A1%80/",
+        "headline": "gitlab之git基础",
+        "description": "gitlab之git基础",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  7584 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20201202153545857.png","https://gitee.com/boogie96/img/raw/master/img/image-20201202173741140.png","https://gitee.com/boogie96/img/raw/master/img/image-20201203112610865.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="gitlab之git基础" />
+<meta property="og:description" content="gitlab之git基础" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/gitlab%E4%B9%8Bgit%E5%9F%BA%E7%A1%80/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20201202153545857.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-12-02T10:56:55&#43;00:00" />
+    <meta property="article:modified_time" content="2020-12-07T16:40:58&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">gitlab之git基础</h1>
+
+            
+
+            
+                <div class="post-description p-summary">gitlab之git基础</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-12-02T10:56:55&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.12.2</time>
+    
+    
+        
+        <time datetime="2020-12-07T16:40:58&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.12.7</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/ci/cd/" class="category-link p-category">ci/cd</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;7584</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;16&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:安装配置" href="#安装配置">安装配置</a></li>
+    <li><a id="contents:git术语" href="#git术语">git术语</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:创建本地版本库repo" href="#创建本地版本库repo">创建本地版本库repo</a></li>
+    <li><a id="contents:修改文件并查看" href="#修改文件并查看">修改文件并查看</a></li>
+    <li><a id="contents:版本回退" href="#版本回退">版本回退</a></li>
+    <li><a id="contents:文件修改提交的过程" href="#文件修改提交的过程">文件修改提交的过程</a></li>
+    <li><a id="contents:撤销修改" href="#撤销修改">撤销修改</a>
+      <ol>
+        <li><a id="contents:修改在工作区" href="#修改在工作区">修改在工作区</a></li>
+        <li><a id="contents:修改到了暂存区" href="#修改到了暂存区">修改到了暂存区</a></li>
+        <li><a id="contents:修改到了版本库" href="#修改到了版本库">修改到了版本库</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:删除文件" href="#删除文件">删除文件</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:本地上传到github" href="#本地上传到github">本地上传到github</a></li>
+    <li><a id="contents:github仓库克隆到本地" href="#github仓库克隆到本地">github仓库克隆到本地</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:创建合并分支" href="#创建合并分支">创建、合并分支</a></li>
+    <li><a id="contents:解决冲突" href="#解决冲突">解决冲突</a></li>
+    <li><a id="contents:分支管理策略" href="#分支管理策略">分支管理策略</a></li>
+    <li><a id="contents:bug分支" href="#bug分支">bug分支</a></li>
+    <li><a id="contents:feature分支" href="#feature分支">feature分支</a></li>
+    <li><a id="contents:多人协作" href="#多人协作">多人协作</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="git基础安装"><a href="#git基础安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:git基础安装" class="headings">git基础安装</a></h1>
+<h2 id="安装配置"><a href="#安装配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装配置" class="headings">安装配置</a></h2>
+<ol>
+<li>
+<p>yum安装</p>
+<pre><code>[root@git-client ~]# yum install -y git
+   
+[root@git-client ~]# git --version
+git version 1.8.3.1
+</code></pre></li>
+<li>
+<p>配置全局git账户</p>
+<p>配置username和email，和将要同步的远端git型server账户一致，（如公网gitlab、github的注册账户，私有gitlab仓库的注册账户等）</p>
+<p>这里采用了公网gitlab上注册的账户和邮箱信息</p>
+<pre><code>[root@git-client ~]# git config --global --list
+fatal: unable to read config file '/root/.gitconfig': No such file or directory
+[root@git-client ~]# git config --global user.name &quot;ice_latte&quot;
+[root@git-client ~]# git config --global user.email &quot;xx@163.com&quot;
+[root@git-client ~]# git config --global --list
+user.name=ice_latte
+user.email=xx@163.com
+</code></pre></li>
+<li>
+<p>配置认证方法</p>
+<p>一般采用ssh-key免密认证方式，认证到远程的git服务器，如gitlab</p>
+<p>另一种方式为git基于https的认证，不推荐</p>
+<pre><code>[root@git-client ~]# ssh-keygen -t rsa
+Generating public/private rsa key pair.
+   
+采用如上密码，本地开发机，生成密钥对，然后在~/.ssh/，当前用户的.ssh目录下，找到pub结尾的公钥文件，
+登陆gitlab网页，找到ssh设置选择，将公钥字符串贴入其中即可
+</code></pre></li>
+<li>
+<p>验证</p>
+<p>验证是否在个人客户端、和gitlab之间建立连接，采用如下命令，若是私有仓库，gitlab.com要替换为适当的私有域名或ip</p>
+<pre><code>[root@git-client ~]# ssh -T git@gitlab.com
+The authenticity of host 'gitlab.com (172.65.251.78)' can't be established.
+ECDSA key fingerprint is SHA256:HbW3g8zUjNSksFbqTiUWPWg2Bq1x8xdGUrliXFzSnUw.
+ECDSA key fingerprint is MD5:f1:d0:fb:46:73:7a:70:92:5a:ab:5d:ef:43:e2:1c:35.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'gitlab.com,172.65.251.78' (ECDSA) to the list of known hosts.
+Welcome to GitLab, @ice_latte!
+</code></pre></li>
+</ol>
+<h2 id="git术语"><a href="#git术语" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:git术语" class="headings">git术语</a></h2>
+<p>对于gitlab来说，namespace：有2类</p>
+<ul>
+<li><a href="https://gitlab.com/" target="_blank" rel="noopener">https://gitlab.com/</a>你注册的用户名</li>
+<li><a href="https://gitlab.com/" target="_blank" rel="noopener">https://gitlab.com/</a>你创建的群组名</li>
+</ul>
+<p>repo仓库：</p>
+<p>​	相当于一个目录，里面存放的文本文件，都接受git的追踪、管理；</p>
+<ul>
+<li>本地仓库：新建一个目录，然后git init就是；</li>
+<li>远程仓库：注册的github、gitee这种账户，点击新建repo就是；</li>
+<li>本地仓库和远程仓库可以相关联，本地仓库可以推送一到多个远程仓库做备份，或分享开源之用；</li>
+</ul>
+<h1 id="git基础使用"><a href="#git基础使用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:git基础使用" class="headings">git基础使用</a></h1>
+<p><strong>git只能追踪文件文件的内容变化，如code，网页代码，word这种属于二进制文件，无法追踪其内容变化；</strong></p>
+<h2 id="创建本地版本库repo"><a href="#创建本地版本库repo" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:创建本地版本库repo" class="headings">创建本地版本库repo</a></h2>
+<ol>
+<li>
+<p>初始化git目录</p>
+<pre><code>[root@git-client git-demo]# pwd
+/git-demo
+   
+[root@git-client git-demo]# git init
+Initialized empty Git repository in /git-demo/.git/
+   
+[root@git-client git-demo]# ll -a
+total 0
+drwxr-xr-x   3 root root  18 Dec  2 14:09 .
+dr-xr-xr-x. 18 root root 240 Dec  2 14:09 ..
+drwxr-xr-x   7 root root 119 Dec  2 14:09 .git
+   
+创建一个新的空的目录，做本地repo目录，git init即可初始化，之后生成.git目录为仓库追踪元信息；
+</code></pre></li>
+<li>
+<p>编辑2个新文件</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># vim file1.txt</span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># cat file1.txt </span>
+hello git
+I am the one!
+   
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># vim file2.txt</span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># cat file2.txt </span>
+linux user
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>git添加</p>
+<p>git add会将指定的文件，添加到git缓存区，需要指定文件名，file2未添加，所以commit时只会有file1</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">   
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git add file1.txt </span>
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>git提交</p>
+<p>git commit会把上次commit之后add的文件，即在git缓存区的文件提交到本地仓库，</p>
+<p>提示信息：</p>
+<p>为主分支，root用户提交</p>
+<p>添加了一个文件，里面有2行插入</p>
+<p>-m 为注释信息，要意义明确</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git commit -m &#34;my first commit,include one file2&#34;</span>
+<span class="o">[</span>master <span class="o">(</span>root-commit<span class="o">)</span> af61fed<span class="o">]</span> my first commit,include two file2
+ <span class="m">1</span> file changed, <span class="m">2</span> insertions<span class="o">(</span>+<span class="o">)</span>
+ create mode <span class="m">100644</span> file1.txt
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># ll</span>
+total <span class="m">8</span>
+-rw-r--r-- <span class="m">1</span> root root <span class="m">24</span> Dec  <span class="m">2</span> 14:15 file1.txt
+-rw-r--r-- <span class="m">1</span> root root <span class="m">11</span> Dec  <span class="m">2</span> 14:16 file2.txt
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+</ol>
+<h2 id="修改文件并查看"><a href="#修改文件并查看" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:修改文件并查看" class="headings">修改文件并查看</a></h2>
+<ol>
+<li>
+<p>修改文件内容</p>
+<p>第一行末尾，添加了cool！</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># cat file1.txt </span>
+hello git cool!
+I am the one!
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>git status查看当前工作区状态</p>
+<p>可以看出是否有变化，提示信息为：主分支、file1.txt发生了修改，还没提交</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git status</span>
+<span class="c1"># On branch master</span>
+<span class="c1"># Changes not staged for commit:</span>
+<span class="c1">#   (use &#34;git add &lt;file&gt;...&#34; to update what will be committed)</span>
+<span class="c1">#   (use &#34;git checkout -- &lt;file&gt;...&#34; to discard changes in working directory)</span>
+<span class="c1">#</span>
+<span class="c1">#	modified:   file1.txt</span>
+<span class="c1">#</span>
+no changes added to commit <span class="o">(</span>use <span class="s2">&#34;git add&#34;</span> and/or <span class="s2">&#34;git commit -a&#34;</span><span class="o">)</span>
+   
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>git diff查看两次变化信息</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git diff</span>
+diff --git a/file1.txt b/file1.txt
+index bf68a56..88f7199 <span class="m">100644</span>
+--- a/file1.txt
++++ b/file1.txt
+@@ -1,2 +1,2 @@
+-hello git
++hello git cool!
+ I am the one!
+   
+可以看出，变化为加了一个cool！
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>确认无误后、提交变化后文件</p>
+<p>确认是自己想要的文件修改后，（不是误修改），git add 、git commit再次提交；</p>
+<p>此时查看git status状态为“干净的”</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git add file1.txt </span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git commit -m &#39;i confirm&#39;</span>
+<span class="o">[</span>master 409066c<span class="o">]</span> i confirm
+ <span class="m">1</span> file changed, <span class="m">1</span> insertion<span class="o">(</span>+<span class="o">)</span>, <span class="m">1</span> deletion<span class="o">(</span>-<span class="o">)</span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git status</span>
+<span class="c1"># On branch master</span>
+nothing to commit, working directory clean
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+</ol>
+<p>总结：</p>
+<ol>
+<li>修改文件后，</li>
+<li>git status可以查看当前工作区状态，查看距离上次commit后，有无变化，有哪些变化；</li>
+<li>git diff可以看到文件变化的内容，输出格式为diff格式</li>
+<li>确认修改后，可以再次add，然后commit</li>
+</ol>
+<h2 id="版本回退"><a href="#版本回退" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:版本回退" class="headings">版本回退</a></h2>
+<ol>
+<li>
+<p>再次修改file1.txt，目前共有3个版本；</p>
+<p>除去添加file2的提交，仅仅针对file1而言，共有3次提交；3个文件版本；</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git log</span>
+commit 2ba3654be407a797f9267a9bf4f334189338f558
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec <span class="m">2</span> 14:49:53 <span class="m">2020</span> +0800
+   
+    third modified
+   
+commit 409066ced43ef1a71c5c29d8285ff1eec6e2d2b7
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec <span class="m">2</span> 14:35:36 <span class="m">2020</span> +0800
+   
+    i confirm
+   
+commit c5adcc0311e259847ddf4198b0b16626eb5b54c8
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec <span class="m">2</span> 14:32:25 <span class="m">2020</span> +0800
+   
+    add file2.txt
+   
+commit af61fed1ff436427946d59776de248e9eecc4936
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec <span class="m">2</span> 14:16:45 <span class="m">2020</span> +0800
+   
+    my first commit,include two file2
+       
+<span class="c1">##简洁输出参数，第一列为提交的hash码，也是标识id，前7个字符是短格式</span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git log --pretty=oneline</span>
+2ba3654be407a797f9267a9bf4f334189338f558 third modified
+409066ced43ef1a71c5c29d8285ff1eec6e2d2b7 i confirm
+c5adcc0311e259847ddf4198b0b16626eb5b54c8 add file2.txt
+af61fed1ff436427946d59776de248e9eecc4936 my first commit,include two file2
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>回退到第二个版本；</p>
+<pre><code>[root@git-client git-demo]# cat file1.txt 
+hello git cool!
+I am the one!
+third modified,add one line.
+   
+# HEAD^为上个版本，HEAD^^为上2个版本，HEAD~100为上一百个版本
+# 也可以根据commit的id回退到指定版本，id用git log或git reflog获得
+   
+[root@git-client git-demo]# git reset --hard HEAD^
+HEAD is now at 409066c i confirm
+   
+[root@git-client git-demo]# cat file1.txt 
+hello git cool!
+I am the one!
+</code></pre></li>
+<li>
+<p>再次回到最新的第三个版本；</p>
+<pre><code>[root@git-client git-demo]# git log
+commit 409066ced43ef1a71c5c29d8285ff1eec6e2d2b7
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec 2 14:35:36 2020 +0800
+   
+    i confirm
+   
+commit c5adcc0311e259847ddf4198b0b16626eb5b54c8
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec 2 14:32:25 2020 +0800
+   
+    add file2.txt
+   
+commit af61fed1ff436427946d59776de248e9eecc4936
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec 2 14:16:45 2020 +0800
+   
+    my first commit,include two file2
+   
+# git log看到的是提交日志，回退后，新版本的id就丢失
+# git reflog看到的是操作日志，可以看到所有的id
+   
+[root@git-client git-demo]# git reflog
+409066c HEAD@{0}: reset: moving to HEAD^
+2ba3654 HEAD@{1}: commit: third modified
+409066c HEAD@{2}: commit: i confirm
+c5adcc0 HEAD@{3}: commit: add file2.txt
+af61fed HEAD@{4}: commit (initial): my first commit,include two file2
+   
+   
+# 再根据id，回到第三个版本即可
+[root@git-client git-demo]# git reset --hard 2ba3654
+HEAD is now at 2ba3654 third modified
+[root@git-client git-demo]# cat file1.txt 
+hello git cool!
+I am the one!
+third modified,add one line.
+</code></pre></li>
+</ol>
+<h2 id="文件修改提交的过程"><a href="#文件修改提交的过程" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:文件修改提交的过程" class="headings">文件修改提交的过程</a></h2>
+<p><strong>git追踪的不是文件、而是文件的修改！</strong></p>
+<p>三个区：</p>
+<ul>
+<li>工作区</li>
+<li>暂存区</li>
+<li>master分支</li>
+</ul>
+<ol>
+<li>新加的文件，或已经挂在分支下，但又有新修改的文件，需要git add将<strong>其修改</strong>添加到暂存区（本质都是新的修改）</li>
+<li>添加到暂存区 staged的<strong>修改</strong> ，是准备提交到master分支上的，git commit提交；</li>
+</ol>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201202153545857.png" alt="image-20201202153545857"></p>
+<p><strong>测试：</strong></p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># vim file2.txt </span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git add file2.txt</span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git status</span>
+<span class="c1"># On branch master</span>
+<span class="c1"># Changes to be committed:</span>
+<span class="c1">#   (use &#34;git reset HEAD &lt;file&gt;...&#34; to unstage)</span>
+<span class="c1">#</span>
+<span class="c1">#	modified:   file2.txt</span>
+<span class="c1">#</span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git commit -m &#34;file2 add two-line&#34;</span>
+<span class="o">[</span>master 4285c1a<span class="o">]</span> file2 add two-line
+ <span class="m">1</span> file changed, <span class="m">1</span> insertion<span class="o">(</span>+<span class="o">)</span>
+ 
+ <span class="c1"># 修改file2后，先add，后commit，后即可；</span>
+
+
+
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># vim file2.txt </span>
+<span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git commit -m &#34;file2 add three-line&#34;</span>
+<span class="c1"># On branch master</span>
+<span class="c1"># 提示看出，还没有提交到staged阶段，为commit做准备，</span>
+<span class="c1"># staged就是暂存区</span>
+<span class="c1"># 需要先add</span>
+<span class="c1"># Changes not staged for commit:</span>
+<span class="c1">#   (use &#34;git add &lt;file&gt;...&#34; to update what will be committed)</span>
+<span class="c1">#   (use &#34;git checkout -- &lt;file&gt;...&#34; to discard changes in working directory)</span>
+<span class="c1">#</span>
+<span class="c1">#	modified:   file2.txt</span>
+<span class="c1">#</span>
+no changes added to commit <span class="o">(</span>use <span class="s2">&#34;git add&#34;</span> and/or <span class="s2">&#34;git commit -a&#34;</span><span class="o">)</span>
+
+<span class="c1"># 再次修改file2，跳过add，直接commit不行，因为又是一个新的修改，需要先add！</span>
+</code></pre></td></tr></table></div>
+</div>
+</div><p><strong>总结：即每一个修改（修改原有文件、或添加新文件），都要先add到暂存区，再commit到分支上，多次修改，可以最后只一个add，一个commit；</strong></p>
+<h2 id="撤销修改"><a href="#撤销修改" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:撤销修改" class="headings">撤销修改</a></h2>
+<p>分三种情况</p>
+<ul>
+<li>只是工作区修改，修改后并未git add；</li>
+<li>修改到了暂存区，修改后git add添加到了暂存区；</li>
+<li>修改提交到了版本库中，修改后git add、git commit到了分支上；（但没有推送到远程库）</li>
+</ul>
+<h3 id="修改在工作区"><a href="#修改在工作区" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:修改在工作区" class="headings">修改在工作区</a></h3>
+<pre><code>[root@git-client git-demo]# git status
+# On branch master
+# Changes not staged for commit:
+#   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#	modified:   file2.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+
+# 修改file2，发现是不想要的修改，在未提交到staged时，可以用checkout撤销修改
+# git status都有对应提示
+# 撤销后，刚刚修改丢失
+
+[root@git-client git-demo]# git checkout -- file2.txt
+[root@git-client git-demo]# git status
+# On branch master
+nothing to commit, working directory clean
+
+[root@git-client git-demo]# cat file2.txt 
+linux user
+two line
+</code></pre><h3 id="修改到了暂存区"><a href="#修改到了暂存区" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:修改到了暂存区" class="headings">修改到了暂存区</a></h3>
+<pre><code>[root@git-client git-demo]# vim file2.txt 
+
+[root@git-client git-demo]# git add file2.txt 
+[root@git-client git-demo]# git status
+# On branch master
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#	modified:   file2.txt
+
+修改后还add了，，根据提示撤销，分2步：
+
+[root@git-client git-demo]# git reset HEAD file2.txt 
+Unstaged changes after reset:
+M	file2.txt
+
+[root@git-client git-demo]# git checkout -- file2.txt 
+[root@git-client git-demo]# git status
+# On branch master
+nothing to commit, working directory clean
+</code></pre><h3 id="修改到了版本库"><a href="#修改到了版本库" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:修改到了版本库" class="headings">修改到了版本库</a></h3>
+<pre><code>[root@git-client git-demo]# vim file2.txt 
+[root@git-client git-demo]# git add file2.txt 
+[root@git-client git-demo]# git commit -m 'file2 add three-line'
+[master cef9515] file2 add three-line
+ 1 file changed, 1 insertion(+)
+[root@git-client git-demo]# cat file2.txt 
+linux user
+two line
+three-line
+
+[root@git-client git-demo]# git log
+commit cef95158395c8843bd694ceadf7ef7e78c5c8f7b
+Author: ice_latte &lt;boogies@163.com&gt;
+Date:   Wed Dec 2 16:07:16 2020 +0800
+
+    file2 add three-line
+
+commit 4285c1a19de268ab63c63200a6990c316fc86580
+...
+
+# 修改后，add，还commit了，此时就属于版本回退了，
+# git log找到上一个commit的id，然后reset到那个版本即可；
+
+[root@git-client git-demo]# git reset --hard 4285c1a19de268ab63c63200a6990c316fc86580
+HEAD is now at 4285c1a file2 add two-line
+[root@git-client git-demo]# cat file2.txt 
+linux user
+two line
+
+</code></pre><h2 id="删除文件"><a href="#删除文件" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:删除文件" class="headings">删除文件</a></h2>
+<ol>
+<li>工作区、先直接rm删除需要的文件
+<ol>
+<li>若确认删除，版本库中文件也继续删除</li>
+<li>若为误删除，需要从版本库中恢复该文件到工作区</li>
+</ol>
+</li>
+<li>ps：
+<ol>
+<li>只有之前提交过到版本库（分支）后的可以恢复</li>
+<li>恢复后，最近一次commit后的修改会丢失</li>
+</ol>
+</li>
+</ol>
+<p>实验：</p>
+<p>1，添加新文件f3，并加到版本库中</p>
+<p>​	添加、删除都是<strong>修改</strong>，</p>
+<pre><code>[root@git-client git-demo]# touch f3
+
+[root@git-client git-demo]# git add f3
+
+[root@git-client git-demo]# git commit -m &quot;add f3&quot;
+[master 9357e75] add f3
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 f3
+[root@git-client git-demo]# git status
+# On branch master
+nothing to commit, working directory clean
+</code></pre><p>2，删除f3后，并删除版本库中f3</p>
+<pre><code>[root@git-client git-demo]# rm -rf f3 
+
+[root@git-client git-demo]# git rm f3
+rm 'f3'
+
+[root@git-client git-demo]# git commit -m 'delete f3'
+</code></pre><p>3，删除f3后，发现误删除，要恢复</p>
+<p>​	多git status查看状态，都有对应提示；</p>
+<pre><code>[root@git-client git-demo]# rm -rf f3 
+[root@git-client git-demo]# git status
+# On branch master
+# Changes not staged for commit:
+#   (use &quot;git add/rm &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#	deleted:    f3
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+[root@git-client git-demo]# git checkout -- f3
+
+[root@git-client git-demo]# ll
+total 8
+-rw-r--r-- 1 root root  0 Dec  2 16:24 f3
+</code></pre><h1 id="远程仓库"><a href="#远程仓库" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:远程仓库" class="headings">远程仓库</a></h1>
+<h2 id="本地上传到github"><a href="#本地上传到github" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:本地上传到github" class="headings">本地上传到github</a></h2>
+<ol>
+<li>创建github仓库</li>
+<li>添加本地机器生成的公钥到github的ssh-key</li>
+<li>github创建一个仓库</li>
+<li>上三步略...</li>
+</ol>
+<p>将本地仓库关联到新建立的github仓库；下为新建仓库后，给出的提示命令</p>
+<pre><code>git remote add origin git@github.com:ice-latte/git-demo.git
+添加远程库信息
+git branch -M main
+创建main分支
+git push -u origin main
+第一次-u参数，将main分支关联到本地的master分支，origin为远程仓库的名字
+</code></pre><pre><code>先验证github联通性
+[root@git-client git-demo]# ssh -T git@github.com
+Hi ice-latte! You've successfully authenticated, but GitHub does not provide shell access.
+
+根据提示命令执行即可；
+[root@git-client git-demo]# git remote add origin git@github.com:ice-latte/git-demo.git
+[root@git-client git-demo]# git branch -M main
+[root@git-client git-demo]# git push -u origin main
+Counting objects: 26, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (20/20), done.
+Writing objects: 100% (26/26), 2.15 KiB | 0 bytes/s, done.
+Total 26 (delta 4), reused 0 (delta 0)
+remote: Resolving deltas: 100% (4/4), done.
+To git@github.com:ice-latte/git-demo.git
+ * [new branch]      main -&gt; main
+Branch main set up to track remote branch main from origin.
+</code></pre><p>推送后，github可以看到相应文件，之后再提交到本地的修改，直接<code>git push orgin main</code>即可；不再需要u参数</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201202173741140.png" alt="image-20201202173741140"></p>
+<h2 id="github仓库克隆到本地"><a href="#github仓库克隆到本地" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:github仓库克隆到本地" class="headings">github仓库克隆到本地</a></h2>
+<p>github创建好仓库后，直接git clone即可</p>
+<pre><code>[root@git-client /]# git clone git@github.com:ice-latte/git-demo2.git
+Cloning into 'git-demo2'...
+remote: Enumerating objects: 4, done.
+remote: Counting objects: 100% (4/4), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 4 (delta 0), reused 0 (delta 0), pack-reused 0
+Receiving objects: 100% (4/4), 4.49 KiB | 0 bytes/s, done.
+[root@git-client /]# ll /git-demo2/
+total 16
+-rw-r--r-- 1 root root 11357 Dec  2 17:47 LICENSE
+-rw-r--r-- 1 root root    11 Dec  2 17:47 README.md
+</code></pre><h1 id="分支管理"><a href="#分支管理" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:分支管理" class="headings">分支管理</a></h1>
+<p>分支的管理，本质就是指针的切换，创建与删除；<a href="https://www.liaoxuefeng.com/wiki/896043488029600/900003767775424" target="_blank" rel="noopener">参考图示</a></p>
+<h2 id="创建合并分支"><a href="#创建合并分支" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:创建合并分支" class="headings">创建、合并分支</a></h2>
+<ol>
+<li>
+<p>查看当前分支，并创建新分支并同时切换，*表示的是当前分支位置</p>
+<pre><code>[root@git-client git-demo2]# git branch
+* main
+[root@git-client git-demo2]# git checkout -b dev
+Switched to a new branch 'dev'
+[root@git-client git-demo2]# git branch
+* dev
+  main
+</code></pre></li>
+<li>
+<p>先创建分支，再切换</p>
+<pre><code>[root@git-client git-demo2]# git branch test
+[root@git-client git-demo2]# git checkout test
+Switched to branch 'test'
+[root@git-client git-demo2]# git branch
+  dev
+  main
+* test
+[root@git-client git-demo2]# git checkout dev
+Switched to branch 'dev'
+</code></pre></li>
+<li>
+<p>在dev分支开发继续</p>
+<p>在dev分支，开发的code1，提交后，再切换为main，看不到code1</p>
+<pre><code>[root@git-client git-demo2]# touch code1
+[root@git-client git-demo2]# git add code1
+[root@git-client git-demo2]# git commit -m 'dev code1'
+[dev 155bb55] dev code1
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 code1
+[root@git-client git-demo2]# ll
+total 16
+-rw-r--r-- 1 root root     0 Dec  2 18:08 code1
+-rw-r--r-- 1 root root 11357 Dec  2 17:47 LICENSE
+-rw-r--r-- 1 root root    11 Dec  2 17:47 README.md
+[root@git-client git-demo2]# git checkout main
+Switched to branch 'main'
+[root@git-client git-demo2]# ll
+total 16
+-rw-r--r-- 1 root root 11357 Dec  2 17:47 LICENSE
+-rw-r--r-- 1 root root    11 Dec  2 17:47 README.md
+   
+</code></pre></li>
+<li>
+<p>合并dev分支的内容到main主分支，</p>
+<p>其实就是将main分支的指针指向了dev，fast-forward为一种合并模式，就是只切换了指针指向，</p>
+<p>合并后，看到了code1文件</p>
+<p>先要切换到main分支，且merge其他分支</p>
+<pre><code>[root@git-client git-demo2]# git merge dev
+Updating 012d8ac..155bb55
+Fast-forward
+ code1 | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 code1
+[root@git-client git-demo2]# ll
+total 16
+-rw-r--r-- 1 root root     0 Dec  2 18:12 code1
+-rw-r--r-- 1 root root 11357 Dec  2 17:47 LICENSE
+-rw-r--r-- 1 root root    11 Dec  2 17:47 README.md
+   
+</code></pre></li>
+<li>
+<p>删除dev分支</p>
+<pre><code>[root@git-client git-demo2]# git branch -d dev
+Deleted branch dev (was 155bb55).
+[root@git-client git-demo2]# git branch
+* main
+  test
+   
+</code></pre></li>
+<li>
+<p>新的分支命令</p>
+<pre><code>git switch -c dev2 创建并切换到dev2分支
+git switch master 切换到master分支
+</code></pre></li>
+</ol>
+<p>git推荐，拉取新分支进行开发功能，对分支代码确认后，再merge到主分支，效果一致，且更安全，</p>
+<h2 id="解决冲突"><a href="#解决冲突" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:解决冲突" class="headings">解决冲突</a></h2>
+<p>​	一般情况下，多人协同开发时，都是各自开发不同的模块，操作不同的文本文件、各自拉取的分支在合并后，只是不同模块代码文件的合并；fast-forward合并模式基本可以应付；</p>
+<p>​	但当有多个分支的开发人员操作了同一个文件，且修改了同一行的，且修改不同，此时自动合并就会报出冲突，需要合并时 ，手动解决冲突：<strong>就是在多份修改不同时，敲定一个版本，然后提交</strong></p>
+<p><strong>测试：</strong></p>
+<ol>
+<li>
+<p>先拉取一个新特性分支feature1</p>
+<ol>
+<li>
+<p>新分支上修改file1，并在第五行添加 is cool</p>
+<pre><code>[root@git-client git-demo]# git branch
+* main
+[root@git-client git-demo]# git checkout -b feature1
+Switched to a new branch 'feature1'
+[root@git-client git-demo]# git branch
+* feature1
+  main
+[root@git-client git-demo]# ll
+total 8
+-rw-r--r-- 1 root root  0 Dec  2 16:24 f3
+-rw-r--r-- 1 root root  0 Dec  2 17:41 f4
+-rw-r--r-- 1 root root 79 Dec  2 15:20 file1.txt
+-rw-r--r-- 1 root root 20 Dec  2 16:08 file2.txt
+[root@git-client git-demo]# vim file1.txt 
+[root@git-client git-demo]# cat file1.txt 
+hello git cool!
+I am the one!
+third modified,add one line.
+four line
+five line is cool.
+</code></pre></li>
+<li>
+<p>git add</p>
+</li>
+<li>
+<p>git commit提交</p>
+<pre><code>[root@git-client git-demo]# git add file1.txt 
+[root@git-client git-demo]# git commit -m &quot;file1 add is cool&quot;
+[feature1 043bf76] file1 add is cool
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+[root@git-client git-demo]# git status
+# On branch feature1
+nothing to commit, working directory clean
+</code></pre></li>
+</ol>
+</li>
+<li>
+<p>切换回main主分支</p>
+<ol>
+<li>
+<p>此时查看file1，第五行未添加任何内容</p>
+<pre><code>[root@git-client git-demo]# git checkout main
+Switched to branch 'main'
+[root@git-client git-demo]# git status
+# On branch main
+nothing to commit, working directory clean
+[root@git-client git-demo]# cat file1.txt 
+hello git cool!
+I am the one!
+third modified,add one line.
+four line
+five line
+</code></pre></li>
+<li>
+<p>修改file1，并在第五行添加 is not cool</p>
+</li>
+<li>
+<p>git add</p>
+</li>
+<li>
+<p>git commit提交</p>
+<pre><code>[root@git-client git-demo]# vim file1.txt 
+[root@git-client git-demo]# git status
+# On branch main
+# Changes not staged for commit:
+#   (use &quot;git add &lt;file&gt;...&quot; to update what will be committed)
+#   (use &quot;git checkout -- &lt;file&gt;...&quot; to discard changes in working directory)
+#
+#	modified:   file1.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+[root@git-client git-demo]# git add file1.txt
+[root@git-client git-demo]# git commit -m 'file1 add is not cool'
+[main c246768] file1 add is not cool
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+</code></pre></li>
+</ol>
+</li>
+<li>
+<p>开始合并</p>
+<ol>
+<li>
+<p>在main主分支上，合并feature1上的修改</p>
+</li>
+<li>
+<p>git branch merge feature1时报错，报合并冲突，因为2个分支都修改了同一个文件，同一行；</p>
+<pre><code>[root@git-client git-demo]# git merge feature1
+Auto-merging file1.txt
+CONFLICT (content): Merge conflict in file1.txt
+Automatic merge failed; fix conflicts and then commit the result.
+[root@git-client git-demo]# git status
+# On branch main
+# Your branch is ahead of 'origin/main' by 1 commit.
+#   (use &quot;git push&quot; to publish your local commits)
+#
+# You have unmerged paths.
+#   (fix conflicts and run &quot;git commit&quot;)
+#
+# Unmerged paths:
+#   (use &quot;git add &lt;file&gt;...&quot; to mark resolution)
+#
+#	both modified:      file1.txt
+#
+no changes added to commit (use &quot;git add&quot; and/or &quot;git commit -a&quot;)
+</code></pre></li>
+</ol>
+</li>
+<li>
+<p>解决冲突</p>
+<ol>
+<li>
+<p>在main主分支上，查看file1内容，会有冲突行的提示</p>
+<pre><code>[root@git-client git-demo]# cat file1.txt 
+hello git cool!
+I am the one!
+third modified,add one line.
+four line
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+five line is not cool.
+=======
+five line is cool.
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature1
+</code></pre></li>
+<li>
+<p>在main主分支上，编辑file1，敲定冲突行到底选定那个分支的修改，或综合一下</p>
+<pre><code>[root@git-client git-demo]# vim file1.txt 
+      
+</code></pre></li>
+</ol>
+</li>
+<li>
+<p>解决冲突后提交</p>
+<ol>
+<li>
+<p>git add</p>
+</li>
+<li>
+<p>git commit提交即可</p>
+<pre><code>[root@git-client git-demo]# git add file1.txt 
+[root@git-client git-demo]# git commit -m &quot;conflict fixed,real cool&quot;
+[main 10fc0d3] conflict fixed,real cool
+[root@git-client git-demo]# git status
+# On branch main
+# Your branch is ahead of 'origin/main' by 3 commits.
+#   (use &quot;git push&quot; to publish your local commits)
+#
+nothing to commit, working directory clean
+</code></pre></li>
+</ol>
+</li>
+<li>
+<p>查看提交日志</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@git-client git-demo<span class="o">]</span><span class="c1"># git log --graph --pretty=oneline --abbrev-commit</span>
+*   10fc0d3 conflict fixed,real cool
+<span class="p">|</span><span class="se">\ </span> 
+<span class="p">|</span> * 043bf76 file1 add is cool
+* <span class="p">|</span> c246768 file1 add is not cool
+<span class="p">|</span>/  <span class="c1"># 这块儿看到，2个分支，冲突，最后解决了冲突再merge</span>
+* d90cc73 add f4
+* cf3d7d1 add f3
+* 3837d88 delete f3
+* 9357e75 add f3
+* 4285c1a file2 add two-line
+* 74a3395 yes
+* b9c43df add four line
+* 2ba3654 third modified
+* 409066c i confirm
+* c5adcc0 add file2.txt
+* af61fed my first commit,include two file2
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>​	删除feature1分支</p>
+<pre><code>[root@git-client git-demo]# git branch
+  feature1
+* main
+[root@git-client git-demo]# git branch -d feature1
+Deleted branch feature1 (was 043bf76).
+[root@git-client git-demo]# git branch
+* main
+</code></pre></li>
+</ol>
+<h2 id="分支管理策略"><a href="#分支管理策略" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:分支管理策略" class="headings">分支管理策略</a></h2>
+<p>​	默认分支合并策略为fast-forwarding，也可以用--no-ff参数禁用fast-forwarding合并策略；采用普通合并模式；</p>
+<ol>
+<li>
+<p>拉取新分支dev</p>
+<ol>
+<li>
+<p>修改f3文件</p>
+<pre><code>[root@git-client git-demo]# git checkout -b dev
+Switched to a new branch 'dev'
+[root@git-client git-demo]# git branch
+* dev
+  main
+[root@git-client git-demo]# vim f3 
+</code></pre></li>
+<li>
+<p>add、commit2步提交</p>
+<pre><code>[root@git-client git-demo]# git add f3
+      
+[root@git-client git-demo]# git commit -m 'f3 add '
+[dev 6dd5183] f3 add
+ 1 file changed, 1 insertion(+)
+      
+</code></pre></li>
+</ol>
+</li>
+<li>
+<p>切换回main分支</p>
+<pre><code>[root@git-client git-demo]# git status
+# On branch dev
+nothing to commit, working directory clean
+[root@git-client git-demo]# git checkout main
+Switched to branch 'main'
+Your branch is ahead of 'origin/main' by 3 commits.
+  (use &quot;git push&quot; to publish your local commits)
+</code></pre><ol>
+<li>
+<p>用no-ff模式合并dev</p>
+<pre><code>[root@git-client git-demo]# git merge --no-ff -m 'test no-ff merge' dev
+Merge made by the 'recursive' strategy.
+ f3 | 1 +
+ 1 file changed, 1 insertion(+)
+</code></pre></li>
+<li>
+<p>查看git log图形</p>
+<pre><code>[root@git-client git-demo]# git log --graph --pretty=oneline --abbrev-commit
+*   e9a12ff test no-ff merge
+|\  
+| * 6dd5183 f3 add
+|/  
+*   10fc0d3 conflict fixed,real cool
+|\  
+| * 043bf76 file1 add is cool
+* | c246768 file1 add is not cool
+|/  
+* d9
+</code></pre></li>
+</ol>
+</li>
+</ol>
+<p><strong>开发时分支策略：</strong></p>
+<ul>
+<li>master应保持稳定，只有在发布新版本时使用，将dev分支的代码合并到master然后发布；</li>
+<li>在master初始化后拉取一个dev分支，作为各个开发人员开发后汇总的分支；</li>
+<li>在dev拉取各个开发人员自己的分支，根据需要合并，</li>
+</ul>
+<p><strong>图示：</strong></p>
+<p>​	各个开发人员开发分支示意，dev分支汇总各开发的代码，测试通过后，再merge到master上发版；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201203112610865.png" alt="image-20201203112610865"></p>
+<h2 id="bug分支"><a href="#bug分支" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:bug分支" class="headings">bug分支</a></h2>
+<p>​	假定，正在dev分支进行开发，开发到中途，上一版master的发版有bug，需要立刻修复，方法：保存dev分支现场，切换到master，拉取bug修复分支，然后切换到master合并bug分支，最后切换为dev，还原现场，继续开发；</p>
+<ol>
+<li>
+<p>保存dev现场</p>
+<pre><code>[root@git-client git-demo2]# touch code3
+[root@git-client git-demo2]# git add code3 
+[root@git-client git-demo2]# git status
+# On branch dev
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#	new file:   code3
+#
+此时code3还未提交，未完成也不能提交，只能先保存现场；
+[root@git-client git-demo2]# git stash
+Saved working directory and index state WIP on dev: df5c057 add code2
+HEAD is now at df5c057 add code2
+[root@git-client git-demo2]# git status
+# On branch dev
+nothing to commit, working directory clean
+   
+git stash保存现场，保存后，工作目录是干净的
+</code></pre></li>
+<li>
+<p>切换到master</p>
+<pre><code>[root@git-client git-demo2]# git checkout main
+Switched to branch 'main'
+Your branch is ahead of 'origin/main' by 2 commits.
+  (use &quot;git push&quot; to publish your local commits)
+[root@git-client git-demo2]# git status
+# On branch main
+# Your branch is ahead of 'origin/main' by 2 commits.
+#   (use &quot;git push&quot; to publish your local commits)
+#
+nothing to commit, working directory clean
+</code></pre></li>
+<li>
+<p>拉取bug修复分支，并修复</p>
+<pre><code>[root@git-client git-demo2]# git checkout -b bugfix
+Switched to a new branch 'bugfix'
+[root@git-client git-demo2]# ll
+total 20
+-rw-r--r-- 1 root root     4 Dec  3 15:02 code1
+-rw-r--r-- 1 root root 11357 Dec  2 17:47 LICENSE
+-rw-r--r-- 1 root root    11 Dec  2 17:47 README.md
+[root@git-client git-demo2]# cat code1 
+bug
+   
+# 假定code1中的bug删除，就为bug修复操作；
+   
+[root@git-client git-demo2]# &gt; code1 
+[root@git-client git-demo2]# cat code1 
+[root@git-client git-demo2]# git add code1 
+[root@git-client git-demo2]# git commit -m 'fixed bug'
+[bugfix ba43126] fixed bug
+ 1 file changed, 1 deletion(-)
+[root@git-client git-demo2]# git status
+# On branch bugfix
+nothing to commit, working directory clean
+</code></pre></li>
+<li>
+<p>切换到master，合并bug修复分支</p>
+<pre><code>[root@git-client git-demo2]# git checkout main
+Switched to branch 'main'
+Your branch is ahead of 'origin/main' by 2 commits.
+  (use &quot;git push&quot; to publish your local commits)
+[root@git-client git-demo2]# git merge --no-ff -m 'merge bug fixed' bugfix
+Merge made by the 'recursive' strategy.
+ code1 | 1 -
+ 1 file changed, 1 deletion(-)
+   
+</code></pre></li>
+<li>
+<p>切换为dev，恢复现场</p>
+<pre><code>[root@git-client git-demo2]# git checkout dev
+Switched to branch 'dev'
+[root@git-client git-demo2]# git status
+# On branch dev
+nothing to commit, working directory clean
+   
+# 列出之前保存的现场
+[root@git-client git-demo2]# git stash list
+stash@{0}: WIP on dev: df5c057 add code2
+   
+# 用git stash pop恢复
+[root@git-client git-demo2]# git stash pop
+# On branch dev
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#	new file:   code3
+#
+Dropped refs/stash@{0} (985929981fb0112131abe194d466ae595d166c66)
+[root@git-client git-demo2]# git stash list
+[root@git-client git-demo2]# git status
+# On branch dev
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#	new file:   code3
+</code></pre></li>
+<li>
+<p>（重放，修复dev中隐含的相同的bug）</p>
+<p>dev是从master拉取的分支，master的bug在dev分支同样存在，可以采用重放的方式，快速修复dev中的bug；</p>
+<pre><code>[root@git-client git-demo2]# git cherry-pick ba43126
+[dev 8f58ed9] fixed bug
+ 1 file changed, 1 deletion(-)
+[root@git-client git-demo2]# cat code1 
+   
+找到修改bug的那个commit的id，git cherry-pick ID即可，前提，当前git status要是干净的；
+</code></pre></li>
+</ol>
+<h2 id="feature分支"><a href="#feature分支" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:feature分支" class="headings">feature分支</a></h2>
+<p>1、拉取用于新的特性开发的分支，并做了commit</p>
+<pre><code>[root@git-client git-demo2]# git checkout -b feature
+Switched to a new branch 'feature'
+
+[root@git-client git-demo2]# touch func1
+[root@git-client git-demo2]# git add func1 
+[root@git-client git-demo2]# git commit -m 'add func1'
+[feature f40650c] add func1
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 func1
+</code></pre><p>2、切换回dev上，若要删除刚刚的分支的话，对于已经commit但未合并的分支，删除需要D参数，</p>
+<pre><code>[root@git-client git-demo2]# git status
+# On branch feature
+nothing to commit, working directory clean
+[root@git-client git-demo2]# git checkout dev
+Switched to branch 'dev'
+[root@git-client git-demo2]# git branch -d feature
+error: The branch 'feature' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D feature'.
+[root@git-client git-demo2]# git branch -D feature
+Deleted branch feature (was f40650c).
+[root@git-client git-demo2]# git branch
+* dev
+  main
+</code></pre><h2 id="多人协作"><a href="#多人协作" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:多人协作" class="headings">多人协作</a></h2>
+<p>推送分支：除主分支外，其余分支可以根据需要推送；</p>
+<p>​	多人协助时，一般都有一个远程仓库，做汇总，和远程仓库同步时，需要指定远程的仓库名，（是仓库在本地的标识名，不一定是创建仓库时的名字）</p>
+<p>​	git remote add origin <a href="mailto:git@github.com">git@github.com</a>:ice-latte/git-demo.git，origin就是远程仓库在本地的标识名，默认是origin，当有多个远程库要同步时，要定义不同的名字区分开，</p>
+<pre><code># 查看远程仓库的信息
+
+[root@git-client git-demo2]# git remote
+origin
+[root@git-client git-demo2]# git remote -v
+origin	git@github.com:ice-latte/git-demo2.git (fetch)
+origin	git@github.com:ice-latte/git-demo2.git (push)
+
+# 将本地的main分支，对应远程的主分支master，推送上去；
+
+[root@git-client git-demo2]# git push origin main
+Counting objects: 13, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (10/10), done.
+Writing objects: 100% (12/12), 1003 bytes | 0 bytes/s, done.
+Total 12 (delta 5), reused 0 (delta 0)
+remote: Resolving deltas: 100% (5/5), done.
+To git@github.com:ice-latte/git-demo2.git
+   012d8ac..1dc27c7  main -&gt; main
+
+# 将本地的dev分支，推送上去，远程也将创建一个dev分支；
+[root@git-client git-demo2]# git push origin dev
+Total 0 (delta 0), reused 0 (delta 0)
+remote: 
+remote: Create a pull request for 'dev' on GitHub by visiting:
+remote:      https://github.com/ice-latte/git-demo2/pull/new/dev
+remote: 
+To git@github.com:ice-latte/git-demo2.git
+ * [new branch]      dev -&gt; dev
+</code></pre><p>推送分支：</p>
+<ol>
+<li>推送自己本地分支提交的更新时，</li>
+<li>若推送失败，提示远程库较新，需要先把远程库pull下来合并，然后再push</li>
+<li>若合并有冲突，就手动解决冲突，然后提交，然后再push</li>
+</ol>
+<pre><code># 下为提示，push被拒绝，因为，远程库较新，有别人先push了，提示要先pull下来跟自己合并，
+# 若修改了冲突的行，还需解决冲突，然后再push
+
+[root@git-client git-demo2]# git push origin dev
+Warning: Permanently added the RSA host key for IP address '192.30.255.113' to the list of known hosts.
+To git@github.com:ice-latte/git-demo2.git
+ ! [rejected]        dev -&gt; dev (fetch first)
+error: failed to push some refs to 'git@github.com:ice-latte/git-demo2.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first merge the remote changes (e.g.,
+hint: 'git pull') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+</code></pre>
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/gitlab%E4%B9%8Bgit%E5%9F%BA%E7%A1%80/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/gitlab之git基础/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-12-07 16:40:58 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-12-07</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-12-07</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/gitlab%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D/" class="related-link">gitlab备份恢复</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/gitlab%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/" class="related-link">gitlab权限管理</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/gitlab%E9%83%A8%E7%BD%B2/" class="related-link">gitlab部署</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/jenkins%E9%9B%86%E6%88%90sonarqube%E4%BB%A3%E7%A0%81%E5%AE%A1%E6%9F%A5/" class="related-link">jenkins集成sonarqube代码审查</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/jenkins%E4%B9%8Bpipline%E5%9F%BA%E7%A1%80/" class="related-link">jenkins之pipline基础</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/git/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>git</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/gitlab/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>gitlab</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/gitlab%E9%83%A8%E7%BD%B2/" rel="prev">&lt; gitlab部署</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/k8s%E4%B9%8B%E4%BA%8C%E8%BF%9B%E5%88%B6%E9%83%A8%E7%BD%B2%E9%9B%86%E7%BE%A4/" rel="next">k8s之二进制部署集群 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

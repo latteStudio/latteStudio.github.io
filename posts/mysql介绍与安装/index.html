@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>mysql介绍与安装 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="mysql介绍与安装" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/mysql%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-08-28T12:27:40+00:00",
+        "dateModified": "2021-03-09T12:31:18+08:00",
+        "url": "https://latteStudio.github.io/posts/mysql%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/",
+        "headline": "mysql介绍与安装",
+        "description": "mysql介绍与安装",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  4903 ,
+        "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary" />
+
+
+    
+
+
+
+<meta property="og:title" content="mysql介绍与安装" />
+<meta property="og:description" content="mysql介绍与安装" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/mysql%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://latteStudio.github.io/icons/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-08-28T12:27:40&#43;00:00" />
+    <meta property="article:modified_time" content="2021-03-09T12:31:18&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">mysql介绍与安装</h1>
+
+            
+
+            
+                <div class="post-description p-summary">mysql介绍与安装</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-08-28T12:27:40&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.8.28</time>
+    
+    
+        
+        <time datetime="2021-03-09T12:31:18&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2021.3.9</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-link p-category">数据库</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;4903</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;10&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:数据存储发展过程" href="#数据存储发展过程">数据存储发展过程</a></li>
+    <li><a id="contents:关系型数据库范式" href="#关系型数据库范式">关系型数据库范式</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:mysql简介" href="#mysql简介">mysql简介</a></li>
+    <li><a id="contents:yum安装" href="#yum安装">yum安装</a></li>
+    <li><a id="contents:二进制安装" href="#二进制安装">二进制安装</a>
+      <ol>
+        <li><a id="contents:安装后配置" href="#安装后配置">安装后配置</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:编译安装" href="#编译安装">编译安装</a></li>
+    <li><a id="contents:mariadb" href="#mariadb">mariadb</a>
+      <ol>
+        <li><a id="contents:mariadb与mysql版本演变" href="#mariadb与mysql版本演变">mariadb与mysql版本演变</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="关系型数据库"><a href="#关系型数据库" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:关系型数据库" class="headings">关系型数据库</a></h1>
+<h2 id="数据存储发展过程"><a href="#数据存储发展过程" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:数据存储发展过程" class="headings">数据存储发展过程</a></h2>
+<p>​	文件系统-》网状/层次型数据库-》关系型数据库-》分布式数据库/noSQL</p>
+<p>​	<strong>文件系统是对磁盘的抽象，将磁盘的地址空间抽象给可理解，易操作的文件；关系型数据库dbms是堆文件系统的进一步抽象，进一步抽象为数据之间关系更有逻辑，更清楚的表，数据库文件都是存在于文件系统之上的文件，只是需要dbms软件才能打开识别</strong>，也有直接去掉文件系统，直接在裸设备上存储数据库数据的，去掉一层更快，</p>
+<h2 id="关系型数据库范式"><a href="#关系型数据库范式" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:关系型数据库范式" class="headings">关系型数据库范式</a></h2>
+<p>​	共有6种范式：1NF、2NF、3NF、BCNF、4NF、5NF；一般关系型数据库满足3NF即可；详见wikipedia</p>
+<p><a href="https://en.wikipedia.org/wiki/Category:Database_normalization" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Category:Database_normalization</a></p>
+<h1 id="mysql安装"><a href="#mysql安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mysql安装" class="headings">mysql安装</a></h1>
+<h2 id="mysql简介"><a href="#mysql简介" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mysql简介" class="headings">mysql简介</a></h2>
+<p>作者：Michael Widenius</p>
+<p>相关官网：分别是mysql，mariadb，percona第三方发行版服务商</p>
+<ul>
+<li>
+<p><a href="https://www.mysql.com/" target="_blank" rel="noopener">https://www.mysql.com/</a></p>
+<ul>
+<li><a href="https://dev.mysql.com/doc/" target="_blank" rel="noopener">https://dev.mysql.com/doc/</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://mariadb.org/" target="_blank" rel="noopener">https://mariadb.org/</a></p>
+<ul>
+<li><a href="https://mariadb.org/documentation/" target="_blank" rel="noopener">https://mariadb.org/documentation/</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://www.percona.com/" target="_blank" rel="noopener">https://www.percona.com/</a></p>
+<ul>
+<li><a href="https://www.percona.com/doc/percona-distribution-mysql/8.0/index.html" target="_blank" rel="noopener">https://www.percona.com/doc/percona-distribution-mysql/8.0/index.html</a></li>
+</ul>
+</li>
+</ul>
+<p><strong>特性：</strong></p>
+<ul>
+<li>插件式存储引擎，支持多种存储引擎，常用myisam和innodb（mysql5.5.5后默认）</li>
+<li>单进程、多线程</li>
+<li>开源</li>
+<li>诸多扩展、新特性</li>
+<li>提供较多测试组件</li>
+</ul>
+<p><strong>安装方式</strong></p>
+<ul>
+<li>yum仓库安装：版本较落后，适合测试</li>
+<li>二进制安装，采用官方编译后二进制文件，简单配置即可；（类似与windows的绿色免安装软件）</li>
+<li>编译安装，从源码从头编译安装</li>
+</ul>
+<h2 id="yum安装"><a href="#yum安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:yum安装" class="headings">yum安装</a></h2>
+<p><strong>安装、启动：</strong></p>
+<pre><code>[root@host3 ~]# yum list all |grep mariadb
+Repodata is over 2 weeks old. Install yum-cron? Or run: yum makecache fast
+mariadb-libs.x86_64                      1:5.5.56-2.el7                @anaconda
+mariadb.x86_64                           1:5.5.65-1.el7                base     
+mariadb-bench.x86_64                     1:5.5.65-1.el7                base     
+mariadb-devel.i686                       1:5.5.65-1.el7                base     
+mariadb-devel.x86_64                     1:5.5.65-1.el7                base     
+mariadb-embedded.i686                    1:5.5.65-1.el7                base     
+mariadb-embedded.x86_64                  1:5.5.65-1.el7                base     
+mariadb-embedded-devel.i686              1:5.5.65-1.el7                base     
+mariadb-embedded-devel.x86_64            1:5.5.65-1.el7                base     
+mariadb-libs.i686                        1:5.5.65-1.el7                base     
+mariadb-libs.x86_64                      1:5.5.65-1.el7                base     
+mariadb-server.x86_64                    1:5.5.65-1.el7                base     
+mariadb-test.x86_64                      1:5.5.65-1.el7                base   
+# centos7采用阿里云的yum源，带的mariadb默认版本5.5，
+# mariadb-server是包含服务器软件的包
+
+# 直接安装即可，会自动安装依赖包，更新依赖包，
+[root@host3 ~]# yum install -y mariadb-server
+
+# 启动后查看进程状态，
+[root@host3 ~]# systemctl start mariadb
+[root@host3 ~]# systemctl status mariadb
+● mariadb.service - MariaDB database server
+   Loaded: loaded (/usr/lib/systemd/system/mariadb.service; disabled; vendor preset: disabled)
+   Active: active (running) since Fri 2020-09-18 11:48:10 CST; 2s ago
+  Process: 1263 ExecStartPost=/usr/libexec/mariadb-wait-ready $MAINPID (code=exited, status=0/SUCCESS)
+  Process: 1179 ExecStartPre=/usr/libexec/mariadb-prepare-db-dir %n (code=exited, status=0/SUCCESS)
+ Main PID: 1262 (mysqld_safe)
+   CGroup: /system.slice/mariadb.service
+           ├─1262 /bin/sh /usr/bin/mysqld_safe --basedir=/usr
+           └─1424 /usr/libexec/mysqld --basedir=/usr --datadir=/var/lib/mysql --plugin-dir=/usr/lib64/mysql/plugin --log-error=/var/log/mariadb/mariadb.log --pid-file=/var/run/mariadb/m...
+           
+[root@host3 ~]# ss -nlt                                                                
+默认3306端口
+
+# 免密连接
+[root@host3 ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 2
+Server version: 5.5.65-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+4 rows in set (0.00 sec)
+
+MariaDB [(none)]&gt; 
+
+# 启动后生成的数据文件
+[root@host3 ~]# ll /var/lib/mysql/
+total 37852
+-rw-rw---- 1 mysql mysql    16384 Sep 18 11:48 aria_log.00000001
+-rw-rw---- 1 mysql mysql       52 Sep 18 11:48 aria_log_control
+-rw-rw---- 1 mysql mysql 18874368 Sep 18 11:48 ibdata1
+-rw-rw---- 1 mysql mysql  5242880 Sep 18 11:48 ib_logfile0
+-rw-rw---- 1 mysql mysql  5242880 Sep 18 11:48 ib_logfile1
+drwx------ 2 mysql mysql     4096 Sep 18 11:48 mysql
+srwxrwxrwx 1 mysql mysql        0 Sep 18 11:48 mysql.sock
+drwx------ 2 mysql mysql     4096 Sep 18 11:48 performance_schema
+drwx------ 2 mysql mysql        6 Sep 18 11:48 test
+</code></pre><p><strong>安装后目录结构：</strong></p>
+<pre><code>[root@host3 ~]# rpm -ql mariadb-server
+/etc/logrotate.d/mariadb
+/etc/my.cnf.d/server.cnf
+配置文件
+/usr/bin/mysqld_multi
+/usr/bin/mysqld_safe 启动脚本，通过该脚本调用启动主程序/usr/libexec/mysqld
+/usr/bin/mysqld_safe_helper
+各类程序文件
+/usr/lib/systemd/system/mariadb.service
+服务脚本
+/usr/lib/tmpfiles.d/mariadb.conf
+/usr/lib64/mysql/INFO_BIN
+/usr/lib64/mysql/INFO_SRC
+/usr/lib64/mysql/mysqlbug
+/usr/lib64/mysql/plugin
+/usr/lib64/mysql/plugin/adt_null.so
+/usr/lib64/mysql/plugin/auth_0x0100.so
+...
+插件目录，下的各类插件，有些需要显示启用才行
+
+/usr/libexec/mariadb-prepare-db-dir
+/usr/libexec/mariadb-wait-ready
+/usr/libexec/mysqld
+主程序
+/usr/share/man/man1/innochecksum.1.gz
+/usr/share/man/man1/msql2mysql.1.gz
+/usr/share/man/man1/myisam_ftdump.1.gz
+...
+帮助文件手册、示例sql、配置文件模版等
+
+
+/var/lib/mysql
+/var/log/mariadb
+/var/log/mariadb/mariadb.log
+/var/run/mariadb
+数据目录，日志目录，pid文件目录
+</code></pre><p><strong>进程结构</strong></p>
+<pre><code>[root@host3 ~]# pstree -p |grep mysql
+           |-mysqld_safe(1262)---mysqld(1424)-+-{mysqld}(1428)
+           |                                  |-{mysqld}(1429)
+           |                                  |-{mysqld}(1430)
+           |                                  |-{mysqld}(1431)
+           |                                  |-{mysqld}(1432)
+           |                                  |-{mysqld}(1433)
+           |                                  |-{mysqld}(1434)
+           |                                  |-{mysqld}(1435)
+           |                                  |-{mysqld}(1436)
+           |                                  |-{mysqld}(1437)
+           |                                  |-{mysqld}(1438)
+           |                                  |-{mysqld}(1439)
+           |                                  |-{mysqld}(1440)
+           |                                  |-{mysqld}(1441)
+           |                                  |-{mysqld}(1442)
+           |                                  |-{mysqld}(1443)
+           |                                  |-{mysqld}(1451)
+           |                                  `-{mysqld}(1452)
+可以看出，由mysqld_safe脚本启动的mysqld主进程，派生多个子线程；
+符合单进程，多线程特性；
+</code></pre><h2 id="二进制安装"><a href="#二进制安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:二进制安装" class="headings">二进制安装</a></h2>
+<ol>
+<li>下载适合版本、适合平台的二进制软件包；</li>
+<li>解压到需要的目录，可选择做软链接，方便版本更新</li>
+<li>创建mysql用户、数据目录，改数据目录属主</li>
+<li>准备配置文件、服务脚本、</li>
+<li>配置环境变量</li>
+<li>数据库初始化脚本，初始化数据目录</li>
+<li>测试启停数据库</li>
+<li>安装后配置操作</li>
+</ol>
+<hr>
+<p>1、下载适合版本、适合平台的二进制软件包；以mariadb-10.2.25为例</p>
+<pre><code>[root@host2 src]# ll
+total 517536
+-rw-r--r-- 1 root root 457955398 Oct 29  2019 mariadb-10.2.25-linux-x86_64.tar.gz
+</code></pre><p>2、解压到需要的目录，可选择做软链接，方便版本更新</p>
+<pre><code>[root@host2 src]# tar -xf mariadb-10.2.25-linux-x86_64.tar.gz -C /usr/local/
+
+# 注意，软连接名字一定要是/usr/local/mysql，不能是/usr/local/mariadb，
+# 否则，启动时，官方提供的服务脚本默认去找/usr/local/mysql的文件，其他的路径，会报错找不到！
+[root@host2 mariadb]# ln -sv /usr/local/mariadb-10.2.25-linux-x86_64/ /usr/local/mysql
+‘/usr/local/mysql’ -&gt; ‘/usr/local/mariadb-10.2.25-linux-x86_64/’
+[root@host2 mariadb]# ll /usr/local/
+total 0
+drwxr-xr-x.  2 root root    6 Apr 11  2018 bin
+drwxr-xr-x.  2 root root    6 Apr 11  2018 etc
+drwxr-xr-x.  2 root root    6 Apr 11  2018 games
+drwxr-xr-x.  2 root root    6 Apr 11  2018 include
+drwxr-xr-x.  2 root root    6 Apr 11  2018 lib
+drwxr-xr-x.  2 root root    6 Apr 11  2018 lib64
+drwxr-xr-x.  2 root root    6 Apr 11  2018 libexec
+drwxrwxr-x  12 root mysql 282 Jun 15  2019 mariadb-10.2.25-linux-x86_64
+lrwxrwxrwx   1 root root   40 Sep 18 14:49 mysql -&gt; /usr/local/mariadb-10.2.25-linux-x86_64/
+drwxr-xr-x.  2 root root    6 Apr 11  2018 sbin
+drwxr-xr-x.  5 root root   49 Aug  8 11:58 share
+drwxr-xr-x.  2 root root   79 Sep 18 13:13 src
+
+[root@host2 mariadb]# chown -R root:mysql /usr/local/mariadb-10.2.25-linux-x86_64/
+</code></pre><p>3、创建mysql用户、数据目录，改数据目录属主</p>
+<pre><code>[root@host2 src]# mkdir /data/mysql -pv
+mkdir: created directory ‘/data’
+mkdir: created directory ‘/data/mysql’
+[root@host2 src]# groupadd mysql -g 306
+[root@host2 src]# useradd -g mysql -u 306 mysql
+[root@host2 src]# id mysql
+uid=306(mysql) gid=306(mysql) groups=306(mysql)
+[root@host2 src]# chown -R mysql.mysql /data/mysql/
+
+</code></pre><p>4、准备配置文件、服务脚本</p>
+<pre><code># mysql读取配置文件顺序第一位是/etc/my.cnf，属于mariadb-libs包，二进制安装时，默认配置文件不适合，可选择官方提供的配置文件，并做修改；
+
+[root@host2 mariadb]# rpm -qf /etc/my.cnf
+mariadb-libs-5.5.56-2.el7.x86_64
+[root@host2 mariadb]# cp /etc/my.cnf{,.bak}
+[root@host2 mariadb]# cp support-files/my-medium.cnf /etc/my.cnf
+cp: overwrite ‘/etc/my.cnf’? y
+# 修改配置文件，
+[mysqld]
+port            = 3306
+socket          = /tmp/mysql.sock
+skip-external-locking
+key_buffer_size = 16M
+max_allowed_packet = 1M
+table_open_cache = 64
+sort_buffer_size = 512K
+net_buffer_length = 8K
+read_buffer_size = 256K
+read_rnd_buffer_size = 512K
+myisam_sort_buffer_size = 8M
+在mysqld配置段，加入如下3项，datadir根据情况修改，innodb存储引擎性能相关；禁止反解客户端名字，因为没必要
+datadir=/data/mysql
+innodb_file_per_table=on
+skip_name_resolve=on
+
+
+# 解压后目录的support-files目录下，有服务脚本，sysV风格，centos7可用
+[root@host2 mariadb]# pwd
+/usr/local/mariadb
+[root@host2 mariadb]# ls support-files/
+binary-configure  my-innodb-heavy-4G.cnf  my-small.cnf         mysql.server  wsrep_notify
+magic             my-large.cnf            mysqld_multi.server  policy
+my-huge.cnf       my-medium.cnf           mysql-log-rotate     wsrep.cnf
+
+[root@host2 mariadb]# cp support-files/mysql.server /etc/init.d/mysqld
+[root@host2 mariadb]# chkconfig --add mysqld
+[root@host2 mariadb]# chkconfig mysqld on
+[root@host2 mariadb]# chkconfig --list
+
+mysqld         	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+netconsole     	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+network        	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+
+</code></pre><p>5、配置环境变量</p>
+<pre><code>[root@host2 mysql]# cat /etc/profile.d/mysql.sh
+export PATH=/usr/local/mysql/bin:$PATH
+
+source /etc/profile.d/mysql.sh
+</code></pre><p>6、数据库初始化脚本，初始化数据目录</p>
+<p>注：不同版本，数据目录初始化，和安全加固脚本，步骤和实现脚本会有变化，以官网为准；</p>
+<pre><code>[root@host2 mariadb]# ./scripts/mysql_install_db --datadir=/data/mysql/ --user=mysql
+Installing MariaDB/MySQL system tables in '/data/mysql/' ...
+./bin/mysqld: error while loading shared libraries: libaio.so.1: cannot open shared object file: No such file or directory
+
+[root@host2 mariadb]# yum install -y libaio
+# 初始化时，缺失libaio.so.1，安装对应的包即可
+
+[root@host2 mariadb]# ./scripts/mysql_install_db --datadir=/data/mysql/ --user=mysql
+# 提示的后续操作：
+# 准备服务脚本
+# 改root密码
+# 安全加固脚本
+
+To start mysqld at boot time you have to copy
+support-files/mysql.server to the right place for your system
+
+
+PLEASE REMEMBER TO SET A PASSWORD FOR THE MariaDB root USER !
+To do so, start the server, then issue the following commands:
+
+'./bin/mysqladmin' -u root password 'new-password'
+'./bin/mysqladmin' -u root -h host2.b.com password 'new-password'
+
+Alternatively you can run:
+'./bin/mysql_secure_installation'
+
+# 再次安装即可，并在数据目录，生成如下数据文件；
+[root@host2 mariadb]# ll /data/mysql/
+total 110660
+-rw-rw---- 1 mysql mysql    16384 Sep 18 14:42 aria_log.00000001
+-rw-rw---- 1 mysql mysql       52 Sep 18 14:42 aria_log_control
+-rw-rw---- 1 mysql mysql      938 Sep 18 14:42 ib_buffer_pool
+-rw-rw---- 1 mysql mysql 12582912 Sep 18 14:42 ibdata1
+-rw-rw---- 1 mysql mysql 50331648 Sep 18 14:42 ib_logfile0
+-rw-rw---- 1 mysql mysql 50331648 Sep 18 14:42 ib_logfile1
+drwx------ 2 mysql mysql     4096 Sep 18 14:42 mysql
+-rw-rw---- 1 mysql mysql    29277 Sep 18 14:42 mysql-bin.000001
+-rw-rw---- 1 mysql mysql       19 Sep 18 14:42 mysql-bin.index
+-rw-rw---- 1 mysql mysql        7 Sep 18 14:42 mysql-bin.state
+drwx------ 2 mysql mysql       20 Sep 18 14:42 performance_schema
+drwx------ 2 mysql mysql       20 Sep 18 14:42 test
+
+</code></pre><p>7、测试启停数据库</p>
+<pre><code>[root@host2 mysql]# service mysqld status
+ ERROR! MariaDB is not running
+[root@host2 mysql]# service mysqld start
+Starting mysqld (via systemctl):                           [  OK  ]
+[root@host2 mysql]# service mysqld status
+ SUCCESS! MariaDB running (5561)
+[root@host2 mysql]# service mysqld restart
+Restarting mysqld (via systemctl):                         [  OK  ]
+[root@host2 mysql]# service mysqld status
+ SUCCESS! MariaDB running (6050)
+
+
+[root@host2 mysql]# ss -nlt
+State      Recv-Q Send-Q                                                 Local Address:Port                                                                Peer Address:Port              
+LISTEN     0      128                                                                *:22                                                                             *:*                  
+LISTEN     0      100                                                        127.0.0.1:25                                                                             *:*                  
+LISTEN     0      80                                                                :::3306                                                                          :::*           
+
+# 查看进程信息，利用mysqld_safe脚本启动mysqld二进制主程序，pid文件，不指定时，默认在数据目录下，以主机名加.pid后缀，为文件名，最好指定；
+
+[root@host2 mysql]# ps aux
+root       4461  0.0  0.1 115432  1724 ?        S    14:52   0:00 /bin/sh /usr/local/mysql/bin/mysqld_safe --datadir=/data/mysql --pid-file=/data/mysql/host2.b.com.pid
+mysql      4585  0.8  4.8 1598104 48460 ?       Sl   14:52   0:00 /usr/local/mysql/bin/mysqld --basedir=/usr/local/mysql --datadir=/data/mysql --plugin-dir=/usr/local/mysql/lib/plugin --us
+root       4621  0.0  0.1 155324  1868 pts/1    R+   14:52   0:00 ps aux
+</code></pre><p>8、安装后配置操作，安全加固脚本！</p>
+<pre><code>[root@host2 mysql]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 10
+Server version: 10.2.25-MariaDB-log MariaDB Server
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+4 rows in set (0.00 sec)
+# 默认本机，免密直接连入，因此需执行自带的安全加固脚本；
+
+</code></pre><h3 id="安装后配置"><a href="#安装后配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装后配置" class="headings">安装后配置</a></h3>
+<ol>
+<li>执行安全增强脚本：
+<ol>
+<li>设置数据库root用户口令</li>
+<li>禁止root远程登陆</li>
+<li>删除anonymous账户</li>
+<li>删除test数据库</li>
+</ol>
+</li>
+</ol>
+<pre><code>
+[root@host2 mysql]# mysql_secure_installation 
+# 按照提示进行即可；
+# 分别是：
+1. 设置数据库root用户口令
+2. 禁止root远程登陆
+3. 删除anonymous账户
+4. 删除test数据库
+
+
+[root@host2 mysql]# mysql -uroot -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 23
+Server version: 10.2.25-MariaDB-log MariaDB Server
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
++--------------------+
+3 rows in set (0.00 sec)
+# 此时需要口令才能登陆
+</code></pre><h2 id="编译安装"><a href="#编译安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:编译安装" class="headings">编译安装</a></h2>
+<ol>
+<li>安装编译工具、依赖包</li>
+<li>下载需要版本的源码包，解压</li>
+<li>创建用户、数据目录，改数据目录属主</li>
+<li>cmake编译，添加自己需要的编译选项</li>
+<li>make &amp;&amp; make install</li>
+<li>执行数据库数据文件初始化脚本</li>
+<li>准备配置文件、服务脚本</li>
+<li>配置环境变量</li>
+<li>测试启停数据库进程</li>
+<li>安装后配置</li>
+</ol>
+<hr>
+<p>1、安装编译工具、依赖包</p>
+<pre><code>[root@host3 src]#  yum install bison bison-devel  zlib-devel libcurl-devel libarchive-devel  boostdevel  gcc  gcc-c++  cmake ncurses-devel gnutls-devel libxml2-devel openssldevel libevent-devel libaio-devel
+
+</code></pre><p>2、下载需要版本的源码包，解压</p>
+<pre><code>[root@host3 src]# tar -xf mariadb-10.2.25.tar.gz
+[root@host3 src]# ll
+total 87692
+drwxrwxr-x 33 1001 1001     4096 Jun 15  2019 mariadb-10.2.25
+-rw-r--r--  1 root root 71997847 Sep 21 16:00 mariadb-10.2.25.tar.gz
+</code></pre><p>3、创建用户、数据目录，改数据目录属主</p>
+<pre><code>[root@host3 src]# mkdir /data/mysql
+[root@host3 src]# id mysql
+uid=27(mysql) gid=27(mysql) groups=27(mysql)
+[root@host3 src]# chown -R mysql.mysql /data/mysql/
+[root@host3 src]# ll /data/mysql/ -d
+drwxr-xr-x 2 mysql mysql 6 Sep 21 16:04 /data/mysql/
+# 本机之前安装后mariadb，所以存在安装过程中脚本创建好的mysql用户
+# 正常情况下，仍需手动创建mysql用户，如下：
+
+[root@host2 src]# groupadd mysql -g 306
+[root@host2 src]# useradd -g mysql -u 306 mysql
+[root@host2 src]# id mysql
+uid=306(mysql) gid=306(mysql) groups=306(mysql)
+</code></pre><p>4、cmake编译，添加自己需要的编译选项</p>
+<p>​	利用cmake工具指定编译选项，会生成一系列文件和目录；编译选项参数官网：https://dev.mysql.com/doc/refman/5.7/en/source-configuration-options.html</p>
+<pre><code>cmake . \
+-DCMAKE_INSTALL_PREFIX=/app/mysql \
+-DMYSQL_DATADIR=/data/mysql/ \
+-DSYSCONFDIR=/etc/ \
+-DMYSQL_USER=mysql \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+-DWITH_PARTITION_STORAGE_ENGINE=1 \
+-DWITHOUT_MROONGA_STORAGE_ENGINE=1 \
+-DWITH_DEBUG=0 \
+-DWITH_READLINE=1 \
+-DWITH_SSL=system \
+-DWITH_ZLIB=system \
+-DWITH_LIBWRAP=0 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_UNIX_ADDR=/data/mysql/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci
+# 指定了：安装目录、配置文件目录、进程用户、启用ssl，zlib、编码utf8、unix套接字文件等信息；
+
+-- Looking for event.h - found
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /usr/local/src/mariadb-10.2.25
+[root@host3 mariadb-10.2.25]# echo $?
+0
+# 过程中未报错！
+</code></pre><p>5、make &amp;&amp; make install</p>
+<pre><code>[root@host3 mariadb-10.2.25]# make &amp;&amp; make install
+# 时间较长，根据性能和分配的cpu数量而定；
+
+# 安装后，程序目录文件如下，数据目录仍为空，需要初始化；
+[root@host3 mariadb-10.2.25]# ll /app/mysql/
+total 176
+drwxr-xr-x  2 root root  4096 Sep 21 16:58 bin
+-rw-r--r--  1 root root 17987 Jun 15  2019 COPYING
+-rw-r--r--  1 root root  2354 Jun 15  2019 CREDITS
+drwxr-xr-x  3 root root    18 Sep 21 16:58 data
+drwxr-xr-x  2 root root    81 Sep 21 16:58 docs
+-rw-r--r--  1 root root  8245 Jun 15  2019 EXCEPTIONS-CLIENT
+drwxr-xr-x  3 root root    19 Sep 21 16:58 include
+-rw-r--r--  1 root root  8694 Jun 15  2019 INSTALL-BINARY
+drwxr-xr-x  4 root root   235 Sep 21 16:58 lib
+drwxr-xr-x  4 root root    30 Sep 21 16:58 man
+drwxrwxr-x 11 root root  4096 Sep 21 16:58 mysql-test
+-rw-r--r--  1 root root  2843 Jun 15  2019 README.md
+-rw-r--r--  1 root root 19477 Jun 15  2019 README-wsrep
+drwxr-xr-x  2 root root    30 Sep 21 16:58 scripts
+drwxr-xr-x 29 root root  4096 Sep 21 16:58 share
+drwxr-xr-x  4 root root  4096 Sep 21 16:58 sql-bench
+drwxr-xr-x  3 root root   275 Sep 21 16:58 support-files
+-rw-r--r--  1 root root 86263 Jun 15  2019 THIRDPARTY
+
+[root@host3 mariadb-10.2.25]# ll /data/mysql/
+total 0
+</code></pre><p>6、执行数据库数据文件初始化脚本</p>
+<pre><code>[root@host3 mariadb-10.2.25]# ll scripts/mysql_install_db
+-rwxrwxr-x 1 root root 19257 Sep 21 16:13 scripts/mysql_install_db
+# 利用自带的数据目录初始化脚本；
+
+[root@host3 mariadb-10.2.25]# mysql_install_db --datadir=/data/mysql/ --user=mysql
+
+
+# 遇到的错误；
+# 参数写错，reslove改为resolve，修改后，删除生成的一半的数据目录文件，再次执行脚本即可；
+[root@host3 mariadb-10.2.25]# mysql_install_db --datadir=/data/mysql/ --user=mysql
+Installing MariaDB/MySQL system tables in '/data/mysql/' ...
+200921 17:02:39 [Warning] 'THREAD_CONCURRENCY' is deprecated and will be removed in a future release.
+200921 17:02:39 [Note] /usr/libexec/mysqld (mysqld 5.5.65-MariaDB) starting as process 29524 ...
+200921 17:02:39 [ERROR] /usr/libexec/mysqld: unknown variable 'skip_name_reslove=on'
+
+[root@host3 mariadb-10.2.25]# rm  -rf /data/mysql/*
+
+
+# 初始化后的目录
+[root@host3 mariadb-10.2.25]# ll /data/mysql/
+total 1076
+-rw-rw---- 1 mysql mysql   16384 Sep 21 17:03 aria_log.00000001
+-rw-rw---- 1 mysql mysql      52 Sep 21 17:03 aria_log_control
+drwx------ 2 mysql root     4096 Sep 21 17:03 mysql
+-rw-rw---- 1 mysql mysql   28409 Sep 21 17:03 mysql-bin.000001
+-rw-rw---- 1 mysql mysql 1038814 Sep 21 17:03 mysql-bin.000002
+-rw-rw---- 1 mysql mysql      38 Sep 21 17:03 mysql-bin.index
+drwx------ 2 mysql mysql    4096 Sep 21 17:03 performance_schema
+drwx------ 2 mysql root        6 Sep 21 17:03 test
+</code></pre><p>7、准备配置文件、服务脚本</p>
+<pre><code># 源码包提供的配置文件，复制到对应目录，覆盖掉mariadb-libs包里自带的配置文件，并适当修改；
+[root@host3 mariadb-10.2.25]# cp support-files/my-large.cnf /etc/my.cnf
+cp: overwrite ‘/etc/my.cnf’? y
+[root@host3 mariadb-10.2.25]# vim /etc/my.cnf
+...
+[mysqld]
+port            = 3306
+socket          = /data/mysql/mysql.sock
+# 加入下2行；
+datadir=/data/mysql
+skip_name_reslove=1
+
+
+
+# 将源码包提供的服务脚本，复制到对应目录，并添加为开机启动
+[root@host3 mariadb-10.2.25]# cp support-files/mysql.server /etc/init.d/mysqld
+[root@host3 mariadb-10.2.25]# chkconfig --add mysqld 
+[root@host3 mariadb-10.2.25]# chkconfig mysqld on
+[root@host3 mariadb-10.2.25]# chmod +x /etc/init.d/mysqld # 注意执行权限；
+</code></pre><p>8、配置环境变量</p>
+<pre><code>[root@host3 mariadb-10.2.25]# vim /etc/profile.d/mysql.sh
+[root@host3 mariadb-10.2.25]# source /etc/profile.d/mysql.sh 
+[root@host3 mariadb-10.2.25]# cat !$
+cat /etc/profile.d/mysql.sh
+export PATH=/app/mysql/bin:$PATH
+</code></pre><p>9、测试启停数据库进程</p>
+<pre><code>[root@host3 mariadb-10.2.25]# service mysqld status
+ ERROR! MariaDB is not running
+[root@host3 mariadb-10.2.25]# service mysqld start
+Reloading systemd:                                         [  OK  ]
+Starting mysqld (via systemctl):  ^[[A^[[A                 [  OK  ]
+</code></pre><p>10、安装后配置</p>
+<pre><code>[root@host3 mariadb-10.2.25]# ll scripts/mysql_secure_installation
+-rwxrwxr-x 1 root root 12539 Sep 21 16:13 scripts/mysql_secure_installation
+# 利用自带的安全加固脚本；
+
+[root@host3 mariadb-10.2.25]# /app/mysql/bin/mysql_secure_installation 
+# 根据提示执行即可；
+
+# 问题：
+# 采用的sock文件路径不对，which发现默认的路径是yum安装mariadb的脚本路径，和编译安装的路径不同
+# 实验机器，之前用yum安装了mariadb-server包；
+# 用绝对路径即可解决
+# 干净机器，没有用yum安装过mariadb的机器不会出现；
+[root@host3 mariadb-10.2.25]# mysql_secure_installation 
+Enter current password for root (enter for none): 
+ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+
+[root@host3 mariadb-10.2.25]# which mysql_secure_installation
+/usr/bin/mysql_secure_installation
+</code></pre><h2 id="mariadb"><a href="#mariadb" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mariadb" class="headings">mariadb</a></h2>
+<p>​	和mysql同一个作者，mysql归属oracle后的另写的开源数据库管理软件DBMS，和mysql基本兼容；</p>
+<h3 id="mariadb与mysql版本演变"><a href="#mariadb与mysql版本演变" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mariadb与mysql版本演变" class="headings">mariadb与mysql版本演变</a></h3>
+<ul>
+<li>mysql：
+<ul>
+<li>5.1-》5.5-》5.6-》5.7-》8.0</li>
+</ul>
+</li>
+<li>mariadb：
+<ul>
+<li>5.5-》10.0-》10.1-》10.2-》10.3</li>
+</ul>
+</li>
+</ul>
+<h1 id="mysql安装脚本"><a href="#mysql安装脚本" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mysql安装脚本" class="headings">mysql安装脚本</a></h1>
+<p>​	根据如下步骤，将二进制安装mysql的步骤，写到脚本里即可；</p>
+<ol>
+<li>解压二进制包到指定目录；</li>
+<li>做解压后程序目录软链接；改目录属主，属组为root.mysql</li>
+<li>配置环境变量，并source；</li>
+<li>复制服务脚本到指定目录；</li>
+<li>准备好的配置文件my.cnf复制到指定目录；</li>
+<li>创建mysql用户，</li>
+<li>创建数据目录</li>
+<li>改数据目录属主为mysql</li>
+<li>数据目录初始化，mysql_install_db或mysqld --initiale （mysql5.7）（不同发行版，或不同版本不同）</li>
+<li>启动数据库实例</li>
+<li>安全加固脚本my_secure_installtion</li>
+</ol>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/mysql%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/mysql介绍与安装/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2021-03-09 12:31:18 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2021-03-09</text><text x="915" y="140" textLength="650" transform="scale(.1)">2021-03-09</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E5%8E%8B%E6%B5%8B%E4%B8%8E%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B/" class="related-link">mysql压测与生产环境配置示例</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/" class="related-link">mysql备份还原</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E5%A4%8D%E5%88%B6%E9%9B%86%E7%BE%A4/" class="related-link">mysql复制集群</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86/" class="related-link">mysql日志管理</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%89%E9%A1%B9%E4%B8%8E%E5%8F%98%E9%87%8F/" class="related-link">mysql服务器选项与变量</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/mysql/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>mysql</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/mysql%E4%B9%8Bsql%E5%9F%BA%E7%A1%80%E4%B8%8Emysql%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AF%B9%E8%B1%A1/" rel="prev">&lt; mysql之sql基础与mysql对象</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/" rel="next">mysql备份还原 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

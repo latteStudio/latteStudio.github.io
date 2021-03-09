@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>httpd之LAMP环境 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="httpd搭建lamp环境，以及discuz和wordpress的部署..." />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/httpd%E4%B9%8Blamp%E7%8E%AF%E5%A2%83/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-10-15T16:06:38+00:00",
+        "dateModified": "2020-10-19T12:58:02+08:00",
+        "url": "https://latteStudio.github.io/posts/httpd%E4%B9%8Blamp%E7%8E%AF%E5%A2%83/",
+        "headline": "httpd之LAMP环境",
+        "description": "httpd搭建lamp环境，以及discuz和wordpress的部署...",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  4787 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20200901175252260.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="httpd之LAMP环境" />
+<meta property="og:description" content="httpd搭建lamp环境，以及discuz和wordpress的部署..." />
+<meta property="og:url" content="https://latteStudio.github.io/posts/httpd%E4%B9%8Blamp%E7%8E%AF%E5%A2%83/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20200901175252260.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-10-15T16:06:38&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-19T12:58:02&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">httpd之LAMP环境</h1>
+
+            
+
+            
+                <div class="post-description p-summary">httpd搭建lamp环境，以及discuz和wordpress的部署...</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-10-15T16:06:38&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.10.15</time>
+    
+    
+        
+        <time datetime="2020-10-19T12:58:02&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.19</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/web%E6%9C%8D%E5%8A%A1/" class="category-link p-category">web服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;4787</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;10&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:编译安装httpd" href="#编译安装httpd">编译安装httpd</a></li>
+    <li><a id="contents:编译php" href="#编译php">编译php</a></li>
+    <li><a id="contents:安装xcache" href="#安装xcache">安装xcache</a></li>
+    <li><a id="contents:二进制mysql安装" href="#二进制mysql安装">二进制mysql安装</a></li>
+    <li><a id="contents:httpd配置fastcgi代理转发" href="#httpd配置fastcgi代理转发">httpd配置fastcgi代理转发</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="lamp环境搭建"><a href="#lamp环境搭建" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:lamp环境搭建" class="headings">LAMP环境搭建</a></h1>
+<p>本实验，采用异机部署，机httpd和php，mysql的实例不在同一台主机，<strong>异机部署时，应注意httpd和php分别处理的动静内容的转发问题，通过nfs等网络共享服务能较好的解决该问题，</strong></p>
+<h2 id="编译安装httpd"><a href="#编译安装httpd" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:编译安装httpd" class="headings">编译安装httpd</a></h2>
+<p>官方文档：http://httpd.apache.org/docs/2.4/install.html</p>
+<ol>
+<li>安装依赖包，编译工具</li>
+<li>configure、make、make install 三步走</li>
+<li>安装后配置
+<ol>
+<li>PATH变量、</li>
+<li>man文件、头文件、库文件、[可选]</li>
+<li>单独的网页文件存放目录，（一般单独挂载高可用的存储设备，或nfs共享）</li>
+<li>添加apache用户</li>
+<li>服务脚本、配置文件准备</li>
+</ol>
+</li>
+</ol>
+<p>1，安装依赖包，编译安装apr和apr-utils</p>
+<pre><code># 安装依赖包，编译工具
+# 包含pcre正则，expat和xml相关的包，会被httpd应用到
+[root@host2 ~]# yum install -y pcre-devel expat-devel pcre gcc gcc++
+
+# 编译安装apr
+[root@host2 apr-1.6.2]# ./configure --prefix=/usr/local/apr
+[root@host2 apr-1.6.2]# make &amp;&amp; make install
+[root@host2 apr-1.6.2]# ll /usr/local/apr/
+total 0
+drwxr-xr-x 2 root root  26 Aug 31 19:40 bin
+drwxr-xr-x 2 root root 148 Aug 31 19:40 build-1
+drwxr-xr-x 3 root root  19 Aug 31 19:40 include
+drwxr-xr-x 3 root root 140 Aug 31 19:40 lib
+
+
+# 编译安装apr-utils，需要在apr之后！
+configure: error: APR could not be located. Please use the --with-apr option.
+[root@host2 apr-util-1.6.1]# ./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr/
+[root@host2 apr-util-1.6.1]# make &amp;&amp; make install
+[root@host2 apr-util-1.6.1]# ll /usr/local/apr-util/
+total 0
+drwxr-xr-x 2 root root  26 Aug 31 19:42 bin
+drwxr-xr-x 3 root root  19 Aug 31 19:42 include
+drwxr-xr-x 3 root root 164 Aug 31 19:42 lib
+</code></pre><p>2，三步走</p>
+<p>常见编译选项</p>
+<pre><code>./configure -h
+...
+# 查看选项，编译时应该根据实际需求选择
+
+
+prefix 
+程序安装路径
+
+sysconfdir 
+配置文件路径，非必须，不指定默认是prefix目录下的conf目录
+
+#
+  --enable-mpms-shared=MPM-LIST
+  
+  
+  --with-mpm=MPM          Choose the process model for Apache to use by
+                          unless --enable-mpms-shared is also specified.
+单独此项，为静态编译一个mpm模型，这样mpm就选死了；
+# 
+--with-mpm=MPM
+mpm模型三选一，如果选择是只静态编译一种mpm模型，则需要更换其他模型时，必须重新编译！
+较好方式：3个都动态编译，指定一个为默认，其他2个还可以随时切换；
+示例如下：意思是3种动态模型都动态编译，默认为event，安装后还可以用LoadModule指令可以切换其他2种模型
+--with-mpm=event --enable-mpms-shared=all
+
+with-z zlib
+压缩启用
+with-pcre 
+正则启用
+with-apr
+with-apr-utils
+启用Apache Portable Runtime：为应用提供通用运行时环境
+
+# 编译时，动态编译了3种mpm模型后，可以在模块目录看到对应的3种动态模块
+[root@host2 httpd-2.4.27]# ll /usr/local/apache/modules/ |grep mpm
+-rwxr-xr-x 1 apache apache 191360 Aug 18 19:35 mod_mpm_event.so
+-rwxr-xr-x 1 apache apache  88720 Aug 18 19:35 mod_mpm_prefork.so
+-rwxr-xr-x 1 apache apache 137424 Aug 18 19:35 mod_mpm_worker.so
+
+
+configure选项中：
+--disable-xx默认是开启的模块
+--enable-xx默认是关闭的模块
+</code></pre><p><strong>动态/静态编译的区别</strong></p>
+<ul>
+<li>静态static编译：编译时，把模块编译到核心模块里面，随着核心模块启动而启动，<strong>也就是说和httpd进程的生命周期一致</strong></li>
+<li>静态shared编译：把模块编译为二进制文件，但是不随着核心模块启动而启动，而是需要的时候，用LoadModule指令引用；<strong>所谓动态，即需要增减的时候，用LoadMoudule加载或注释掉需要的模块，然后发送HUP信号，重读配置文件即实现模块的动态装载或卸载</strong></li>
+</ul>
+<p>--enable-so：启用so模块，默认启用，默认静态编译，指定为动态选择不生效</p>
+<pre><code>[root@host2 httpd-2.4.27]# httpd -M
+Loaded Modules:
+ core_module (static)
+ so_module (static)
+ http_module (static)
+
+一定静态编译的模块so_module,这个模块才使得httpd有了动态装载、卸载模块的能力；
+DSO：dymanic shared object 动态共享模块对象；
+</code></pre><p>3，开始编译</p>
+<pre><code># 进入解压后目录，三步走；
+# 三种mpm都动态编译，默认用event；启用pcre正则、apr跨平台、启用zlib压缩
+[root@host2 httpd-2.4.27]# ./configure --prefix=/usr/local/apache --with-z --with-pcre --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util/ --with-mpm=event --enable-mpms-shared=all
+
+[root@host2 httpd-2.4.27]# make &amp;&amp; make install
+
+# 安装后测试
+[root@host2 httpd-2.4.27]# /usr/local/apache/bin/httpd -t
+Syntax OK
+[root@host2 httpd-2.4.27]# /usr/local/apache/bin/httpd -k start
+[root@host2 httpd-2.4.27]# curl localhost
+&lt;html&gt;&lt;body&gt;&lt;h1&gt;It works!&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;
+</code></pre><p>4，编译安装后配置</p>
+<pre><code># path变量配置
+[root@host2 httpd-2.4.27]# cat /etc/profile.d/httpd.sh
+export PATH=/usr/local/apache/bin:$PATH
+[root@host2 httpd-2.4.27]# source !$
+source /etc/profile.d/httpd.sh
+
+# 改httpd的进程启动用户，默认为nobody
+[root@host2 httpd-2.4.27]# useradd apache
+[root@host2 httpd-2.4.27]# id apache
+uid=1000(apache) gid=1000(apache) groups=1000(apache)
+
+[root@host2 apache]# vim conf/httpd.conf 
+	...
+	User apache
+	Group apche
+	...
+[root@host2 apache]# apachectl -k restart
+
+# 服务脚本准备
+实验时，从yum安装中复制过来，然后修改的服务脚本有点问题，无法关闭进程
+# 解决方法：命令行方式管理httpd进程，
+apachectl脚本，或httpd即可完成程序的启停；
+# 再结合利用/etc/rc.local可以实现开机自启动
+</code></pre><p>以下：非必须配置，但path变量一般都需要配置</p>
+<pre><code>
+--
+manpath配置
+echo &quot;MANPATH /usr/local/apache/man&quot; &gt;&gt; /etc/man.config
+
+--
+path配置
+echo &quot;PATH=/usr/local/apache/bin:$PATH&quot; &gt;&gt; /etc/profile.d/apache.sh
+source /etc/profile.d/apache.sh 
+
+
+--
+头文件引用？
+ln -s /usr/include /usr/local/apache/include
+
+service编写，用yum安装的修改即可；
+EnvironmentFile=/etc/sysconfig/httpd
+ExecStart=/usr/local/apache/bin/httpd $OPTIONS -k start -DFOREGROUND
+ExecReload=/usr/local/apache/bin/httpd $OPTIONS -k graceful
+ExecStop=/bin/kill -WINCH ${MAINPID}
+主要改了httpd进程的路径；
+能启动，能访问，但是启动、关闭，都卡住？如果是命令正常，应该是service文件问题；编译没问题；
+</code></pre><h2 id="编译php"><a href="#编译php" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:编译php" class="headings">编译php</a></h2>
+<p><strong>整体步骤如下：</strong></p>
+<ol>
+<li>安装依赖包、编译工具；</li>
+<li>三步走
+<ol>
+<li>configure：注意：启用php-fpm、mysql连接方式一般选为mysqlnd、</li>
+<li>make</li>
+<li>make install</li>
+</ol>
+</li>
+<li>准备：php配置文件，php-fpm配置文件、服务脚本</li>
+<li>配置php-fpm，允许apache主机的连接，修改监听地址；进程用户改为apache</li>
+<li>apache httpd和php-fpm同主机情况：注意静态网页根目录和动态脚本目根录同一个；</li>
+<li>apache httpd和php-fpm不同主机情况：通过nfs服务，使得网页根目录和脚本目录也为同一个；属主都为apache用户，且uid一致；（php-fpm主机上要创建apache用户，且指定uid一致）</li>
+</ol>
+<p>1，安装依赖包</p>
+<pre><code>yum install -y bzip2-devel libmcrypt-devel openssl-devel libxml2-devel gcc gcc++ 
+devel包不要写成level，写错过！
+</code></pre><p>2，下载源码包，解压，进入解压后目录</p>
+<pre><code>[root@php src]# ll
+total 17372
+-rw-r--r-- 1 root root 17785731 Aug 19 15:26 php-5.5.38.tar.gz
+[root@php src]# tar -xf php-5.5.38.tar.gz 
+[root@php src]# cd php-5.5.38
+</code></pre><p>3，三步走</p>
+<pre><code>#configure：启用php-fpm方式，用mysqlnd连接数据库，指定安装目录，等，
+
+[root@php php-5.5.38]# ./configure --prefix=/usr/local/php --with-openssl --with-mbstring --enable-sockets --with-freetype-dir --with-jpeg-dir --with-png-dir --with-libxml-dir=/usr --enable-xml --with-zlib --with-mcrypt --with-bz2 --with-mhash --with-config-file-path=/etc \--with-config-file-scan-dir=/etc/php.d --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-fpm
+
+#make
+
+#make install
+</code></pre><p>php的configure脚本一些参数说明；</p>
+<pre><code>
+
+SAPI modules:
+
+  --with-apxs2=FILE       Build shared Apache 2.0 Handler module. FILE is the optional
+                          pathname to the Apache apxs tool apxs
+php编译为apache模式的方式时，指定，模块的路径
+  --enable-fpm            Enable building of the fpm SAPI executable
+php单独运行为fpm格式；
+
+General settings:
+
+  --with-config-file-path=PATH
+                          Set the path in which to look for php.ini [PREFIX/lib]
+php解释器的配置文件                        
+  --with-config-file-scan-dir=PATH
+                          Set the path where to scan for configuration files
+php-fpm的配置文件夹
+
+---
+php连接mysql方式2种；libmysql驱动连接、mysqlnd连接
+# libmysql时：需先安装mysql，mysql-devel
+# --with-mysql指定mysql安装路径
+# with-mysqli mysql_config 脚本路径
+# with-pdo-mysql mysql安装路径
+# 例如：
+./configure --prefix=/usr/local/php --with-mysql=/usrlocal/mysql --with-mysqli=/usr/local/mysql/bin/mysql_cofig 
+--with-pdo-mysql=/usr/local/mysql
+
+
+ --with-pdo-mysql=DIR    PDO: MySQL support. DIR is the MySQL base directory
+                          If no value or mysqlnd is passed as DIR, the
+                         directory /usr/local/freetds
+  --with-mysql=DIR        Include MySQL support.  DIR is the MySQL base
+                          directory, if no DIR is passed or the value is
+                          mysqlnd the MySQL native driver will be used
+
+  --with-mysqli=FILE      Include MySQLi support.  FILE is the path
+                          to mysql_config.  If no value or mysqlnd is passed
+                          as FILE, the MySQL native driver will be used
+                          
+                          
+# mysqlnd驱动连接时，不需提前安装mysql mysql-devel
+mysqlnd作为上面3项的值，然后enable-mysqlnd
+# 例子
+./configure --prefix=/usr/local/php --enable-mysqld --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd
+
+
+ --enable-mysqlnd        Enable mysqlnd explicitly, will be done implicitly
+                          when required by other extensions
+
+建议用mysqlnd
+
+# 扩展php支持类型的
+  --with-vpx-dir=DIR      GD: Set the path to libvpx install prefix
+  --with-jpeg-dir=DIR     GD: Set the path to libjpeg install prefix
+  --with-png-dir=DIR      GD: Set the path to libpng install prefix
+  --with-zlib-dir=DIR     GD: Set the path to libz install prefix
+  --with-xpm-dir=DIR      GD: Set the path to libXpm install prefix
+  --with-freetype-dir=DIR GD: Set the path to FreeType 2 install prefix
+加密，安装，压缩，等；
+  --with-libxml-dir=DIR   LIBXML: libxml2 install prefix
+  --with-openssl=DIR      Include OpenSSL support (requires OpenSSL &gt;= 0.9.6)
+  --with-kerberos=DIR     OPENSSL: Include Kerberos support
+  --with-pcre-regex=DIR   Include Perl Compatible Regular Expressions support.
+                          DIR is the PCRE install prefix BUNDLED
+  --without-sqlite3=DIR   Do not include SQLite3 support. DIR is the prefix to
+                          SQLite3 installation directory.
+  --with-zlib=DIR         Include ZLIB support (requires zlib &gt;= 1.0.9)
+  --with-zlib-dir=&lt;DIR&gt;   Define the location of zlib install directory
+</code></pre><p>4，安装后配置</p>
+<p>php的配置文件php.ini</p>
+<pre><code>准备php解释器的配置文件；php的一般还有个/etc/php.d/目录
+
+[root@php php-5.5.38]# cp php.ini-production /etc/php.ini
+[root@php php-5.5.38]# pwd
+/usr/local/src/php-5.5.38
+</code></pre><p>php-fpmd服务脚本</p>
+<pre><code>准备php-fpm的服务脚本，加入执行权限
+
+[root@php php-5.5.38]# cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpmd
+[root@php php-5.5.38]# chmod +x /etc/init.d/php-fpmd 
+[root@php php-5.5.38]# chkconfig php-fpmd on
+
+</code></pre><p>php-fpmd的配置文件</p>
+<pre><code>准备php-fpm的配置文件；【和php的配置文件不一回事，类比java配置和tomcat的配置】
+
+[root@php php-5.5.38]# cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+
+注意：/usr/local/php是编译安装的目录；根据情况修改；
+</code></pre><p>修改监听端口为本机所有地址</p>
+<pre><code>[root@php php-5.5.38]# cd /usr/local/php/
+[root@php php]# ll
+total 0
+drwxr-xr-x 2 root root 132 Aug 30 16:54 bin
+drwxr-xr-x 2 root root  71 Aug 30 16:58 etc
+drwxr-xr-x 3 root root  17 Aug 30 16:54 include
+drwxr-xr-x 3 root root  17 Aug 30 16:54 lib
+drwxr-xr-x 4 root root  28 Aug 30 16:54 php
+drwxr-xr-x 2 root root  21 Aug 30 16:54 sbin
+drwxr-xr-x 4 root root  28 Aug 30 16:54 var
+
+[root@php php]# vim etc/php-fpm.conf
+
+# 取消127.0.0.1，即改成监听所有地址
+
+[root@php php]# service php-fpmd start
+Starting php-fpm  done
+[root@php php]# ss -nlt
+State      Recv-Q Send-Q                                                 Local Address:Port                                                                Peer Address:Port              
+LISTEN     0      128                                                                *:9000                                                                           *:*                  
+LISTEN     0      128                                                                *:22                                                                             *:*        
+# php-fpm默认监听9000端口
+</code></pre><p>修改php-fpm的进程用户</p>
+<pre><code>httpd或nginx配置向后端的php-fpm转发时，需要2者进程用户一致，避免权限问题；**uid不同时，测试也可以，但最好保持一致**
+</code></pre>
+<pre><code># 将如下nginx改为apache即可，如下为lnmp时实验配置；
+
+[root@php php]# groupadd -g 2000 nginx
+[root@php php]# useradd -u 2000 nginx -g nginx
+[root@php php]# id nginx
+uid=2000(nginx) gid=2000(nginx) groups=2000(nginx)
+# 添加nginx用户，uid最好一致，
+
+[root@php php]# vim etc/php-fpm.conf
+[root@php php]# service php-fpmd restart
+Gracefully shutting down php-fpm . done
+Starting php-fpm  done
+
+# 改为nginx用户启动
+
+[root@php php]# ps aux|grep php
+root      81399  0.0  0.4  74912  4196 ?        Ss   17:02   0:00 php-fpm: master process (/usr/local/php/etc/php-fpm.conf)
+nginx     81400  0.0  0.3  74912  3744 ?        S    17:02   0:00 php-fpm: pool www
+nginx     81401  0.0  0.3  74912  3744 ?        S    17:02   0:00 php-fpm: pool www
+</code></pre><h2 id="安装xcache"><a href="#安装xcache" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装xcache" class="headings">安装xcache</a></h2>
+<pre><code>php不是直接编译成二进制，而是会先编译成字节码；opcode，于是采用xcache做字节码的缓存，提高效率，不用随用随编译；
+</code></pre>
+<pre><code>[root@host2 xcache-3.2.0]# make install
+Installing shared extensions:     /usr/local/php/lib/php/extensions/no-debug-non-zts-20121212/
+
+问题：
+yum install -y autoconf m4
+无法打开htdoc目录
+暂略；
+</code></pre><h2 id="二进制mysql安装"><a href="#二进制mysql安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:二进制mysql安装" class="headings">二进制mysql安装</a></h2>
+<p>1，下载二进制压缩包</p>
+<p>2，解压，解压后目录做软链接</p>
+<pre><code>[root@mysql local]# tar -xf mysql-5.7.30-el7-x86_64.tar.gz 
+[root@mysql local]# ll
+...
+drwxr-xr-x  9 root root       129 Aug 30 17:10 mysql-5.7.30-el7-x86_64
+-rw-r--r--  1 root root 727333633 Aug 20 16:16 mysql-5.7.30-el7-x86_64.tar.gz
+...
+[root@mysql local]# ln -sv mysql-5.7.30-el7-x86_64 mysql
+‘mysql’ -&gt; ‘mysql-5.7.30-el7-x86_64’
+</code></pre><p>3，配置环境变量</p>
+<pre><code>[root@mysql local]# vim /etc/profile.d/mysql.sh
+[root@mysql local]# source /etc/profile.d/mysql.sh
+[root@mysql local]# cat /etc/profile.d/mysql.sh 
+export PATH=/usr/local/mysql/bin:$PATH
+
+</code></pre><p>4，创建数据目录</p>
+<pre><code>[root@mysql local]# mkdir /data/mysql -pv
+mkdir: created directory ‘/data’
+mkdir: created directory ‘/data/mysql’
+</code></pre><p>5，创建用户</p>
+<pre><code>[root@mysql local]# useradd mysql
+[root@mysql local]# chown -R mysql.mysql /data/mysql/
+</code></pre><p>6，服务脚本</p>
+<pre><code>[root@mysql mysql]# cp support-files/mysql.server /etc/init.d/mysqld
+[root@mysql mysql]# pwd
+/usr/local/mysql
+
+</code></pre><p>7，配置文件</p>
+<pre><code># 将原有配置文件备份，并修改
+[root@mysql mysql]# cp /etc/my.cnf{,.bak}
+
+[root@mysql mysql]# ll /etc/my.cnf*
+-rw-r--r--. 1 root root 570 Jun  8  2017 /etc/my.cnf
+-rw-r--r--  1 root root 570 Aug 30 17:27 /etc/my.cnf.bak
+
+# 修改如下
+[root@mysql mysql]# vim /etc/my.cnf
+[root@mysql mysql]# cat /etc/my.cnf
+[mysqld]
+
+datadir=/data/mysql
+socket=/data/mysql/mysql.sock
+
+symbolic-links=0
+
+skip_name_resolve=on
+[mysqld_safe]
+log-error=/data/mysql/mariadb.log
+pid-file=/data/mysql/mariadb.pid
+
+#
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
+</code></pre><p>6，执行数据库初始化脚本</p>
+<pre><code>[root@mysql mysql]# mysql_install_db --datadir=/data/mysql --user=mysql
+2020-08-30 17:31:00 [WARNING] mysql_install_db is deprecated. Please consider switching to mysqld --initialize
+2020-08-30 17:31:00 [ERROR]   Child process: /usr/local/mysql-5.7.30-el7-x86_64/bin/mysqldterminated prematurely with errno= 32
+2020-08-30 17:31:00 [ERROR]   Failed to execute /usr/local/mysql-5.7.30-el7-x86_64/bin/mysqld --bootstrap --datadir=/data/mysql --lc-messages-dir=/usr/share/mysql --lc-messages=en_US
+-- server log begin --
+/usr/local/mysql-5.7.30-el7-x86_64/bin/mysqld: error while loading shared libraries: libaio.so.1: cannot open shared object file: No such file or directory
+
+
+# 数据库初始化脚本会报错，需要libaio库，安装即可
+[root@mysql mysql]# yum install -y libaio
+
+# mysql_install_db脚本废弃，仍会报错，改用mysqld --initialize，会生成随机密码
+[root@mysql mysql]# mysqld --initialize
+...
+[Note] A temporary password is generated for root@localhost: u5qu((8Cp&gt;xs
+
+
+</code></pre><p>7，本地连入，配置远程连接用户权限，建库，建用户</p>
+<pre><code>[root@mysql mysql]# service mysqld status
+ ERROR! MySQL is not running
+[root@mysql mysql]# chkconfig mysqld on
+
+[root@mysql mysql]# service mysqld start
+Starting MySQL.Logging to '/data/mysql/mariadb.log'.
+ SUCCESS! 
+[root@mysql mysql]# ss -nlt
+                                                                       :::*        
+# 连接，用初始化时，生成的随机密码；-S指定通信的socket，默认的/tmp/mysql.sock替换为了/data/mysql/mysql.sock
+
+[root@mysql mysql]# mysql -p&quot;u5qu((8Cp&gt;xs&quot; -S /data/mysql/mysql.sock
+
+# 需先修改密码
+mysql&gt; alter user root@'localhost' identified by 'wang';
+Query OK, 0 rows affected (0.01 sec)
+
+# 建立远程连接用户
+mysql&gt; grant all on *.* to root@'192.168.80.%' identified by 'wang';
+
+</code></pre><h2 id="httpd配置fastcgi代理转发"><a href="#httpd配置fastcgi代理转发" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:httpd配置fastcgi代理转发" class="headings">httpd配置fastcgi代理转发</a></h2>
+<p>1，新建一个虚拟主机，配置fastcgi的转发</p>
+<pre><code>
+
+[root@host2 httpd]# cat conf.d/lamp.conf 
+&lt;Directory &quot;/lamp&quot;&gt;
+	DirectoryIndex index.php index.html
+	# 安装wordpress时，没有该项时，报错，浏览器访问一直显示forbidden，
+	# 查看日志发现是index文件问题，默认只找index.html，wordpress里面的index.php文件不会找，自然报错；
+	# 加上该行之后，重启，即可访问，执行后续安装步骤
+	Require all granted
+&lt;/Directory&gt;
+&lt;VirtualHost *:80&gt;
+	ServerName www.bbs.com
+	DocumentRoot /lamp
+	ProxyPassMatch &quot;^/(.*\.php)$&quot; &quot;fcgi://192.168.80.103:9000/lamp/$1&quot;
+&lt;/VirtualHost&gt;
+
+# 错误日志如下：
+[Tue Sep 01 18:07:21.854468 2020] [autoindex:error] [pid 2623] [client 192.168.80.1:12361] AH01276: Cannot serve directory /lamp/upload/: No matching DirectoryIndex (index.html) found, and server-generated directory index forbidden by Options directive
+</code></pre><p>2，php-fpm配置</p>
+<ul>
+<li>监听本机所有ip</li>
+<li>允许httpd主机连接</li>
+<li>创建apache用户，uid和http主机的apache用户保持一致</li>
+<li>提供nfs，供httpd主机挂载；</li>
+<li>逻辑和lnmp完全一致，唯一区别是httpd和nginx代理的配置方法，注意小问题，如Directoryindex那个错误；</li>
+</ul>
+<p>3，测试index.php页面</p>
+<p>​	向网页文件根目录，（也是php动态脚本根目录）写入测试php页面；</p>
+<p>​	如下：表明lamp部署成功；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200901175252260.png" alt="image-20200901175252260"></p>
+<h1 id="部署discuz"><a href="#部署discuz" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:部署discuz" class="headings">部署discuz</a></h1>
+<p>1，将解压后的upload目录放在网页文件根目录</p>
+<p>2，浏览器访问http://ip/upload，进行安装，（指定数据库信息，安装中会进行创建，wordpress需要提前建库建用户）</p>
+<p>3，期间可能会遇到目录权限问题，根据提示添加权限，刷新页面即可继续安装；</p>
+<h1 id="部署wordpress"><a href="#部署wordpress" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:部署wordpress" class="headings">部署Wordpress</a></h1>
+<p>1，建库建用户</p>
+<pre><code>mysql&gt; create database wd;
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; grant all on wd.* to wd@'192.168.80.%' identified by 'wd';
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+</code></pre><p>2，把解压后wordpress目录放到网页文件根目录，</p>
+<p>3，浏览器访问http://ip/wordpress，进行安装，根据页面提示即可</p>
+<p>4，如果是wordpress下所有内容，直接放到网页文件根目录，则访问http://ip/即可安装；（建议第一种方式）</p>
+<h1 id="reference"><a href="#reference" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:reference" class="headings">reference</a></h1>
+<p><a href="https://boogie96.gitee.io/2020/09/06/nginx%E4%B9%8BLNMP%E7%8E%AF%E5%A2%83/" target="_blank" rel="noopener">lnmp实验示例</a></p>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/httpd%E4%B9%8Blamp%E7%8E%AF%E5%A2%83/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/httpd之lamp环境/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-19 12:58:02 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-19</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-19</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" class="related-link">httpd之七层代理服务</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" class="related-link">httpd之web服务</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E4%B8%89%E7%A7%8Dmpm%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B/" class="related-link">httpd之三种mpm工作模型</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E4%B8%8E%E9%9D%99%E6%80%81web%E7%BB%93%E5%90%88%E9%85%8D%E7%BD%AE/" class="related-link">tomcat之与静态web结合</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="related-link">httpd之安装与配置</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/httpd/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>httpd</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/lamp/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>LAMP</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/nginx%E4%B9%8B%E7%A8%8B%E5%BA%8F%E7%83%AD%E9%83%A8%E7%BD%B2/" rel="prev">&lt; nginx之程序热部署</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" rel="next">httpd之七层代理服务 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

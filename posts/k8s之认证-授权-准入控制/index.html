@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>k8s之认证-授权-准入控制 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="k8s之认证-授权-准入控制" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/k8s%E4%B9%8B%E8%AE%A4%E8%AF%81-%E6%8E%88%E6%9D%83-%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-11-11T14:34:47+00:00",
+        "dateModified": "2020-12-01T15:35:51+08:00",
+        "url": "https://latteStudio.github.io/posts/k8s%E4%B9%8B%E8%AE%A4%E8%AF%81-%E6%8E%88%E6%9D%83-%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/",
+        "headline": "k8s之认证-授权-准入控制",
+        "description": "k8s之认证-授权-准入控制",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  13521 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20201123151735032.png","https://gitee.com/boogie96/img/raw/master/img/image-20201123183508821.png","https://gitee.com/boogie96/img/raw/master/img/image-20201123183519258.png","https://gitee.com/boogie96/img/raw/master/img/image-20201123183841417.png","https://gitee.com/boogie96/img/raw/master/img/image-20201124104357284.png","https://gitee.com/boogie96/img/raw/master/img/image-20201124183239267.png","https://gitee.com/boogie96/img/raw/master/img/image-20201124184530312.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="k8s之认证-授权-准入控制" />
+<meta property="og:description" content="k8s之认证-授权-准入控制" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/k8s%E4%B9%8B%E8%AE%A4%E8%AF%81-%E6%8E%88%E6%9D%83-%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20201123151735032.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-11-11T14:34:47&#43;00:00" />
+    <meta property="article:modified_time" content="2020-12-01T15:35:51&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">k8s之认证-授权-准入控制</h1>
+
+            
+
+            
+                <div class="post-description p-summary">k8s之认证-授权-准入控制</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-11-11T14:34:47&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.11.11</time>
+    
+    
+        
+        <time datetime="2020-12-01T15:35:51&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.12.1</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E5%AE%B9%E5%99%A8%E4%BA%91%E7%B3%BB%E5%88%97/" class="category-link p-category">容器云系列</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;13521</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;27&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:用户账户" href="#用户账户">用户账户</a></li>
+    <li><a id="contents:用户组" href="#用户组">用户组</a></li>
+    <li><a id="contents:认证授权准入控制" href="#认证授权准入控制">认证、授权、准入控制</a>
+      <ol>
+        <li><a id="contents:认证" href="#认证">认证</a></li>
+        <li><a id="contents:授权" href="#授权">授权</a></li>
+        <li><a id="contents:准入控制" href="#准入控制">准入控制</a></li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:serviceaccount自动化" href="#serviceaccount自动化">serviceaccount自动化</a></li>
+    <li><a id="contents:创建serviceaccount" href="#创建serviceaccount">创建serviceaccount</a></li>
+    <li><a id="contents:sa引用imagepullsecret" href="#sa引用imagepullsecret">sa引用imagepullSecret</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:k8s中的tlsssl认证" href="#k8s中的tlsssl认证">k8s中的tls/ssl认证</a></li>
+    <li><a id="contents:客户端配置kubeconfig" href="#客户端配置kubeconfig">客户端配置kubeconfig</a>
+      <ol>
+        <li><a id="contents:kubectl-config命令" href="#kubectl-config命令">kubectl config命令</a></li>
+        <li><a id="contents:kubeconfig文件格式" href="#kubeconfig文件格式">kubeconfig文件格式</a></li>
+        <li><a id="contents:创建kubeconfig文件" href="#创建kubeconfig文件">创建kubeconfig文件</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:tls-bootstraping机制" href="#tls-bootstraping机制">tls bootstraping机制</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:rbac授权插件" href="#rbac授权插件">RBAC授权插件</a></li>
+    <li><a id="contents:role和rolebinding" href="#role和rolebinding">role和rolebinding</a></li>
+    <li><a id="contents:clusterrole和clusterrolebinding" href="#clusterrole和clusterrolebinding">clusterrole和clusterrolebinding</a></li>
+    <li><a id="contents:聚合型clusterrole" href="#聚合型clusterrole">聚合型clusterrole</a></li>
+    <li><a id="contents:内建clusterrole" href="#内建clusterrole">内建clusterrole</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:部署https的dashboard" href="#部署https的dashboard">部署https的dashboard</a></li>
+    <li><a id="contents:配置token认证" href="#配置token认证">配置token认证</a></li>
+    <li><a id="contents:配置kubeconfig认证" href="#配置kubeconfig认证">配置kubeconfig认证</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:limitrange资源准入控制" href="#limitrange资源准入控制">limitRange资源准入控制</a></li>
+    <li><a id="contents:resourcequota资源准入控制" href="#resourcequota资源准入控制">resourceQuota资源准入控制</a></li>
+    <li><a id="contents:podsecuritypolicy" href="#podsecuritypolicy">podSecurityPolicy</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="whats-访问控制"><a href="#whats-访问控制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:whats-访问控制" class="headings">what`s 访问控制</a></h1>
+<p>​	<strong>api-server是k8s集群各个组件、scheduler、controller-manager、kubelet、kube-proxy、etcd、以及用户账户user、pod进程账户serviceaccount通信的唯一入口，是集群的网关；</strong></p>
+<p>​	ks8的访问控制分为3个阶段：由api-server实现，插件机制，</p>
+<ol>
+<li>用户认证，确保该用户有权限连入api-server；所有插件通过一个就放行</li>
+<li>用户鉴权，识别该用户对哪些用户、有哪些操作权限；所有插件通过一个就放行</li>
+<li>准入控制，对用户操作进行细粒度的补充，如用默认值填充用户未定义的字段；所有插件需全部通过才可放行</li>
+</ol>
+<p>图示：</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201123151735032.png" alt="image-20201123151735032"></p>
+<h2 id="用户账户"><a href="#用户账户" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:用户账户" class="headings">用户账户</a></h2>
+<p>通过api-server操作k8s集群一般有3种途径：<strong>发起操作的对象有人、pod对象，分别对应user、serviceaccount2类账户</strong></p>
+<ul>
+<li>kubectl命令行客户端，或图形客户端</li>
+<li>客户端接口库</li>
+<li>对接口发起rest的http请求</li>
+</ul>
+<p>​	用户账户分2类：</p>
+<ul>
+<li>人用的：useraccount；集群级别资源，</li>
+<li>pod用的：serviceaccount；名称空间级别资源</li>
+</ul>
+<p>对于k8s集群来说，api-server作为唯一的集群网关，其接收着，来自用户的、其他组件的、运行其上的pod的所有的api请求，<strong>每个api请求都要经过api-server的认证鉴权准入控制的检测步骤；在认证验证api请求来自哪个用户身份时，就分为了2类，一类是人类用户user、一类是pod用户serviceaccount、</strong></p>
+<p>api请求会附带其用户身份信息供api-server验证，如某个user身份、某个serviceaccount身份、</p>
+<p>无论是user账户还是sa账户（serviceaccount），都可以属于某个用户组，该组上添加的权限，会被组内成员自动继承，<strong>因此方便了某一类用户的批量授予某些权限或取消</strong></p>
+<h2 id="用户组"><a href="#用户组" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:用户组" class="headings">用户组</a></h2>
+<p>​	用户账户分组有4类：</p>
+<ul>
+<li>system:authenticated 所有通过api-server认证的账户，user或sa，自动归为自类</li>
+<li>system:unauthenticated 未通过api-server认证的账户，user或sa，</li>
+<li>system:serviceaacounts 当前集群下所有sa账户所在的组</li>
+<li>system:serviceaccounts:<namespace> 指定名称空间下所有sa账户所在组</li>
+</ul>
+<p>无论是谁发起的，每个api请求要么携带user人类身份、要么携带serviceaccount pod对象的身份，且需通过认证，否则就归为匿名请求，为匿名用户身份</p>
+<h2 id="认证授权准入控制"><a href="#认证授权准入控制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:认证授权准入控制" class="headings">认证、授权、准入控制</a></h2>
+<h3 id="认证"><a href="#认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:认证" class="headings">认证</a></h3>
+<p>​	认证时，api-server会从客户端提供的认证信息中，抽取出username、uid、groups、extra的信息，用做后续标识该用户的信息</p>
+<p>​	认证客户端身份时，api-server可支持客户端多种认证方式，常见的有：每种认证方式由一种认证的插件来实现，至少k8s集群应启用user和sa认证插件，因为此2种方式为客户端最常用</p>
+<ul>
+<li>x509客户端证书</li>
+<li>静态令牌文件static token file</li>
+<li>引导令牌bootstrap token，用于新节点加入时对新node的身份认证</li>
+<li>静态密码文件</li>
+<li>serviceaccount令牌</li>
+<li>openID连接令牌</li>
+<li>webhook令牌</li>
+<li>认证代理</li>
+<li>外部keystone服务器认证</li>
+<li>匿名请求</li>
+</ul>
+<h3 id="授权"><a href="#授权" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:授权" class="headings">授权</a></h3>
+<p>​	经过前一步的身份认证后，就要由鉴权插件确认该用户对哪些资源、具有哪些操作权限，场景鉴权插件</p>
+<ul>
+<li>node，对kubelet的访问控制</li>
+<li>abac，基于属性的访问控制</li>
+<li>rbac，基于角色的访问控制</li>
+<li>webhook，基于http回调机制，借助外部rest服务检查权限的访问控制</li>
+<li>alwaysdeny</li>
+<li>alwaysallow，2类特殊插件</li>
+</ul>
+<h3 id="准入控制"><a href="#准入控制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:准入控制" class="headings">准入控制</a></h3>
+<p>​	经过身份认证、用户鉴权后，对于有写操作的请求，还会经过准入控制插件的拦截，在写入etcd集群前，对写操作进行更细粒度的检查、补充等操作，常见插件：</p>
+<ul>
+<li>alwaysallow</li>
+<li>alwaysdeny</li>
+<li>alwayspullimage</li>
+<li>namespacelifecycle</li>
+<li>limitRanger，资源限制方面</li>
+<li>serviceaccount，为pod对象自动关联sa账户</li>
+<li>resourceQuota</li>
+<li>...</li>
+</ul>
+<p>ps：只读的api请求，不经过准入控制插件检查</p>
+<h1 id="服务账户serviceaccount"><a href="#服务账户serviceaccount" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:服务账户serviceaccount" class="headings">服务账户serviceaccount</a></h1>
+<p>​	运行中，pod可能会需要通过api-server发起api请求，访问集群中其他服务，这些服务会要求验证身份，因此pod就需要提供自己的身份信息给要请求的服务方。该信息就由pod携带的serviceaccount提供，通常包含用户名，和相关的secret对象</p>
+<p>​	如：监控用pod，需要请求各个节点的kubelet提供监控数据，就需要提供sa账户给kubelet认证，且该账户还需要有获得节点监控数据的权限</p>
+<h2 id="serviceaccount自动化"><a href="#serviceaccount自动化" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:serviceaccount自动化" class="headings">serviceaccount自动化</a></h2>
+<p>​	未明确定义sa账户的pod都会被分配一个默认的sa账户</p>
+<p>1、查看某运行中pod信息</p>
+<pre><code>[root@client ~]# kubectl get pods ngx1 -o yaml
+apiVersion: v1
+kind: Pod
+metadata:
+...
+  serviceAccount: default
+  serviceAccountName: default
+...
+volumeMounts:
+    - mountPath: /usr/share/nginx/html/
+      name: nginx
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-q6vpk
+      readOnly: true
+
+
+...
+  volumes:
+  - name: default-token-q6vpk
+    secret:
+      defaultMode: 420
+      secretName: default-token-q6vpk
+1，定义了一个secret类型的存储卷，其中，引用了名为default-token-q6vpk的secret对象
+2，在容器中引用，并挂载到了容器中/var/run/secrets/kubernetes.io/serviceaccount目录下，只读权限
+3、secret对象中存储了认证需要的信息
+4，由准入控制器补全的默认的sa账户，为当前名称空间下的default账户
+</code></pre><p>2、查看对应的secret对象</p>
+<pre><code>[root@client ~]# kubectl get secret default-token-q6vpk
+NAME                  TYPE                                  DATA   AGE
+default-token-q6vpk   kubernetes.io/service-account-token   3      13d
+
+1，其中提供了ca.crt，namespace，token三个字段的信息
+[root@client ~]# kubectl get secret default-token-q6vpk -o yaml
+apiVersion: v1
+data:
+  ca.crt: LS0tLS1C...
+  namespace: ZGVmYXVsdA==
+  token: ZXlKaGJHY2...
+kind: Secret
+
+</code></pre><p>3、查看挂载到容器中的文件</p>
+<p>​	可以看到，secret中定义的3个字段，被挂载成为了容器中的三个文件</p>
+<pre><code>[root@client ~]# kubectl exec  ngx1 -- ls /var/run/secrets/kubernetes.io/serviceaccount
+ca.crt
+namespace
+token
+[root@client ~]# kubectl exec  ngx1 -- cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+-----BEGIN CERTIFICATE-----
+MIICyDCCAbCgAwIBAgIBADANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwprdWJl
+cm5ldGVzMB4XDTIwMTExMDA2NTAwM1oXDTMwMTEwODA2NTAwM1owFTETMBEGA1UE
+AxMKa3ViZXJuZXRlczCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALue
+E6S/sjrJd0CKIQjTK2wLdOSo+Q9HMiJQLvwq6A3daLLqaIGo0FRcvVIWtwwW78oO
+SXKJWqImUQsthj+Fhuy8QFaaGIJgoQnSL5VYDzDRLaRN6lg0fjOYIFB055QVQ54R
+apbpgW/N9BwrTiOQmGSBVWJt7SCb9Mz1ngw4FWSErLUpatFQ9id9AGa+5+H1XxO1
+eiq6MPyejZ4Cfy+w3LCeDLwOizFPdfCP9t0HXYwgQkTOS8WfuyBTa4YCvQX2cM47
+eGxJVB+R0aKOOW9pdtqiIanfYwwIf+oxE+CBYO+KIzWgNnD2wTbjsmebk8KoOk4o
+vgbNPIjeQboEIDKHyskCAwEAAaMjMCEwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB
+/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAI0HpRWd4ZsEHJe6Ef4cWrTX/gSv
+Sbss22pqoZF6EURSpxBMlYa5DFAHBpRqBcWVig4KViCSl+hhSLRvOF8He6nlkxvc
+bsKJT9c4eyFI+dOfEaAZUuhmUddSg72KcJpA+3dCnnYVvGI3gFfydaM8nkUr3Pm1
+88Ixm66VCB/+IFzW88mHY9t3s9/v1aVizlAq3kknTZt7pwvNTirCD39I5PpBfPXL
+/XuzUMBJ9jO4Goi+fwue+yjpOanDQcGCOX2LO7MoafKgMb1Dm3+MsfdNRtjS9FNS
+aFzXCk/+V73U2BHb0qvFMaS4aO5RGJvUzGuzEpoAxDKUWA+Oudo4bI6XWBI=
+-----END CERTIFICATE-----
+[root@client ~]# kubectl exec  ngx1 -- cat /var/run/secrets/kubernetes.io/serviceaccount/namespace
+default[root@client ~]#
+</code></pre><p>4、查看名称空间下生成的默认sa账户</p>
+<p>​	其中引用了包含认证信息的secret对象</p>
+<p>​	<strong>每个ns中，都会生成一个default的sa账户，生成一个default-token-xxx的secret对象，并2者关联起来</strong></p>
+<pre><code>[root@client ~]# kubectl get sa -o yaml
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    creationTimestamp: 2020-11-10T06:50:41Z
+    name: default
+    namespace: default
+    resourceVersion: &quot;333&quot;
+    selfLink: /api/v1/namespaces/default/serviceaccounts/default
+    uid: 0caad4cf-2321-11eb-8d73-000c292d5d7c
+  secrets:
+  - name: default-token-q6vpk
+kind: List
+metadata:
+  resourceVersion: &quot;&quot;
+  selfLink: &quot;&quot;
+
+[root@client ~]# kubectl get sa -o wide
+NAME      SECRETS   AGE
+default   1         13d
+[root@client ~]# kubectl get secret -o wide
+NAME                  TYPE                                  DATA   AGE
+default-token-q6vpk   kubernetes.io/service-account-token   3      13d
+
+</code></pre><p>5、sa账户自动化实现过程，（由3个组件协同实现）</p>
+<ul>
+<li>sa账户的控制器</li>
+<li>token的控制器</li>
+<li>sa的准入控制器</li>
+</ul>
+<ol>
+<li>sa账户控制器，负责在每个ns中生成一个默认的sa账户</li>
+<li>token控制器，负责监控sa账户的生成，并为其添加secret对象，其中存储了认证相关信息</li>
+<li>sa的准入控制器，
+<ol>
+<li>创建pod的请求来临时，未指定sa账户的补上pod所在ns中默认的sa账户，名为default</li>
+<li>指定sa账户的pod，检查引用sa是否存在，不存在报错</li>
+</ol>
+</li>
+</ol>
+<p>6、指定给sa的token签名的密钥对</p>
+<ul>
+<li>controller-manager启动时指定--service-account-private-key-file给sa的token签名的私钥</li>
+<li>api-server指定--service-account-key-file指定验证sa的token时的公钥，验证sa的token的合法性</li>
+</ul>
+<h2 id="创建serviceaccount"><a href="#创建serviceaccount" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:创建serviceaccount" class="headings">创建serviceaccount</a></h2>
+<p>​	创建pod时，可以用spec.serviceAccount字段指定sa，没指定的就是该ns中默认的sa账户，名为default；</p>
+<p>​	命令行或yaml清单均可创建sa账户，创建sa账户后，由controller-manager其中的子组件：token控制器监测到，然后自动生成一个token添加到一个secret对象中，并关联到创建的sa账户上；</p>
+<p>1、查看ns中默认的sa账户，每个ns都有一个名为default的sa账户；</p>
+<pre><code>[root@client ~]# kubectl get sa   --all-namespaces |grep default
+NAMESPACE       NAME                                 SECRETS   AGE
+default         default                              1         13d
+ingress-nginx   default                              1         5d4h
+kube-public     default                              1         13d
+kube-system     default                              1         13d
+test            default                              1         5d3
+</code></pre><p>2、基于yaml文件创建sa账户</p>
+<pre><code>[root@client sa]# kubectl apply -f sa-demo1.yaml 
+serviceaccount/da-demo1 created
+[root@client sa]# kubectl get sa
+NAME       SECRETS   AGE
+da-demo1   1         3s
+default    1         13d
+[root@client sa]# cat sa-demo1.yaml 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: da-demo1
+
+定义sa名称和名称空间即可，其中的secret会自动被token控制器创建；名字格式：SA_NAME-token-xxx
+当然，可以手动指定secret对象，
+以及，imagePullSecrets对象，私有仓库的认证信息
+[root@client sa]# kubectl get secrets
+NAME                   TYPE                                  DATA   AGE
+da-demo1-token-b6tln   kubernetes.io/service-account-token   3      50s
+
+
+</code></pre><h2 id="sa引用imagepullsecret"><a href="#sa引用imagepullsecret" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:sa引用imagepullsecret" class="headings">sa引用imagepullSecret</a></h2>
+<p>​	sa的spec.imagePullSecrets字段，通过指定docker-registry类型的secret，之后，引用该sa账户的pod，可以从对应的私有镜像仓库拉取镜像，而无需手动在节点上先docker login登陆</p>
+<p>​	docker-registry类型的secret需要事先创建，其中加密了私有仓库的地址，用户名，密码，用户邮箱信息</p>
+<pre><code>[root@client ~]# kubectl explain sa.imagePullSecrets
+KIND:     ServiceAccount
+VERSION:  v1
+...
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: da-demo1
+imagePullSecrets:
+- name: some-regstiry-secrets
+</code></pre><h1 id="x509数字证书认证"><a href="#x509数字证书认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:x509数字证书认证" class="headings">x509数字证书认证</a></h1>
+<p>tls/ssl单向认证图示：</p>
+<p>​	只有客户验证服务端的证书，确保服务端的安全性</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201123183508821.png" alt="image-20201123183508821"></p>
+<p>tls/ssl双向认证图示：</p>
+<p>​	客户端/服务端相互验证证书，确保双方均为安全用户，</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201123183519258.png" alt="image-20201123183519258"></p>
+<h2 id="k8s中的tlsssl认证"><a href="#k8s中的tlsssl认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:k8s中的tlsssl认证" class="headings">k8s中的tls/ssl认证</a></h2>
+<p>k8s中各组件之间、客户端和api-server之间，api-server和etcd集群之间，均需要安全通信，且都是双向安全通信，即客户端，服务端都需要提供对方自己的证书，并验证对方的证书；（基本由一个私有ca签发即可）</p>
+<p>k8s集群安全通信举例：</p>
+<ul>
+<li>api-server和其他组件
+<ul>
+<li>controller-manager</li>
+<li>scheduler</li>
+</ul>
+</li>
+<li>api-server和其客户端之间
+<ul>
+<li>kubectl或gui客户端</li>
+<li>各节点：kubelet和kube-proxy，其中新节点加入集群的时候，可自动生成私钥和证书请求文件csr，提交给api-server，并由master节点签发证书，这过程叫做：tls bootstraping</li>
+</ul>
+</li>
+<li>etcd集群节点之间，2380端口</li>
+<li>etcd集群和其客户端api-server，2379端口</li>
+<li></li>
+</ul>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201123183841417.png" alt="image-20201123183841417"></p>
+<h2 id="客户端配置kubeconfig"><a href="#客户端配置kubeconfig" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:客户端配置kubeconfig" class="headings">客户端配置kubeconfig</a></h2>
+<h3 id="kubectl-config命令"><a href="#kubectl-config命令" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:kubectl-config命令" class="headings">kubectl config命令</a></h3>
+<p>kubeconfig命令格式：用户配置kubeconfig配置文件；</p>
+<pre><code>[root@client sa]# kubectl config --help
+Modify kubeconfig files using subcommands like &quot;kubectl config set current-context my-context&quot; 
+
+Available Commands:
+  current-context Displays the current-context
+  delete-cluster  Delete the specified cluster from the kubeconfig
+  delete-context  Delete the specified context from the kubeconfig
+  get-clusters    Display clusters defined in the kubeconfig
+  get-contexts    Describe one or many contexts
+  rename-context  Renames a context from the kubeconfig file.
+  set             Sets an individual value in a kubeconfig file
+  set-cluster     Sets a cluster entry in kubeconfig
+  set-context     Sets a context entry in kubeconfig
+  set-credentials Sets a user entry in kubeconfig
+  unset           Unsets an individual value in a kubeconfig file
+  use-context     Sets the current-context in a kubeconfig file
+  view            Display merged kubeconfig settings or a specified kubeconfig file
+</code></pre><h3 id="kubeconfig文件格式"><a href="#kubeconfig文件格式" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:kubeconfig文件格式" class="headings">kubeconfig文件格式</a></h3>
+<p>kubeconfig配置文件，为api-server各类客户端可使用的连接到api-server的认证配置文件，组成格式有4部分：可以定义多个集群和用户，并组合为不同的上下文，利用use-context可以实现在不同集群、不同认证用户之间快速切换；</p>
+<ul>
+<li>clusters，定义集群信息，url，名称，</li>
+<li>users，定义用户信息，名称</li>
+<li>contexts：集群信息和用户的组合，</li>
+<li>current-context：当前默认使用哪个用户连接哪个集群</li>
+</ul>
+<pre><code>[root@client sa]# kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://192.168.80.101:6443
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kubernetes-admin
+  name: kubernetes-admin@kubernetes
+current-context: kubernetes-admin@kubernetes
+kind: Config
+preferences: {}
+users:
+- name: kubernetes-admin
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+</code></pre><h3 id="创建kubeconfig文件"><a href="#创建kubeconfig文件" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:创建kubeconfig文件" class="headings">创建kubeconfig文件</a></h3>
+<p>1、创建用户、用户私钥、用户证书</p>
+<p>创建普通用户：</p>
+<pre><code>[root@master kube_config]# useradd kube_user1
+[root@master kube_config]# su - kube_user1
+[kube_user1@master ~]$ ll
+total 0
+
+[kube_user1@master ~]$ (umask 077; openssl genrsa -out kube_user1.key 2048)
+Generating RSA private key, 2048 bit long modulus
+............................................+++
+................................................+++
+e is 65537 (0x10001
+</code></pre><p>生成key和csr文件：subj就是身份认证时，用户的标识id，分别为用户名、用户组名</p>
+<pre><code>[kube_user1@master ~]$ openssl req -new -key kube_user1.key -out kube_user1.csr -subj &quot;/CN=kube_user1/O=k8s&quot;
+[kube_user1@master ~]$ ll
+total 8
+-rw-rw-r-- 1 kube_user1 kube_user1  911 Nov 23 19:24 kube_user1.csr
+-rw------- 1 kube_user1 kube_user1 1679 Nov 23 19:24 kube_user1.key
+</code></pre><p>切换为root用户，然后签发证书，用kubeadm部署集群时生成的k8s集群的ca证书</p>
+<pre><code>[root@master kube_config]# openssl x509 -req -in /home/kube_user1/kube_user1.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out kube_user1.crt -days 3650
+Signature ok
+subject=/CN=kube_user1/O=k8s
+Getting CA Private Key
+
+</code></pre><p>复制到kube_user1用户家目录</p>
+<pre><code>[root@master kube_config]# chown -R kube_user1.kube_user1 /home/kube_user1/kube_user1.crt 
+[root@master kube_config]# ll /home/kube_user1/
+total 12
+-rw-r--r-- 1 kube_user1 kube_user1  997 Nov 23 19:26 kube_user1.crt
+-rw-rw-r-- 1 kube_user1 kube_user1  911 Nov 23 19:24 kube_user1.csr
+-rw------- 1 kube_user1 kube_user1 1679 Nov 23 19:24 kube_user1.key
+
+</code></pre><p>2、配置为kubeconfig文件</p>
+<p>设置集群信息字段：</p>
+<pre><code>[kube_user1@master ~]$ kubectl config set-cluster kubernetes --embed-certs=true \
+&gt; --certificate-authority=/etc/kubernetes/pki/ca.crt --server=&quot;https://192.168.80.101:6443&quot;
+Cluster &quot;kubernetes&quot; set.
+</code></pre><p>设置用户信息字段：</p>
+<pre><code>[kube_user1@master ~]$ kubectl config set-credentials kube_user1 --embed-certs=true --client-certificate=/home/kube_user1/kube_user1.crt \
+&gt; --client-key=/home/kube_user1/kube_user1.key 
+User &quot;kube_user1&quot; set.
+</code></pre><p>设置context字段：</p>
+<pre><code>[kube_user1@master ~]$ kubectl config set-context kube_user1@kubernetes --cluster=kubernetes --user=kube_user1
+Context &quot;kube_user1@kubernetes&quot; created.
+</code></pre><p>设置current-context字段：</p>
+<pre><code>[kube_user1@master ~]$ kubectl config use-context kube_user1@kubernetes
+Switched to context &quot;kube_user1@kubernetes&quot;.
+</code></pre><p>查看：</p>
+<pre><code>[kube_user1@master ~]$ kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://192.168.80.101:6443
+  name: kubernetes
+contexts:
+- context:
+    cluster: kubernetes
+    user: kube_user1
+  name: kube_user1@kubernetes
+current-context: kube_user1@kubernetes
+kind: Config
+preferences: {}
+users:
+- name: kube_user1
+  user:
+    client-certificate-data: REDACTED
+    client-key-data: REDACTED
+</code></pre><p>3、使用上步的kubeconfig文件访问测试</p>
+<p>​	访问被拒绝，因为没有设置对应的权限，但证明kubeconfig文件配置成功；</p>
+<pre><code>[kube_user1@master ~]$ kubectl get pods
+Error from server (Forbidden): pods is forbidden: User &quot;kube_user1&quot; cannot list resource &quot;pods&quot; in API group &quot;&quot; in the namespace &quot;default
+</code></pre><p>​	每个用户默认读取kubeconfig文件路径：$HOME/.kube/config，也可以指定具体采用的kubeconfig文件具体路径；</p>
+<pre><code>[root@master kube_config]# kubectl get pods --kubeconfig=/home/kube_user1/.kube/config 
+Error from server (Forbidden): pods is forbidden: User &quot;kube_user1&quot; cannot list resource &quot;pods&quot; in API group &quot;&quot; in the namespace &quot;default&quot;
+</code></pre><h2 id="tls-bootstraping机制"><a href="#tls-bootstraping机制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tls-bootstraping机制" class="headings">tls bootstraping机制</a></h2>
+<p>​	此前说过，k8s集群通信几乎都需要双向tls认证，然后加密通信，新节点加入集群时也不例外。</p>
+<p>​	给新节点做tls配置有2种方式：1、手动给每个节点，配置好私钥、证书，然后分发到各个节点；2、由各个节点自行生成私钥和签名证书；</p>
+<p>​	集群规模大时，1方法显然任务繁重、2方法又存在安全隐患，因此采用较为折中的办法：tls bootstraping；</p>
+<p>​	新节点加入，由其上kubelet自动生成私钥，和证书请求文件csr，并发送给master进行审核，管理员在master上审核通过后，再进行证书签发；但逐一审核csr文件仍较为繁重，因此引入了token</p>
+<p>​	新节点只有采用了master上生成的，认可的相同的token，就可以在发送csr请求后，自动由controller-manager中的一个证书签发控制器自动签发，避免了手动审核的繁琐，且token有过期时长，持有该token的用户会加入到system:bootstrappers组内；且具有适当的rbac权限，用于证书签发；</p>
+<p>​	kubeadm部署集群时，kubectl join 就需要指定一个token参数，才可加入集群，就是该token</p>
+<p>​	api-server启动参数--client-ca-file，要和证书签发控制器使用的是一个ca，这样才能通过认证；</p>
+<h1 id="rbacrole-based-access-control"><a href="#rbacrole-based-access-control" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:rbacrole-based-access-control" class="headings">RBAC:role-based-access-control</a></h1>
+<p>​	rbac是一种灵活授权的权限授予机制，不同于以往，直接把权限授予用户，**而是在权限和用户之间加入一层：角色role，**角色由；操作verb、对象object构成；即对哪些对象能执行哪些动作，多组操作和对象构成了role角色，角色可以再赋予用户，用户组，用户和角色之间是多对多的关系，</p>
+<p>​	定义好角色后，以后新创建的用户只需关联到角色，就立刻拥有了角色的所有的权限，而不比给新用户一一设置对哪些对象有哪些操作权限，提高了灵活性；</p>
+<h2 id="rbac授权插件"><a href="#rbac授权插件" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:rbac授权插件" class="headings">RBAC授权插件</a></h2>
+<p>​	rbac授权插件，将定义好的，包含对某些对象操作权限的role关联到主体；</p>
+<ul>
+<li>主体：useraccount或serviceaccount，以及group</li>
+<li>动作：create、delete、update、get</li>
+<li>对象：k8s上各种资源对象</li>
+<li>role定义时：就由动作和对象组成，然后关联给主体，即user账户或sa账户</li>
+</ul>
+<p>k8s与rbac相关的资源对象</p>
+<ul>
+<li>clusterrole，集群级资源，用于定义对集群级资源如node的操作集合，</li>
+<li>role，名称空间级资源，用于定义对ns级资源如pod的操作集合，</li>
+<li>clusterrolebinding，引用集群级别的clusterrole</li>
+<li>rolebinding，可以引用本ns里的role，也可引用集群级别的clusterrole
+<ul>
+<li><code>Alternatively, a RoleBinding can reference a ClusterRole and bind that ClusterRole to the namespace of the RoleBinding.</code></li>
+</ul>
+</li>
+<li>注：user为集群级，sa为ns级别，</li>
+</ul>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201124104357284.png" alt="image-20201124104357284"></p>
+<h2 id="role和rolebinding"><a href="#role和rolebinding" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:role和rolebinding" class="headings">role和rolebinding</a></h2>
+<ul>
+<li>role定义了对象（如pod，service）和所允许的操作（如增删改查）</li>
+<li>rolebing 可以将定义好的role绑定给user、group、sa三种账户（sa是ns级别）</li>
+<li>role和rolebinding属于ns级别资源</li>
+<li>rolebinding只可以引用本ns中的role，以及定义的集群级别的clusterrole</li>
+<li>role和rolebinding均可通过yaml清单或命令行创建</li>
+</ul>
+<p>1、定义role清单</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client role]# cat role-get-pod.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Role</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">role-get-pod</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiGroups</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;pods&#34;</span><span class="p">,</span><span class="s2">&#34;pods/log&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">  </span><span class="nt">verbs</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;get&#34;</span><span class="p">,</span><span class="s2">&#34;list&#34;</span><span class="p">,</span><span class="s2">&#34;watch&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 在rules中定义了最必须的2个字段，resources定义对象列表；verbs定义可执行的动作列表</span><span class="w">
+</span><span class="w"></span><span class="c"># apiGroups指定了资源所在群组，也是个列表，“”代表api核心群组</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client role]# kubectl apply -f role-get-pod.yaml </span><span class="w">
+</span><span class="w"></span><span class="l">role.rbac.authorization.k8s.io/role-get-pod created</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client role]# kubectl get role</span><span class="w">
+</span><span class="w"></span><span class="l">NAME           AGE</span><span class="w">
+</span><span class="w"></span><span class="l">role-get-pod   2s</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client role]# kubectl get role role-get-pod -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Role</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">kubectl.kubernetes.io/last-applied-configuration</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">      </span><span class="w">      </span>{<span class="s2">&#34;apiVersion&#34;</span><span class="p">:</span><span class="s2">&#34;rbac.authorization.k8s.io/v1&#34;</span><span class="p">,</span><span class="s2">&#34;kind&#34;</span><span class="p">:</span><span class="s2">&#34;Role&#34;</span><span class="p">,</span><span class="s2">&#34;metadata&#34;</span><span class="p">:</span>{<span class="s2">&#34;annotations&#34;</span><span class="p">:</span>{}<span class="p">,</span><span class="s2">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;role-get-pod&#34;</span><span class="p">,</span><span class="s2">&#34;namespace&#34;</span><span class="p">:</span><span class="s2">&#34;default&#34;</span>}<span class="p">,</span><span class="s2">&#34;rules&#34;</span><span class="p">:[</span>{<span class="s2">&#34;apiGroups&#34;</span><span class="p">:[</span><span class="s2">&#34;&#34;</span><span class="p">],</span><span class="s2">&#34;resources&#34;</span><span class="p">:[</span><span class="s2">&#34;pods&#34;</span><span class="p">,</span><span class="s2">&#34;pods/log&#34;</span><span class="p">],</span><span class="s2">&#34;verbs&#34;</span><span class="p">:[</span><span class="s2">&#34;get&#34;</span><span class="p">,</span><span class="s2">&#34;list&#34;</span><span class="p">,</span><span class="s2">&#34;watch&#34;</span><span class="p">]</span>}<span class="p">]</span>}<span class="w">
+</span><span class="w">  </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="ld">2020-11-24T03:20:38Z</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">role-get-pod</span><span class="w">
+</span><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;560845&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="l">/apis/rbac.authorization.k8s.io/v1/namespaces/default/roles/role-get-pod</span><span class="w">
+</span><span class="w">  </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l">05fd5f74-2e04-11eb-8b3f-000c292d5d7c</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiGroups</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="s2">&#34;&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">pods</span><span class="w">
+</span><span class="w">  </span>- <span class="l">pods/log</span><span class="w">
+</span><span class="w">  </span><span class="nt">verbs</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">get</span><span class="w">
+</span><span class="w">  </span>- <span class="l">list</span><span class="w">
+</span><span class="w">  </span>- <span class="l">watch</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>2、定义rolebinding清单</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client role]# cat rolebinding-get-pod.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">RoleBinding</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">rolebinding-get-pod</span><span class="w">
+</span><span class="w"></span><span class="nt">roleRef</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span><span class="w"> </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Role</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">role-get-pod</span><span class="w">
+</span><span class="w"></span><span class="nt">subjects</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">User</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">kube_user1</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>3、绑定给上步创建的kube_user1这个user用户</p>
+<p>​	绑定前：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@master ~<span class="o">]</span><span class="c1"># kubectl get pods --kubeconfig=/home/kube_user1/.kube/config </span>
+Error from server <span class="o">(</span>Forbidden<span class="o">)</span>: pods is forbidden: User <span class="s2">&#34;kube_user1&#34;</span> cannot list resource <span class="s2">&#34;pods&#34;</span> in API group <span class="s2">&#34;&#34;</span> in the namespace <span class="s2">&#34;default&#34;</span>
+</code></pre></td></tr></table></div>
+</div>
+</div><p>​	绑定：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@client role<span class="o">]</span><span class="c1"># kubectl apply -f rolebinding-get-pod.yaml </span>
+rolebinding.rbac.authorization.k8s.io/rolebinding-get-pod created
+
+<span class="o">[</span>root@client role<span class="o">]</span><span class="c1"># kubectl get rolebinding</span>
+NAME                  AGE
+rolebinding-get-pod   4s
+</code></pre></td></tr></table></div>
+</div>
+</div><p>​	绑定后：根据绑定的role权限，可以查看pod了</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>kube_user1@master ~<span class="o">]</span>$ kubectl get pods
+NAME                    READY   STATUS              RESTARTS   AGE
+dep1-7b96746498-2qv6t   1/1     Running             <span class="m">6</span>          5d16h
+dep1-7b96746498-59x58   1/1     Running             <span class="m">6</span>          5d16h
+dep1-7b96746498-8lldj   1/1     Running             <span class="m">6</span>          5d16h
+nginx-with-ssl          1/1     Running             <span class="m">2</span>          45h
+ngx1                    1/1     Running             <span class="m">2</span>          46h
+pod-env                 0/1     ImagePullBackOff    <span class="m">2</span>          4d18h
+pod1                    0/1     ImagePullBackOff    <span class="m">2</span>          4d20h
+pod2                    0/1     ImagePullBackOff    <span class="m">2</span>          4d20h
+state-stateset-0        0/1     ContainerCreating   <span class="m">0</span>          44h
+
+<span class="o">[</span>kube_user1@master ~<span class="o">]</span>$ kubectl get service
+Error from server <span class="o">(</span>Forbidden<span class="o">)</span>: services is forbidden: User <span class="s2">&#34;kube_user1&#34;</span> cannot list resource <span class="s2">&#34;services&#34;</span> in API group <span class="s2">&#34;&#34;</span> in the namespace <span class="s2">&#34;default&#34;</span>
+</code></pre></td></tr></table></div>
+</div>
+</div><p>4、role定义字段说明：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">kubectl explain role.rules
+   apiGroups	&lt;<span class="o">[]</span>string&gt;
+     APIGroups is the name of the APIGroup that contains the resources. If
+     multiple API groups are specified, any action requested against one of the
+     enumerated resources in any API group will be allowed.
+
+   nonResourceURLs	&lt;<span class="o">[]</span>string&gt;
+   <span class="c1"># 用于定义一些非k8s对象的url型，如/healthz</span>
+     NonResourceURLs is a <span class="nb">set</span> of partial urls that a user should have access to.
+     *s are allowed, but only as the full, final step in the path Since
+     non-resource URLs are not namespaced, this field is only applicable <span class="k">for</span>
+     ClusterRoles referenced from a ClusterRoleBinding. Rules can either apply
+     to API resources <span class="o">(</span>such as <span class="s2">&#34;pods&#34;</span> or <span class="s2">&#34;secrets&#34;</span><span class="o">)</span> or non-resource URL paths
+     <span class="o">(</span>such as <span class="s2">&#34;/api&#34;</span><span class="o">)</span>, but not both.
+
+   resourceNames	&lt;<span class="o">[]</span>string&gt;
+     ResourceNames is an optional white list of names that the rule applies to.
+     An empty <span class="nb">set</span> means that everything is allowed.
+
+   resources	&lt;<span class="o">[]</span>string&gt;
+     Resources is a list of resources this rule applies to. ResourceAll
+     represents all resources.
+
+   verbs	&lt;<span class="o">[]</span>string&gt; -required-
+     Verbs is a list of Verbs that apply to ALL the ResourceKinds and
+     AttributeRestrictions contained in this rule. VerbAll represents all kinds
+     
+     
+role下级只有4个字段，分别为apiVersion kind metadata rules，其中在rules中定义了对哪些对象；能够执行哪些动作
+对象一般为k8s的资源对象，如pod service
+以及某些对象的子对象，如pod/logs nodes/status
+以及一些非k8s对象的url型，如/healthz
+</code></pre></td></tr></table></div>
+</div>
+</div><p>5、rolebinding定义字段说明：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client ~]# kubectl explain rolebinding</span><span class="w">
+</span><span class="w"></span><span class="nt">KIND</span><span class="p">:</span><span class="w">     </span><span class="l">RoleBinding</span><span class="w">
+</span><span class="w"></span><span class="nt">VERSION</span><span class="p">:</span><span class="w">  </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">DESCRIPTION</span><span class="p">:</span><span class="w">
+</span><span class="w">     </span><span class="l">RoleBinding references a role, but does not contain it. It can reference a</span><span class="w">
+</span><span class="w">     </span><span class="l">Role in the same namespace or a ClusterRole in the global namespace. It</span><span class="w">
+</span><span class="w">     </span><span class="l">adds who information via Subjects and namespace information by which</span><span class="w">
+</span><span class="w">     </span><span class="l">namespace it exists in. RoleBindings in a given namespace only have effect</span><span class="w">
+</span><span class="w">     </span><span class="l">in that namespace.</span><span class="w">
+</span><span class="w"></span><span class="nn">...</span><span class="w">
+</span><span class="w">
+</span><span class="w">   </span><span class="l">roleRef	&lt;Object&gt; -required-</span><span class="w">
+</span><span class="w">     </span><span class="l">RoleRef can reference a Role in the current namespace or a ClusterRole in</span><span class="w">
+</span><span class="w">     </span><span class="l">the global namespace. If the RoleRef cannot be resolved, the Authorizer</span><span class="w">
+</span><span class="w">     </span><span class="l">must return an error.</span><span class="w">
+</span><span class="w">
+</span><span class="w">   </span><span class="l">subjects	&lt;[]Object&gt;</span><span class="w">
+</span><span class="w">     </span><span class="l">Subjects holds references to the objects the role applies to.</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="c"># 最基础的sujects定义关联的用户，有三类：user group serviceaccount</span><span class="w">
+</span><span class="w"></span><span class="c"># roleRef指定了关联到哪些角色，类型有2类：role 和 clusterrole</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><h2 id="clusterrole和clusterrolebinding"><a href="#clusterrole和clusterrolebinding" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:clusterrole和clusterrolebinding" class="headings">clusterrole和clusterrolebinding</a></h2>
+<p>​	clusterrole用于定义对集群级别资源的操作权限，如node，ns等资源，格式和role类似；</p>
+<p>​	clusterrolebinding可以将clusterrole绑定给用户，从而使得其具有对集群级别资源的操作权限；</p>
+<p>​	rolebinding对象属于ns级别，它绑定clusterrole的时候，**所授予用户的权限作用范围只限于rolebinding所在的名称空间内；**eg：若某clusterrole定义了权限，可以访问所有名称空间的所有configmap资源，该clusterrole通过test名称空间的rolebinding被绑定到了用户user1上，那user1所能访问的只有test名称空间的所有configmap，若采用的是clusterrolebinding，则user可访问所有名称空间的所有configmap；</p>
+<ul>
+<li>集群级资源：如node，pv无法被rolebinding绑定，只能被clusterrolebinding绑定；</li>
+</ul>
+<p>1、系统内置了对非k8s对象的url型的访问权限</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client role]# kubectl get clusterrole system:discovery -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">rbac.authorization.kubernetes.io/autoupdate</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="ld">2020-11-10T06:50:24Z</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">kubernetes.io/bootstrapping</span><span class="p">:</span><span class="w"> </span><span class="l">rbac-defaults</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">system:discovery</span><span class="w">
+</span><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;55&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="l">/apis/rbac.authorization.k8s.io/v1/clusterroles/system%3Adiscovery</span><span class="w">
+</span><span class="w">  </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l">02162b27-2321-11eb-8d73-000c292d5d7c</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">nonResourceURLs</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/api</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/api/*</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/apis</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/apis/*</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/healthz</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/openapi</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/openapi/*</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/swagger-2.0.0.pb-v1</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/swagger.json</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/swaggerapi</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/swaggerapi/*</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/version</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/version/</span><span class="w">
+</span><span class="w">  </span><span class="nt">verbs</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">get</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client role]# kubectl get clusterrolebinding system:discovery -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRoleBinding</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">rbac.authorization.kubernetes.io/autoupdate</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="ld">2020-11-10T06:50:24Z</span><span class="w">
+</span><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">kubernetes.io/bootstrapping</span><span class="p">:</span><span class="w"> </span><span class="l">rbac-defaults</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">system:discovery</span><span class="w">
+</span><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;111&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="l">/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/system%3Adiscovery</span><span class="w">
+</span><span class="w">  </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l">024781cd-2321-11eb-8d73-000c292d5d7c</span><span class="w">
+</span><span class="w"></span><span class="nt">roleRef</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">system:discovery</span><span class="w">
+</span><span class="w"></span><span class="nt">subjects</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Group</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">system:authenticated</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiGroup</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io</span><span class="w">
+</span><span class="w">  </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Group</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">system:unauthenticated</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="l">clusterrole和clusterrolebinding都叫 system:discovery</span><span class="w">
+</span><span class="w"></span><span class="l">且授权了2个组， system:authenticated、system:unauthenticated</span><span class="w">
+</span><span class="w"></span><span class="l">即包含了所有用户，任何用户都可以获得这些url资源的读取权限；</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>2、自定义对url型资源访问的clusterrole</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">healthz-admin</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">nonResourceURLs</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">/healthz</span><span class="w">
+</span><span class="w">  </span><span class="l">verbs</span><span class="w">
+</span><span class="w">  </span>- <span class="l">get</span><span class="w">
+</span><span class="w">  </span>- <span class="l">create</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><h2 id="聚合型clusterrole"><a href="#聚合型clusterrole" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:聚合型clusterrole" class="headings">聚合型clusterrole</a></h2>
+<p>​	聚合型clusterrole实现了灵活的组合其他多个clusterrole，（通过标签选择器实现）</p>
+<p>​	k8s自1.9后，支持在<code>ClusterRole.aggregationRule</code>字段中聚合其他的clusterrole，即本身不定义权限，而是将多个clusterrole的权限继承下来并聚合为自己的权限，<strong>通过clusterRoleSelecters标签选择器实现</strong></p>
+<p>​	<strong>k8s内建的clusterrole：admin和edit就是聚合型role，用于可以根据需要定义自己的clusterrole，并被admin或edit的标签选择器选中，可以方便的向默认角色中组合添加自定义的权限集合；</strong></p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client ~]# kubectl get clusterrole admin -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">aggregationRule</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">clusterRoleSelectors</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">rbac.authorization.k8s.io/aggregate-to-admin</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client ~]# kubectl get clusterrole edit -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">aggregationRule</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">clusterRoleSelectors</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">rbac.authorization.k8s.io/aggregate-to-edit</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>1、定义聚合型clusterrole</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client role]# cat aggre-clusterrole.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">aggret-clusterrole</span><span class="w">
+</span><span class="w"></span><span class="nt">aggregationRule</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">clusterRoleSelectors</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">rbac.demo.com/aggregate</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>2、定义带标签可被聚合的clusterrole</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client role]# cat demo.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w">
+</span><span class="w"> </span><span class="nt">labels</span><span class="p">:</span><span class="w"> 
+</span><span class="w">  </span><span class="nt">rbac.demo.com/aggregate</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiGroups</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;&#34;</span><span class="p">]</span><span class="w">
+</span><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">pods</span><span class="w">
+</span><span class="w">  </span><span class="nt">verbs</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">get</span><span class="w">
+</span><span class="w">  </span>- <span class="l">watch</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>3、查看权限是否被聚合</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client role]# kubectl apply -f demo.yaml </span><span class="w">
+</span><span class="w"></span><span class="l">clusterrole.rbac.authorization.k8s.io/demo created</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client role]# kubectl get clusterrole aggret-clusterrole -o yaml</span><span class="w">
+</span><span class="w"></span><span class="nt">aggregationRule</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">clusterRoleSelectors</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span><span class="nt">rbac.demo.com/aggregate</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;true&#34;</span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">rbac.authorization.k8s.io/v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterRole</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">annotations</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">kubectl.kubernetes.io/last-applied-configuration</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
+</span><span class="sd">      </span><span class="w">      </span>{<span class="s2">&#34;aggregationRule&#34;</span><span class="p">:</span>{<span class="s2">&#34;clusterRoleSelectors&#34;</span><span class="p">:[</span>{<span class="s2">&#34;matchLabels&#34;</span><span class="p">:</span>{<span class="s2">&#34;rbac.demo.com/aggregate&#34;</span><span class="p">:</span><span class="s2">&#34;true&#34;</span>}}<span class="p">]</span>}<span class="p">,</span><span class="s2">&#34;apiVersion&#34;</span><span class="p">:</span><span class="s2">&#34;rbac.authorization.k8s.io/v1&#34;</span><span class="p">,</span><span class="s2">&#34;kind&#34;</span><span class="p">:</span><span class="s2">&#34;ClusterRole&#34;</span><span class="p">,</span><span class="s2">&#34;metadata&#34;</span><span class="p">:</span>{<span class="s2">&#34;annotations&#34;</span><span class="p">:</span>{}<span class="p">,</span><span class="s2">&#34;name&#34;</span><span class="p">:</span><span class="s2">&#34;aggret-clusterrole&#34;</span>}<span class="p">,</span><span class="s2">&#34;rules&#34;</span><span class="p">:[]</span>}<span class="w">
+</span><span class="w">  </span><span class="nt">creationTimestamp</span><span class="p">:</span><span class="w"> </span><span class="ld">2020-11-24T08:34:50Z</span><span class="w">
+</span><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">aggret-clusterrole</span><span class="w">
+</span><span class="w">  </span><span class="nt">resourceVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;580449&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">selfLink</span><span class="p">:</span><span class="w"> </span><span class="l">/apis/rbac.authorization.k8s.io/v1/clusterroles/aggret-clusterrole</span><span class="w">
+</span><span class="w">  </span><span class="nt">uid</span><span class="p">:</span><span class="w"> </span><span class="l">eaf6b98b-2e2f-11eb-8b3f-000c292d5d7c</span><span class="w">
+</span><span class="w"></span><span class="nt">rules</span><span class="p">:</span><span class="w">
+</span><span class="w"></span>- <span class="nt">apiGroups</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="s2">&#34;&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">resources</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">pods</span><span class="w">
+</span><span class="w">  </span><span class="nt">verbs</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span>- <span class="l">get</span><span class="w">
+</span><span class="w">  </span>- <span class="l">watch</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><h2 id="内建clusterrole"><a href="#内建clusterrole" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:内建clusterrole" class="headings">内建clusterrole</a></h2>
+<p>​	k8s内建了一组clusterrole和clusterbinding，供系统各个组件使用，多以system:开头；</p>
+<p>1、示例：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@client role<span class="o">]</span><span class="c1"># kubectl get clusterrole</span>
+NAME                                                                   AGE
+admin                                                                  14d
+aggret-clusterrole                                                     11m
+cluster-admin                                                          14d
+demo                                                                   4m50s
+edit                                                                   14d
+flannel                                                                13d
+ingress-nginx                                                          6d2h
+ingress-nginx-admission                                                6d2h
+system:aggregate-to-admin                                              14d
+system:aggregate-to-edit                                               14d
+system:aggregate-to-view                                               14d
+system:auth-delegator                                                  14d
+system:aws-cloud-provider                                              14d
+system:basic-user 
+</code></pre></td></tr></table></div>
+</div>
+</div><p>2、常用的clusterole</p>
+<ul>
+<li>cluster-admin，集群超级管理员角色；
+<ul>
+<li>被同名clusterrolebinding绑定到了system:masters组，所有属于该组的用户，都将是集群超级管理员；</li>
+<li>kubeadm部署的集群，管理员/O=system:masters/CN=kubernetes-admin就属于该组</li>
+<li>配置超级管理员方法：
+<ul>
+<li>创建用户绑定到cluster-admin集群角色</li>
+<li>创建用户绑定到system:masters组，设置O=system:master</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>system:kube-scheduler</li>
+<li>system:kube-controller-manage</li>
+<li>system:node</li>
+<li>...</li>
+</ul>
+<h1 id="k8s-dashboard"><a href="#k8s-dashboard" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:k8s-dashboard" class="headings">k8s dashboard</a></h1>
+<p>​	dashborad为k8s集群的附加组件，可以以图形化方式查看，管理k8s集群，<strong>但其本质就是图形化的代理，是api-server的前端，真正处理请求的还是api-server</strong></p>
+<p>​	dashboard也是api-server的客户端，认证到api-server的方式有2种：kubeconfig、token，也需要k8s的CA给其颁发证书</p>
+<h2 id="部署https的dashboard"><a href="#部署https的dashboard" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:部署https的dashboard" class="headings">部署https的dashboard</a></h2>
+<ol>
+<li>
+<p>创建dashboard的私钥、证书</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@client dashboard<span class="o">]</span><span class="c1"># (umask 077; openssl genrsa -out dashboard.key 2048)</span>
+Generating RSA private key, <span class="m">2048</span> bit long modulus
+.......................+++
+..............................................+++
+e is <span class="m">65537</span> <span class="o">(</span>0x10001<span class="o">)</span>
+<span class="o">[</span>root@client dashboard<span class="o">]</span><span class="c1"># ll</span>
+total <span class="m">4</span>
+-rw------- <span class="m">1</span> root root <span class="m">1675</span> Nov <span class="m">24</span> 17:56 dashboard.key
+<span class="c1"># 生成key</span>
+   
+<span class="o">[</span>root@client dashboard<span class="o">]</span><span class="c1"># openssl req -new -key dashboard.key -out dashboard.csr -subj &#34;/O=system:masters/CN=dashboard&#34;</span>
+<span class="o">[</span>root@client dashboard<span class="o">]</span><span class="c1"># ll</span>
+total <span class="m">8</span>
+-rw-r--r-- <span class="m">1</span> root root  <span class="m">924</span> Nov <span class="m">24</span> 17:57 dashboard.csr
+-rw------- <span class="m">1</span> root root <span class="m">1675</span> Nov <span class="m">24</span> 17:56 dashboard.key
+<span class="c1"># 生成csr</span>
+   
+<span class="o">[</span>root@master ~<span class="o">]</span><span class="c1"># openssl x509 -req -in dashboard.csr -CA /etc/kubernetes/pki/ca.crt  -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out dashboard.crt -days 365</span>
+Signature ok
+<span class="nv">subject</span><span class="o">=</span>/O<span class="o">=</span>system:masters/CN<span class="o">=</span>dashboard
+Getting CA Private Key
+<span class="c1"># 签名，</span>
+</code></pre></td></tr></table></div>
+</div>
+</div></li>
+<li>
+<p>将上步的私钥、证书，创建为secret</p>
+<pre><code>[root@master ~]# kubectl create ns !$
+kubectl create ns kubernetes-dashboard
+namespace/kubernetes-dashboard created
+   
+[root@master ~]# kubectl create secret generic kubernetes-dashboard-certs --from-file=$HOME/certs -n kubernetes-dashboard
+secret/kubernetes-dashboard-certs created
+# 创建名称空间，并在其中创建secret，引用上步创建的私钥和证书
+</code></pre></li>
+<li>
+<p>利用在线清单部署pod化的dashboard</p>
+<pre><code>https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.4/aio/deploy/recommended.yaml
+# yaml文件链接
+# 应用前修改：
+# 修改容器启动参数，加上刚刚创建的key和证书路径
+# 修改service类型为Nodeport
+   
+[root@master ~]kubectl apply -f recommended.yaml 
+</code></pre></li>
+<li>
+<p>查看nodeport地址</p>
+<pre><code>[root@master ~]# kubectl get svc -n kubernetes-dashboard
+NAME                        TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)         AGE
+dashboard-metrics-scraper   ClusterIP   10.97.49.122   &lt;none&gt;        8000/TCP        9m57s
+kubernetes-dashboard        NodePort    10.105.77.10   &lt;none&gt;        443:30717/TCP   9m58s
+</code></pre></li>
+<li>
+<p>外部浏览器访问</p>
+</li>
+</ol>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201124183239267.png" alt="image-20201124183239267"></p>
+<p>ps：</p>
+<p>​	<strong>dashboard运行为pod，其连接api-server用的账户就是serviceaccount类型，登陆dashboard界面用的也是该sa账户，登陆后权限，能看到的东西多少，就取决于该sa的权限，</strong></p>
+<p>​	sa可以绑定不同的role来获得不同的权限，如内建的cluster-admin获得超级管理员权限；</p>
+<h2 id="配置token认证"><a href="#配置token认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:配置token认证" class="headings">配置token认证</a></h2>
+<ol>
+<li>
+<p>创建sa账户dash-admin</p>
+<pre><code>[root@master ~]# kubectl create sa dash-admin -n kube-system
+serviceaccount/dash-admin created
+   
+</code></pre></li>
+<li>
+<p>绑定cluster-admin角色给sa账户dash-admin</p>
+<pre><code>[root@master ~]# kubectl create clusterrolebinding dash-admin --clusterrole=cluster-admin \
+&gt; --serviceaccount=kube-system:dash-admin
+clusterrolebinding.rbac.authorization.k8s.io/dash-admin created
+</code></pre></li>
+<li>
+<p>获取sa账户dash-admin对应的secrts</p>
+<pre><code>root@master ~]# kubectl get secret -n kube-system |grep dash-admin
+dash-admin-token-wbdpl                           kubernetes.io/service-account-token   3      5m22s
+</code></pre></li>
+<li>
+<p>查看secret中的token</p>
+<pre><code>[root@master ~]# kubectl describe secrets dash-admin-token-wbdpl -n kube-system 
+Name:         dash-admin-token-wbdpl
+Namespace:    kube-system
+Labels:       &lt;none&gt;
+Annotations:  kubernetes.io/service-account.name: dash-admin
+              kubernetes.io/service-account.uid: aefbae96-2e41-11eb-8b3f-000c292d5d7c
+   
+Type:  kubernetes.io/service-account-token
+   
+Data
+====
+ca.crt:     1025 bytes
+namespace:  11 bytes
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkYXNoLWFkbWluLXRva2VuLXdiZHBsIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNXJ2aWNlLWFjY291bnQubmFtZSI6ImRhc2gtYWRtaW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJhZWZiYWU5Ni0yZTQxLTExZWItOGIzZi0wMDBjMjkyZDVkN2MiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06ZGFzaC1hZG1pbiJ9.IzI5BD6304jg7Ssq-Fq1DjcS0OWuaqjmuLLgGfib-KhHcOAGrEN8-alAZC_maIEqjFHjlXNQfxZ4ihh09zsEv2CBL7J6heFYX_ZAHtNhdoxpsO_
+</code></pre></li>
+<li>
+<p>输入token</p>
+</li>
+</ol>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201124184530312.png" alt="image-20201124184530312"></p>
+<h2 id="配置kubeconfig认证"><a href="#配置kubeconfig认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:配置kubeconfig认证" class="headings">配置kubeconfig认证</a></h2>
+<p>​	相比于token，kubeconfig文件更易于保存、分发：</p>
+<ol>
+<li>
+<p>set-cluster写入集群信息</p>
+</li>
+<li>
+<p>set-credentials写入sa账户的token信息</p>
+<ol>
+<li>user用户的set-credentials是写入用户的：证书和密钥；</li>
+<li>sa用户的set-credentials是写入sa关联的secret的token信息：写入的是secret中的token字符串</li>
+</ol>
+</li>
+<li>
+<p>set-context设置上下文</p>
+</li>
+<li>
+<p>use-context设置默认使用的上下文</p>
+</li>
+<li>
+<p>新创建一个sa账户</p>
+<pre><code>[root@master ~]# kubectl create sa default-admin -n default
+serviceaccount/default-admin created
+[root@master ~]# kubectl create clusterrolebinding default-admin --clusterrole=admin \
+&gt; --serviceaccount=default:default-admin
+clusterrolebinding.rbac.authorization.k8s.io/default-admin created
+</code></pre></li>
+<li>
+<p>set-cluster写入集群信息</p>
+<pre><code>[root@master ~]# kubectl config set-cluster kubernetes --embed-certs=true --server=&quot;https://192.168.80.101:6443&quot; --certificate-authority=/etc/kubernetes/pki/ca.crt --kubeconfig=./defautl-admin.kubeconfig
+Cluster &quot;kubernetes&quot; set.
+</code></pre></li>
+<li>
+<p>set-credentials写入sa账户的token信息</p>
+<pre><code>[root@master ~]# kubectl get secret |grep default-admin
+default-admin-token-g64d2   kubernetes.io/service-account-token   3      4m31s
+   
+   
+   
+~]# token=$(kubectl get secret default-admin-token-g64d2 -o jsonpath={.data.token} |base64 -d)
+   
+   
+   
+   
+[root@master ~]# kubectl config set-credentials default-admin --token=${token} --kubeconfig=./defautl-admin.kubeconfig 
+User &quot;default-admin&quot; set.
+   
+</code></pre></li>
+<li>
+<p>set-context设置上下文</p>
+<pre><code>[root@master ~]# kubectl config set-context default-admin --cluster=kubernetes --user=default-admin --kubeconfig=./defautl-admin.kubeconfig 
+Context &quot;default-admin&quot; created.
+   
+</code></pre></li>
+<li>
+<p>use-context设置默认使用的上下文</p>
+<pre><code>[root@master ~]# kubectl config use-context default-admin --kubeconfig=./defautl-admin.kubeconfig 
+Switched to context &quot;default-admin&quot;.
+   
+</code></pre></li>
+<li>
+<p>将该文件发送到客户端主机上，登陆时选择kubeconfig并选中此文件即可登陆，截图略；</p>
+</li>
+</ol>
+<h1 id="准入控制器"><a href="#准入控制器" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:准入控制器" class="headings">准入控制器</a></h1>
+<p>准入控制器作用：</p>
+<p>​	<strong>经过了身份认证、权限鉴权、后，准入控制器会对写操作做拦截，并经过准入控制器检查，作用有：设置缺失字段为默认值；限制容器镜像必须来自某仓库；检查pod的资源需求是否超过限制；</strong></p>
+<h2 id="limitrange资源准入控制"><a href="#limitrange资源准入控制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:limitrange资源准入控制" class="headings">limitRange资源准入控制</a></h2>
+<p>​	定义pod中容器时，用户可以通过资源request和资源limits定义来限制容器可以使用的资源范围，</p>
+<p>​	但对于未定义，或忘记定义资源限制的容器，就有可能无限不断的消耗节点所在资源，造成影响，</p>
+<p>​	<strong>因此，引入limitrange对象，对名称空间级别的对象，作用是：在每一个名称空间，设置一个limitrange对象，其可以定义运行在该ns中，每个容器所能使用的资源的下限、上限、未定义时的默认值！</strong></p>
+<p>​	limitrange可以限制的资源有cpu、内存、存储，其中cpu，存储针对的是pod和其中的容器；存储主要针对的是pvc</p>
+<p>​	定义了limitrange之后，提交的创建对象的api请求，经过limitrange准入控制器检查，<strong>若其中定义的资源需求不匹配limitrange中定义的范围，就会被决绝，提交失败！</strong></p>
+<p>1、语法：</p>
+<pre><code>[root@master ~]# kubectl explain limitrange
+KIND:     LimitRange
+VERSION:  v1
+
+DESCRIPTION:
+     LimitRange sets resource usage limits for each kind of resource in a
+     Namespace.
+...
+</code></pre><p>2、创建limitrange</p>
+<p>​	定义了容器对，cpu需求的最大，最小，默认值</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client limitrange]# vim limitrange1.yaml</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client limitrange]# kubectl apply -f limitrange1.yaml </span><span class="w">
+</span><span class="w"></span><span class="l">limitrange/cpu-limit created</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client limitrange]# kubectl get limitrange -o wide</span><span class="w">
+</span><span class="w"></span><span class="l">NAME        CREATED AT</span><span class="w">
+</span><span class="w"></span><span class="l">cpu-limit   2020-11-24T11:32:22Z</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client limitrange]# cat limitrange1.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">LimitRange</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">cpu-limit</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">limits</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span>- <span class="nt">default</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">1000m</span><span class="w">
+</span><span class="w">   </span><span class="nt">defaultRequest</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">1000m</span><span class="w">
+</span><span class="w">   </span><span class="nt">min</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">500m</span><span class="w">
+</span><span class="w">   </span><span class="nt">max</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l">2000m</span><span class="w">
+</span><span class="w">   </span><span class="nt">maxLimitRequestRatio</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="m">4</span><span class="w">
+</span><span class="w">   </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">Container</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>3、创建容器，未定义资源需求，查看其默认值是否是limitrange中定义</p>
+<pre><code>[root@client limitrange]# kubectl run limit-pod1 --image=ikubernetes/myapp:v1 \
+&gt; --restart=Never
+pod/limit-pod1 created
+
+# 没定义资源需求的容器，自动继承了该名称空间下limitrange的设置
+[root@client limitrange]# kubectl get pods limit-pod1 -o yaml
+...
+  containers:
+  - image: ikubernetes/myapp:v1
+    imagePullPolicy: IfNotPresent
+    name: limit-pod1
+    resources:
+      limits:
+        cpu: &quot;1&quot;
+      requests:
+        cpu: &quot;1&quot;
+
+</code></pre><p>4、创建容器，资源需求大于最大值</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@client limitrange<span class="o">]</span><span class="c1"># kubectl run limit-pod2 --image=ikubernetes/myapp:v1 --restart=Never --requests=&#39;cpu=400m&#39;</span>
+Error from server <span class="o">(</span>Forbidden<span class="o">)</span>: pods <span class="s2">&#34;limit-pod2&#34;</span> is forbidden: minimum cpu usage per Container is 500m, but request is 400m.
+
+</code></pre></td></tr></table></div>
+</div>
+</div><p>5、创建容器，资源需求小于最小值</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@client limitrange<span class="o">]</span><span class="c1"># kubectl run limit-pod3 --image=ikubernetes/myapp:v1 --restart=Never --requests=&#39;cpu=3000m&#39;</span>
+The Pod <span class="s2">&#34;limit-pod3&#34;</span> is invalid: spec.containers<span class="o">[</span>0<span class="o">]</span>.resources.requests: Invalid value: <span class="s2">&#34;3&#34;</span>: must be less than or equal to cpu limit
+</code></pre></td></tr></table></div>
+</div>
+</div><p>可以看到，定义pod时，给容器设置的资源需求，无论是大于还是小于limitrange中设置的数值，都会在经由limitrange准入控制器检查时，检查不通过，而被拒绝创建pod；</p>
+<h2 id="resourcequota资源准入控制"><a href="#resourcequota资源准入控制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:resourcequota资源准入控制" class="headings">resourceQuota资源准入控制</a></h2>
+<p>​	limitrange只能设置单个pod中容器所能使用的上下限，但某名称空间的用户却可以通过堆积数量的方式来提高该名称空间整体的资源占用量；一个ns对应于一个租户情况下，必须要有机制能限制该租户的资源使用，<strong>于是引入了resourceQuota对象</strong>；可以设置某名称空间下，所能使用的资源总量的上下限，以及各类资源对象的数量；</p>
+<p>作用：</p>
+<ul>
+<li>resourceQuota设置在名称空间级别</li>
+<li>限制该ns中各类对象所能创建的数量，如pod总数，servive总数</li>
+<li>限制该ns中所有pod能使用的cpu上下限，内存上下限，pvc使用数，pv使用总存储等</li>
+<li>定义了resourceQouta对象的名称空间，向其提交的pod，其中容器必须定义resource字段，或有limitrange可以继承默认值；</li>
+</ul>
+<p>​	<strong>多租户环境中，一个ns名称空间一般对应一个租户或一个项目，多租户的各个维度都需要在一个集群里实现隔离，避免干扰</strong></p>
+<ul>
+<li>namespace实现名称的隔离，即不同ns中可以创建相同名称的相同类型资源，而互不影响；</li>
+<li>cni和网络插件实现网络的隔离，不同租户之间网络隔离借助cni和网络插件实现；</li>
+<li>limitrange设置在ns名称空间级别，为该空间的所有pod设置默认的资源限制、下限、上限；</li>
+<li>resourceQuota设置在ns名称空间级别，设置了该空间的所有资源能使用的资源之和的上限，下限，以及各类资源所能创建的数量，如最多创建100个deployment控制器</li>
+</ul>
+<p>1、语法：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client ~]# kubectl explain resourceQuota</span><span class="w">
+</span><span class="w"></span><span class="nt">KIND</span><span class="p">:</span><span class="w">     </span><span class="l">ResourceQuota</span><span class="w">
+</span><span class="w"></span><span class="nt">VERSION</span><span class="p">:</span><span class="w">  </span><span class="l">v1</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">DESCRIPTION</span><span class="p">:</span><span class="w">
+</span><span class="w">     </span><span class="l">ResourceQuota sets aggregate quota restrictions enforced per namespace</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nn">---</span><span class="w">
+</span><span class="w"></span><span class="p">[</span><span class="l">root@client ~]# kubectl explain resourceQuota.spec</span><span class="w">
+</span><span class="w"></span><span class="nt">KIND</span><span class="p">:</span><span class="w">     </span><span class="l">ResourceQuota</span><span class="w">
+</span><span class="w"></span><span class="nt">VERSION</span><span class="p">:</span><span class="w">  </span><span class="l">v1</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">RESOURCE</span><span class="p">:</span><span class="w"> </span><span class="l">spec &lt;Object&gt;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">DESCRIPTION</span><span class="p">:</span><span class="w">
+</span><span class="w">     </span><span class="l">Spec defines the desired quota.</span><span class="w">
+</span><span class="w">     </span><span class="l">https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status</span><span class="w">
+</span><span class="w">
+</span><span class="w">     </span><span class="l">ResourceQuotaSpec defines the desired hard limits to enforce for Quota.</span><span class="w">
+</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>2、常用定义字段：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">cpu<span class="p">|</span>requests.cpu
+
+memory<span class="p">|</span>requests.memory
+
+limits.cpu
+
+limits.memory
+
+requests.storage 所有pvc需要的存储总量
+
+persistentvolumeclaims 可以创建的pvc总数
+
+---
+对象数量限制
+
+count/deployment.apps
+count/services
+</code></pre></td></tr></table></div>
+</div>
+</div><p>3、创建resourceQuota对象</p>
+<p>​	yaml定义：定义了cpu和内存的上限为2核，2G，deployment控制器最多1个</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client resourcesQuota]# cat demo-ns-resourceQuota.yaml </span><span class="w">
+</span><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ResourceQuota</span><span class="w">
+</span><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">demo-quota</span><span class="w">
+</span><span class="w"> </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">demo</span><span class="w">
+</span><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span><span class="w"> </span><span class="nt">hard</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">pods</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span><span class="w">  </span><span class="nt">requests.cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">requests.memory</span><span class="p">:</span><span class="w"> </span><span class="l">1Gi</span><span class="w">
+</span><span class="w">  </span><span class="nt">limits.cpu</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;2&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">limits.memory</span><span class="p">:</span><span class="w"> </span><span class="l">2Gi</span><span class="w">
+</span><span class="w">  </span><span class="nt">count/deployments.apps</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">count/deployments.extensions</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;1&#34;</span><span class="w">
+</span><span class="w">  </span><span class="nt">persistentvolumeclaims</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;2&#34;</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>​	查看：</p>
+<pre><code>[root@client resourcesQuota]# kubectl create ns demo
+namespace/demo created
+
+
+[root@client resourcesQuota]# kubectl get resourceQuota -n demo
+NAME         CREATED AT
+demo-quota   2020-11-25T07:56:17Z
+</code></pre><p>​	查看现在resourceQuota状态，使用部分还为0</p>
+<pre><code>[root@client resourcesQuota]# kubectl describe resourceQuota -n demo 
+Name:                         demo-quota
+Namespace:                    demo
+Resource                      Used  Hard
+--------                      ----  ----
+count/deployments.apps        0     1
+count/deployments.extensions  0     1
+limits.cpu                    0     2
+limits.memory                 0     2Gi
+persistentvolumeclaims        0     2
+pods                          0     3
+requests.cpu                  0     1
+requests.memory               0     1Gi
+</code></pre><p>​	创建一个的deployment控制器：看到，使用部分已经有值，为副本数2个pod之和，</p>
+<pre><code>[root@client resourcesQuota]# kubectl run demo-dep1 --image=ikubernetes/myapp:v1 --replicas=2 --namespace=demo --requests='cpu=200m,memory=256Mi' --limits='cpu=500m,memory=528Mi'
+kubectl run --generator=deployment/apps.v1beta1 is DEPRECATED and will be removed in a future version. Use kubectl create instead.
+deployment.apps/demo-dep1 created
+
+---
+[root@client resourcesQuota]# kubectl describe resourceQuota -n demo 
+Name:                         demo-quota
+Namespace:                    demo
+Resource                      Used    Hard
+--------                      ----    ----
+count/deployments.apps        1       1
+count/deployments.extensions  0       1
+limits.cpu                    1       2
+limits.memory                 1056Mi  2Gi
+persistentvolumeclaims        0       2
+pods                          2       3
+requests.cpu                  400m    1
+requests.memory               512Mi   1Gi
+</code></pre><p>​	扩容pod，最多也只能扩容到3个，为Quota中定义的上限；</p>
+<pre><code>[root@client resourcesQuota]# kubectl scale deploy demo-dep1 -n demo --replicas=4
+deployment.extensions/demo-dep1 scaled
+[root@client resourcesQuota]# kubectl get pods -n demo
+NAME                        READY   STATUS    RESTARTS   AGE
+demo-dep1-894bc78f5-mvzgg   1/1     Running   0          3m17s
+demo-dep1-894bc78f5-mxmp6   1/1     Running   0          11s
+demo-dep1-894bc78f5-p9x8r   1/1     Running   0          3m17s
+</code></pre><h2 id="podsecuritypolicy"><a href="#podsecuritypolicy" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:podsecuritypolicy" class="headings">podSecurityPolicy</a></h2>
+<p>​	podSecurityPolicy简称psp，为集群级别资源：是默认未启用的准入控制插件，因启动后，但没定义psp对象的情况，会禁止在集群中创建任务pod对象</p>
+<p>​	介绍：https://kubernetes.io/docs/concepts/policy/pod-security-policy/</p>
+<p>语法：</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-yaml" data-lang="yaml"><span class="p">[</span><span class="l">root@client resourcesQuota]# kubectl explain podSecurityPolicy.spec</span><span class="w">
+</span><span class="w"></span><span class="nt">KIND</span><span class="p">:</span><span class="w">     </span><span class="l">PodSecurityPolicy</span><span class="w">
+</span><span class="w"></span><span class="nt">VERSION</span><span class="p">:</span><span class="w">  </span><span class="l">extensions/v1beta1</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">RESOURCE</span><span class="p">:</span><span class="w"> </span><span class="l">spec &lt;Object&gt;</span><span class="w">
+</span><span class="w">
+</span><span class="w"></span><span class="nt">DESCRIPTION</span><span class="p">:</span><span class="w">
+</span><span class="w">     </span><span class="l">spec defines the policy enforced.</span><span class="w">
+</span><span class="w">
+</span><span class="w">     </span><span class="nt">PodSecurityPolicySpec defines the policy enforced. Deprecated</span><span class="p">:</span><span class="w"> </span><span class="l">use</span><span class="w">
+</span><span class="w">     </span><span class="l">PodSecurityPolicySpec from policy API Group instead.</span><span class="w">
+</span></code></pre></td></tr></table></div>
+</div>
+</div><p>作用：用于检查用户是否有提交创建特权pod的权限</p>
+<p>使用方法：</p>
+<ol>
+<li>根据需要定义psp对象，</li>
+<li>在api-server中启用psp，（默认禁用）</li>
+<li>定义role或clusterrole，在角色中引用需要的psp对象</li>
+<li>采用rolebinding或clusterrolebinding将引用了psp对象的角色关联到user或sa账户</li>
+<li>之后，user或sa就拥有了对应psp对象中定义的权限，</li>
+<li>user或sa提交创建pod时，会经过psp控制器检查，若申请创建的是<strong>具有特权的pod</strong>（能使用宿主机节点网络名称空间、ipc、能使用什么卷类型、能使用的端口范围、等即为特权pod），就检查其引用的psp对象有无对应的特权权限定义，有就通过，否则就失败</li>
+</ol>
+<h1 id="小结"><a href="#小结" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:小结" class="headings">小结：</a></h1>
+<ul>
+<li>api-server上：用户身份认证、用户鉴权、用户写请求准入控制检查三步的大体工作流程和各自的功用；</li>
+<li>k8s两类账户：人类用户user（group）、pod进程用户serviceaccount
+<ul>
+<li>身份认证：user配置身份信息时，<strong>需要有私钥，ca颁发证书</strong>并注入到客户端配置文件kubeconfig中；</li>
+<li>身份认证：sa配置身份信息时，需要先创建sa账户，<strong>系统随机自动为其创建同名secret对象，其包含了token信息</strong>用于身份验证，可注入到客户端配置kubeconfig文件中；</li>
+<li>权限赋予：【无论是user（group）还是sa用户，赋予权限都需要借助rolebinding或clusterrolebinding将用户账户绑定到某个已经存在的角色上，角色为操作动作和作用对象的集合，用户为操作主体】</li>
+</ul>
+</li>
+<li>k8s集群之间各组件，安全通信的实现：客户端和服务端的双向tls认证、加密通信；</li>
+<li>tls bootstraping机制和流程</li>
+<li>RBAC授权机制：
+<ul>
+<li>rbac为k8s默认的授权机制，由第二步的：用户鉴权部分的rbac插件实现</li>
+<li>role和clusterrole</li>
+<li>rolebinding和clusterrolebinding</li>
+<li>聚合型clusterrole，通过将其他多个clusterrole灵活组合的方式，实现灵活定义clusterrole</li>
+<li>系统内建的clusterrole，供各个组件使用，或供tls bootstraping期间使用</li>
+</ul>
+</li>
+<li>k8s dashboard
+<ul>
+<li>pod运行的dashborad的清单部署过程</li>
+<li>因为dashborad是pod，其身份类型为sa类型，验证其身份就是用关联到sa账户中的secrt对象中的token，<strong>而不是user的私钥和证书的方式</strong></li>
+<li>登陆dashborad的2种方式：token或打入了token的kubeconfig配置文件（本质是一样的）</li>
+</ul>
+</li>
+<li>准入控制器：检查流程的最后一步，
+<ul>
+<li>只对写请求的进行拦截检查，有：补全默认字段信息、检查单个pod的资源限制、检查请求创建资源所在的ns的总量资源限制等作用；</li>
+<li>准入控制器由多个插件实现，串行检查，不像前2步，需要所有准入控制器都通过才可以最终通过</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/k8s%E4%B9%8B%E8%AE%A4%E8%AF%81-%E6%8E%88%E6%9D%83-%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/k8s之认证-授权-准入控制/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-12-01 15:35:51 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-12-01</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-12-01</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8Bkubeadm%E9%83%A8%E7%BD%B2%E9%9B%86%E7%BE%A4/" class="related-link">k8s之kubeadm部署集群</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8Bhelm%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8/" class="related-link">k8s之helm包管理器</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8B%E8%B5%84%E6%BA%90%E6%8C%87%E6%A0%87%E4%B8%8Ehpa%E6%8E%A7%E5%88%B6%E5%99%A8/" class="related-link">k8s之资源指标与hpa控制器</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8B%E7%B3%BB%E7%BB%9F%E6%89%A9%E5%B1%95/" class="related-link">k8s之系统扩展</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/k8s%E4%B9%8Bpod%E8%B5%84%E6%BA%90%E8%B0%83%E5%BA%A6/" class="related-link">k8s之pod资源调度</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/k8s/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>k8s</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/k8s%E8%AE%A4%E8%AF%81%E6%8E%88%E6%9D%83%E5%87%86%E5%85%A5%E6%8E%A7%E5%88%B6/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>k8s认证授权准入控制</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/k8s%E4%B9%8B%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%AD%96%E7%95%A5/" rel="prev">&lt; k8s之网络模型与网络策略</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/k8s%E4%B9%8Bstatefulset%E6%8E%A7%E5%88%B6%E5%99%A8/" rel="next">k8s之statefulset控制器 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

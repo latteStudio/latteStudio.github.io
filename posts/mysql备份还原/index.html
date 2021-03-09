@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>mysql备份还原 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="mysql备份还原实验，" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-08-28T12:27:40+00:00",
+        "dateModified": "2021-03-09T12:30:39+08:00",
+        "url": "https://latteStudio.github.io/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/",
+        "headline": "mysql备份还原",
+        "description": "mysql备份还原实验，",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  6575 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20200924171133428.png","https://gitee.com/boogie96/img/raw/master/img/image-20200927192059049.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="mysql备份还原" />
+<meta property="og:description" content="mysql备份还原实验，" />
+<meta property="og:url" content="https://latteStudio.github.io/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20200924171133428.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-08-28T12:27:40&#43;00:00" />
+    <meta property="article:modified_time" content="2021-03-09T12:30:39&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">mysql备份还原</h1>
+
+            
+
+            
+                <div class="post-description p-summary">mysql备份还原实验，</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-08-28T12:27:40&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.8.28</time>
+    
+    
+        
+        <time datetime="2021-03-09T12:30:39&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2021.3.9</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-link p-category">数据库</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;6575</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;14&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:why" href="#why">why</a></li>
+    <li><a id="contents:要点" href="#要点">要点</a></li>
+    <li><a id="contents:备份分类" href="#备份分类">备份分类</a></li>
+    <li><a id="contents:备份什么" href="#备份什么">备份什么</a></li>
+    <li><a id="contents:备份工具" href="#备份工具">备份工具</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:基于lvm的备份" href="#基于lvm的备份">基于lvm的备份</a>
+      <ol>
+        <li><a id="contents:介绍" href="#介绍">介绍</a></li>
+        <li><a id="contents:备份" href="#备份">备份：</a></li>
+        <li><a id="contents:恢复" href="#恢复">恢复：</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:mysqldump" href="#mysqldump">mysqldump</a>
+      <ol>
+        <li><a id="contents:介绍-1" href="#介绍-1">介绍</a></li>
+        <li><a id="contents:myisam" href="#myisam">myisam</a></li>
+        <li><a id="contents:innodb" href="#innodb">innodb</a></li>
+        <li><a id="contents:备份-1" href="#备份-1">备份：</a></li>
+        <li><a id="contents:恢复-1" href="#恢复-1">恢复：</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:xtrabackup有问题暂略" href="#xtrabackup有问题暂略">xtrabackup（有问题，暂略）</a>
+      <ol>
+        <li><a id="contents:介绍-2" href="#介绍-2">介绍</a>
+          <ol>
+            <li><a id="contents:特点" href="#特点"><strong>特点：</strong></a></li>
+          </ol>
+        </li>
+        <li><a id="contents:安装" href="#安装">安装</a>
+          <ol>
+            <li><a id="contents:程序组成" href="#程序组成">程序组成</a></li>
+            <li><a id="contents:安装方式" href="#安装方式">安装方式</a></li>
+          </ol>
+        </li>
+        <li><a id="contents:xtrabackup备份过程解析" href="#xtrabackup备份过程解析">xtrabackup备份过程解析</a></li>
+        <li><a id="contents:全备与恢复" href="#全备与恢复">全备与恢复</a></li>
+        <li><a id="contents:全备增量备份与恢复" href="#全备增量备份与恢复">全备、增量备份与恢复</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="为什么备份"><a href="#为什么备份" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:为什么备份" class="headings">为什么备份</a></h1>
+<h2 id="why"><a href="#why" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:why" class="headings">why</a></h2>
+<p>为了应对灾难恢复，<strong>人工一定会出错，软硬件一定会故障</strong></p>
+<ul>
+<li>硬件如磁盘故障</li>
+<li>软件崩溃</li>
+<li>自然灾害</li>
+<li>黑客攻击</li>
+<li>管理员误操作</li>
+</ul>
+<h2 id="要点"><a href="#要点" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:要点" class="headings">要点</a></h2>
+<ul>
+<li>考虑成本，</li>
+<li>业务允许丢失多少数据</li>
+<li>恢复数据需要多久完成</li>
+<li>要做还原测试</li>
+<li>定期还原演练</li>
+</ul>
+<h2 id="备份分类"><a href="#备份分类" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:备份分类" class="headings">备份分类</a></h2>
+<p>按照对业务影响分：</p>
+<ul>
+<li>热备：备份过程中，可读可写，业务无感知，正常运行</li>
+<li>温备：备份中，可读，不可写，业务写操作阻塞</li>
+<li>冷备：数据库停机，将磁盘数据全部copy一份，业务会停机</li>
+</ul>
+<p>按照数据完整性分：</p>
+<ul>
+<li>完全备份：假设周一库有1w数据，对整库做完全的数据镜像，即完全备份；</li>
+<li>差异备份：之后每天增加100数据，每天的零点，备份和周一全备相比增加的部分，即周二备份100，周三备份200，周四备份300...<strong>还原简单，全备+最近的差异备份+现在点的binlog即可恢复</strong></li>
+<li>增量备份：之后每天增加100数据，每天的零点，备份和前一天相比增加的部分，即周三，周四，都只需备份100数据；<strong>还原复杂，全备+每次的增量备份依次恢复+现在点的binglog才可恢复，中间的有一份增量备份损坏即无法恢复！</strong></li>
+</ul>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200924171133428.png" alt="image-20200924171133428"></p>
+<p>按照数据层次分：</p>
+<ul>
+<li>物理备份；直接导致磁盘上的二进制数据，速度快，和存储引擎有关，占用一倍存储空间</li>
+<li>逻辑备份：导出数据相关的sql，如mysqldump导出的就是各种sql语句，恢复时，就是把sql重新执行一遍，和存储引擎无关，甚至是语法兼容的其他数据库，都可以用此种形式做迁移恢复；备份的是文本的sql语句，占用空间较小</li>
+</ul>
+<h2 id="备份什么"><a href="#备份什么" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:备份什么" class="headings">备份什么</a></h2>
+<ul>
+<li>数据，毫无疑问</li>
+<li>日志，binlog，事务日志redo，undo，日志可以重现或回滚数据库的状态，</li>
+<li>配置文件，服务器的配置文件，如/etc/my.cnf</li>
+<li>程序，procedure，function，trigger，event scheduler</li>
+</ul>
+<h2 id="备份工具"><a href="#备份工具" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:备份工具" class="headings">备份工具</a></h2>
+<ul>
+<li>cp，tar等命令行，用于物理文件的备份；只适合冷备；</li>
+<li>lvm的快照，先加锁，然后瞬间快照，后解锁，由于速度快相当于热备，<strong>本质借助了支持快照的文件系统进行备份</strong></li>
+<li>mysqldump：逻辑备份，适合所有存储引擎，结合innodb引擎实现热备，再结合binlog可以做主从复制；可以全备，可以对某库某表做部分备份；</li>
+<li>xtrabackup：percona提供的对innodb做热备的工具，<strong>物理备份，速度快，支持全备，增量备份</strong></li>
+<li>mariadb backup：mariadb 10.1.26后集成，基于xtrabackup</li>
+<li>mysqlbackup：热备，mysql 企业版组件</li>
+<li>mysqlhotcopy：perl实现，使用于myisam，使用lock tables，flush tables，最后cp或scp实现备份，几乎算是冷备了</li>
+</ul>
+<h1 id="实验"><a href="#实验" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:实验" class="headings">实验</a></h1>
+<h2 id="基于lvm的备份"><a href="#基于lvm的备份" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于lvm的备份" class="headings">基于lvm的备份</a></h2>
+<h3 id="介绍"><a href="#介绍" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:介绍" class="headings">介绍</a></h3>
+<p>​	借助具有快照功能的文件系统如lvm，zfs实现备份，快照速度极快，原理就是数据的多副本，快照就相当于给快照一刻的数据集合做了个规定，<strong>后续数据修改都是将对应数据复制一份再做修改，被修改的数据都存在多副本，没被修改的数据只有一份，</strong></p>
+<p>​	<strong>快照后，对快照复制一份，就可以删除快照了，此时数据就不会有多副本了</strong></p>
+<h3 id="备份"><a href="#备份" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:备份" class="headings">备份：</a></h3>
+<ol>
+<li>
+<p>添加新磁盘，并安装lvm2工具</p>
+</li>
+<li>
+<p>创建pv，vg，lv，并将某lv做mysql的数据目录，（binlog应该单独存放）</p>
+</li>
+<li>
+<p>初始化数据库目录，导入一批实验数据</p>
+</li>
+<li>
+<p>开始备份：</p>
+<ol>
+<li>连入mysql实例，加全局读锁；</li>
+<li>滚动日志，生成新的日志文件，并记录此刻日志位置；</li>
+<li>shell命令行中做lv的快照；</li>
+<li>在mysql命令行，取消全局读锁</li>
+<li>之后数据库正常读写，<strong>数据量较大时，加全局读锁的时间可能较长，全局读锁期间数据库只能读不能写，因此数据时完整且一致，无更改的，快照几乎瞬间完成</strong></li>
+<li>挂载lv的快照卷到某目录，</li>
+<li>将目录下所有文件拷贝到备份存储目录，（可远程，可本地）</li>
+<li>取消快照卷挂载，删除快照卷，完成备份；</li>
+</ol>
+</li>
+<li>
+<p>添加新磁盘，并安装lvm2工具</p>
+<pre><code>[root@host2 ~]# yum install -y lvm2
+安装lvm管理工具
+   
+#添加新磁盘，重新扫描总线，不重启实现识别新磁盘
+[root@host2 ~]# for i in /sys/class/scsi_host/host*/scan;do echo &quot;- - -&quot; &gt;$i;done
+[root@host2 ~]# fdisk -l
+...
+Disk /dev/sdb: 21.5 GB, 21474836480 bytes, 41943040 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+</code></pre></li>
+<li>
+<p>创建pv，vg，lv，并将某lv做mysql的数据目录，（binlog应该单独存放）</p>
+<pre><code>   
+# 用新磁盘，创建pv，vg，lv
+root@host2 ~]# pvcreate /dev/sdb 
+  Physical volume &quot;/dev/sdb&quot; successfully created.
+[root@host2 ~]# vgcreate mysql_vg /dev/sdb 
+  Volume group &quot;mysql_vg&quot; successfully created
+   
+# 创建了名为mysqldata的lv，将要挂载到mysql的数据目录下；
+[root@host2 ~]# lvcreate -n mysqldata -L 3G mysql_vg
+  Logical volume &quot;mysqldata&quot; created.
+[root@host2 ~]# lvdisplay 
+  --- Logical volume ---
+  LV Path                /dev/mysql_vg/mysqldata
+  LV Name                mysqldata
+  VG Name                mysql_vg
+  LV UUID                7YQ4T7-JQWz-06Li-L2sC-UPzc-gONk-keJW1J
+</code></pre></li>
+<li>
+<p>初始化数据库目录，导入一批实验数据</p>
+<pre><code># 格式化lv，找出uuid，写入fstab文件
+   
+[root@host2 ~]# mkfs.ext4 /dev/vg1/mysqldata 
+[root@host2 ~]# blkid /dev/vg1/mysqldata 
+/dev/vg1/mysqldata: UUID=&quot;c95a64d3-0bff-4a1d-a81b-5eb0f692c831&quot; TYPE=&quot;ext4&quot; 
+   
+   
+# 挂载
+   
+[root@host2 ~]# cat /etc/fstab 
+UUID=&quot;c95a64d3-0bff-4a1d-a81b-5eb0f692c831&quot; /data/mysql ext4 defaults 0 0
+[root@host2 mariadb-10.2.25-linux-x86_64]# mount -a
+[root@host2 ~]# df -h
+/dev/mapper/vg1-mysqldata  2.9G  9.0M  2.8G   1% /data/mysql
+   
+# 重新初始化数据目录
+./scripts/mysql_install_db --datadir=/data/mysql/ --user=mysql
+   
+# 导入一个库
+[root@host2 ~]# mysql &lt; hellodb_innodb.sql 
+[root@host2 ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+</code></pre></li>
+<li>
+<p>开始备份：</p>
+<ol>
+<li>
+<pre><code>1. 连入mysql实例，加全局读锁；
+MariaDB [(none)]&gt; flush tables with read lock;
+Query OK, 0 rows affected (0.00 sec
+      
+2. 滚动日志，生成新的日志文件，并记录此刻日志位置；
+MariaDB [(none)]&gt; flush logs;
+Query OK, 0 rows affected (0.00 sec)
+      
+MariaDB [(none)]&gt; show master status;
++------------------+----------+--------------+------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
++------------------+----------+--------------+------------------+
+| mysql-bin.000003 |      385 |              |                  |
++------------------+----------+--------------+------------------+
+[root@host2 ~]# mysql -e &quot;show master status&quot; &gt; binlog-position.txt
+[root@host2 ~]# cat binlog-position.txt 
+File	Position	Binlog_Do_DB	Binlog_Ignore_DB
+mysql-bin.000003	385	
+      
+3. shell命令行中做lv的快照；此时生成了一个快照卷
+[root@host2 ~]# lvcreate --snapshot /dev/vg1/mysqldata -n mysqlback --size 1G --permission r  Logical volume &quot;mysqlback&quot; created.
+      
+[root@host2 ~]# ll /dev/vg1/mysql*
+lrwxrwxrwx 1 root root 7 Sep 27 11:10 /dev/vg1/mysqlback -&gt; ../dm-3
+lrwxrwxrwx 1 root root 7 Sep 27 11:10 /dev/vg1/mysqldata -&gt; ../dm-0
+      
+4. 在mysql命令行，取消全局读锁，
+创建一个库，模拟快照后数据变更；
+      
+MariaDB [(none)]&gt; unlock tables;
+Query OK, 0 rows affected (0.01 sec)
+      
+MariaDB [(none)]&gt; create database db1;
+Query OK, 1 row affected (0.00 sec)
+      
+      
+5. 之后数据库正常读写，**数据量较大时，加全局读锁的时间可能较长，全局读锁期间数据库只能读不能写，因此数据时完整且一致，无更改的，快照几乎瞬间完成**
+      
+6. 挂载lv的快照卷到某目录，
+[root@host2 ~]# mkdir /tmp1
+[root@host2 ~]# mount /dev/vg1/mysqlback /tmp1/
+mount: /dev/mapper/vg1-mysqlback is write-protected, mounting read-only
+[root@host2 ~]# ll /tmp1/
+total 122980
+-rw-rw---- 1 mysql mysql    16384 Sep 27 10:41 aria_log.00000001
+-rw-rw---- 1 mysql mysql       52 Sep 27 10:41 aria_log_control
+drwx------ 2 mysql mysql     4096 Sep 27 11:01 hellodb
+-rw-rw---- 1 mysql mysql     2543 Sep 27 11:01 host2.b.com.err
+-rw-rw---- 1 mysql mysql        5 Sep 27 11:01 host2.b.com.pid
+-rw-rw---- 1 mysql mysql      938 Sep 27 10:41 ib_buffer_pool
+-rw-rw---- 1 mysql mysql 12582912 Sep 27 11:01 ibdata1
+-rw-rw---- 1 mysql mysql 50331648 Sep 27 11:01 ib_logfile0
+-rw-rw---- 1 mysql mysql 50331648 Sep 27 10:41 ib_logfile1
+-rw-rw---- 1 mysql mysql 12582912 Sep 27 11:01 ibtmp1
+-rw-rw---- 1 mysql mysql        0 Sep 27 11:01 multi-master.info
+drwx------ 2 mysql mysql     4096 Sep 27 10:41 mysql
+-rw-rw---- 1 mysql mysql    29277 Sep 27 10:41 mysql-bin.000001
+-rw-rw---- 1 mysql mysql     9007 Sep 27 11:08 mysql-bin.000002
+-rw-rw---- 1 mysql mysql      385 Sep 27 11:08 mysql-bin.000003
+-rw-rw---- 1 mysql mysql       57 Sep 27 11:08 mysql-bin.index
+drwx------ 2 mysql mysql     4096 Sep 27 10:41 performance_schema
+drwx------ 2 mysql mysql     4096 Sep 27 10:41 test
+      
+7. 将目录下所有文件拷贝到备份存储目录，（可远程，可本地）
+cp 的-a选项保证文件的权限等属性信息在复制中保持完全一致；
+      
+[root@host2 ~]# mkdir /archdir
+[root@host2 ~]# cp -ar /tmp1/* /archdir/
+[root@host2 ~]# ll /archdir/
+total 122968
+-rw-rw---- 1 mysql mysql    16384 Sep 27 10:41 aria_log.00000001
+-rw-rw---- 1 mysql mysql       52 Sep 27 10:41 aria_log_control
+drwx------ 2 mysql mysql      272 Sep 27 11:01 hellodb
+-rw-rw---- 1 mysql mysql     2543 Sep 27 11:01 host2.b.com.err
+-rw-rw---- 1 mysql mysql        5 Sep 27 11:01 host2.b.com.pid
+-rw-rw---- 1 mysql mysql      938 Sep 27 10:41 ib_buffer_pool
+-rw-rw---- 1 mysql mysql 12582912 Sep 27 11:01 ibdata1
+-rw-rw---- 1 mysql mysql 50331648 Sep 27 11:01 ib_logfile0
+-rw-rw---- 1 mysql mysql 50331648 Sep 27 10:41 ib_logfile1
+-rw-rw---- 1 mysql mysql 12582912 Sep 27 11:01 ibtmp1
+-rw-rw---- 1 mysql mysql        0 Sep 27 11:01 multi-master.info
+drwx------ 2 mysql mysql     4096 Sep 27 10:41 mysql
+-rw-rw---- 1 mysql mysql    29277 Sep 27 10:41 mysql-bin.000001
+-rw-rw---- 1 mysql mysql     9007 Sep 27 11:08 mysql-bin.000002
+-rw-rw---- 1 mysql mysql      385 Sep 27 11:08 mysql-bin.000003
+-rw-rw---- 1 mysql mysql       57 Sep 27 11:08 mysql-bin.index
+drwx------ 2 mysql mysql       20 Sep 27 10:41 performance_schema
+drwx------ 2 mysql mysql       20 Sep 27 10:41 test
+      
+      
+8. 取消快照卷挂载，删除快照卷，完成备份；
+[root@host2 ~]# umount /tmp1/
+[root@host2 ~]# lvremove /dev/vg1/mysqlback 
+Do you really want to remove active logical volume vg1/mysqlback? [y/n]: y
+  Logical volume &quot;mysqlback&quot; successfully removed
+</code></pre></li>
+</ol>
+</li>
+</ol>
+<h3 id="恢复"><a href="#恢复" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:恢复" class="headings">恢复：</a></h3>
+<ol>
+<li>
+<p>删除所有数据目录下文件，停止mysql进程，模拟数据损坏；</p>
+</li>
+<li>
+<p>将所有备份数据文件拷贝回数据目录，注意权限一致；</p>
+</li>
+<li>
+<p>启动mysql进程，检查数据，此时已经恢复到快照时状态</p>
+</li>
+<li>
+<p>重放备份时记录日志位置到最新一刻的日志位置的binlog，（binlog应单独存储）使得数据恢复到崩溃前一刻；</p>
+</li>
+<li>
+<p>删除所有数据目录下文件，停止mysql进程，模拟数据损坏；</p>
+<pre><code># 将binlog复制一份用作备份点后的数据重放恢复；
+# 实际中，binlog应单独存储，
+   
+[root@host2 ~]# cp -a /data/mysql/mysql-bin.* /tmp1/
+[root@host2 ~]# ll /tmp1/
+total 52
+-rw-rw---- 1 mysql mysql 29277 Sep 27 10:41 mysql-bin.000001
+-rw-rw---- 1 mysql mysql  9007 Sep 27 11:08 mysql-bin.000002
+-rw-rw---- 1 mysql mysql   515 Sep 27 11:12 mysql-bin.000003
+-rw-rw---- 1 mysql mysql    57 Sep 27 11:08 mysql-bin.index
+   
+# 因连同pid文件一起删除，所以mysql无法正常停止，生产中pid应和数据文件分开存放；
+# 使用kill命令强行停止mysql进程；
+   
+[root@host2 ~]# rm -rf /data/mysql/*
+[root@host2 ~]# ss -nlt
+State      Recv-Q Send-Q Local Address:Port                Peer Address:Port              
+LISTEN     0      128                *:22                             *:*                  
+LISTEN     0      100        127.0.0.1:25                             *:*                  
+LISTEN     0      80                :::3306                          :::*                  
+LISTEN     0      128               :::22                            :::*                  
+LISTEN     0      100              ::1:25                            :::*                  
+[root@host2 ~]# service mysqld status
+ ERROR! MariaDB is not running, but lock file (/var/lock/subsys/mysql) exists
+   
+# kill掉mysql进程；
+[root@host2 ~]# ps -ef|grep msyql
+root       2575   1335  0 11:21 pts/0    00:00:00 grep --color=auto msyql
+[root@host2 ~]# ps -ef|grep mysql
+root       2237      1  0 11:01 ?        00:00:00 /bin/sh /usr/local/mysql/bin/mysqld_safe --datadir=/data/mysql --pid-file=/data/mysql/host2.b.com.pid
+mysql      2364   2237  0 11:01 ?        00:00:01 /usr/local/mysql/bin/mysqld --basedir=/usr/local/mysql --datadir=/data/mysql --plugin-dir=/usr/local/mysql/lib/plugin --user=mysql --log-error=/data/mysql/host2.b.com.err --pid-file=/data/mysql/host2.b.com.pid --socket=/tmp/mysql.sock --port=3306
+root       2577   1335  0 11:21 pts/0    00:00:00 grep --color=auto mysql
+[root@host2 ~]# kill -9 2237
+[root@host2 ~]# kill -9 2364
+</code></pre></li>
+<li>
+<p>将所有备份数据文件拷贝回数据目录，注意权限一致；</p>
+<pre><code># 注意原先快照时，将pid文件，一起快照备份了，应该删除原来的pid文件，锁文件，再重启msyql进程
+# 生产中，锁文件，pid文件都应该单独存储；
+[root@host2 ~]# cp -ar /archdir/* /data/mysql/
+[root@host2 ~]# ll /data/mysql/
+total 122980
+-rw-rw---- 1 mysql mysql    16384 Sep 27 10:41 aria_log.00000001
+-rw-rw---- 1 mysql mysql       52 Sep 27 10:41 aria_log_control
+drwx------ 2 mysql mysql     4096 Sep 27 11:01 hellodb
+-rw-rw---- 1 mysql mysql     2543 Sep 27 11:01 host2.b.com.err
+-rw-rw---- 1 mysql mysql        5 Sep 27 11:01 host2.b.com.pid
+-rw-rw---- 1 mysql mysql      938 Sep 27 10:41 ib_buffer_pool
+-rw-rw---- 1 mysql mysql 12582912 Sep 27 11:01 ibdata1
+-rw-rw---- 1 mysql mysql 50331648 Sep 27 11:01 ib_logfile0
+-rw-rw---- 1 mysql mysql 50331648 Sep 27 10:41 ib_logfile1
+-rw-rw---- 1 mysql mysql 12582912 Sep 27 11:01 ibtmp1
+-rw-rw---- 1 mysql mysql        0 Sep 27 11:01 multi-master.info
+drwx------ 2 mysql mysql     4096 Sep 27 10:41 mysql
+-rw-rw---- 1 mysql mysql    29277 Sep 27 10:41 mysql-bin.000001
+-rw-rw---- 1 mysql mysql     9007 Sep 27 11:08 mysql-bin.000002
+-rw-rw---- 1 mysql mysql      385 Sep 27 11:08 mysql-bin.000003
+-rw-rw---- 1 mysql mysql       57 Sep 27 11:08 mysql-bin.index
+drwx------ 2 mysql mysql     4096 Sep 27 10:41 performance_schema
+drwx------ 2 mysql mysql     4096 Sep 27 10:41 test
+[root@host2 ~]# service mysqld status
+ ERROR! MariaDB is not running, but PID file exists
+[root@host2 ~]# rm -rf /data/mysql/host2.b.com.pid 
+[root@host2 ~]# service mysqld status
+ ERROR! MariaDB is not running, but lock file (/var/lock/subsys/mysql) exists
+[root@host2 ~]# rm -rf /var/lock/subsys/mysql 
+   
+</code></pre></li>
+<li>
+<p>启动mysql进程，检查数据，此时已经恢复到快照时状态</p>
+<pre><code>[root@host2 ~]# service mysqld status
+ ERROR! MariaDB is not running
+[root@host2 ~]# service mysqld start
+Starting mysqld (via systemctl):                           [  OK  ]
+[root@host2 ~]# ss -nlt
+State      Recv-Q Send-Q Local Address:Port                Peer Address:Port              
+LISTEN     0      128                *:22                             *:*                  
+LISTEN     0      100        127.0.0.1:25                             *:*                  
+LISTEN     0      80                :::3306                          :::*                  
+LISTEN     0      128               :::22                            :::*                  
+LISTEN     0      100              ::1:25                            :::*                  
+[root@host2 ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 10
+Server version: 10.2.25-MariaDB-log MariaDB Server
+   
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+   
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+   
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+# 此时已经恢复到了快照时刻的数据；
+</code></pre></li>
+<li>
+<p>重放备份时记录日志位置到最新一刻的日志位置的binlog，（binlog应单独存储）使得数据恢复到崩溃前一刻；</p>
+<pre><code>[root@host2 ~]# cat binlog-position.txt 
+File	Position	Binlog_Do_DB	Binlog_Ignore_DB
+mysql-bin.000003	385		
+   
+[root@host2 ~]# ll /tmp1/
+total 52
+-rw-rw---- 1 mysql mysql 29277 Sep 27 10:41 mysql-bin.000001
+-rw-rw---- 1 mysql mysql  9007 Sep 27 11:08 mysql-bin.000002
+-rw-rw---- 1 mysql mysql   515 Sep 27 11:12 mysql-bin.000003
+-rw-rw---- 1 mysql mysql    57 Sep 27 11:08 mysql-bin.index
+   
+# 根据快照之前日志位置的记录，从那一时刻开始向后重放mysql的binlog，
+# 可以看到快照后的数据变化，创建了一个库，也已经恢复
+[root@host2 ~]# mysqlbinlog /tmp1/mysql-bin.000003 --start-position=385 |mysql
+[root@host2 ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 12
+Server version: 10.2.25-MariaDB-log MariaDB Server
+   
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+   
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+   
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| db1                |
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+</code></pre></li>
+</ol>
+<h2 id="mysqldump"><a href="#mysqldump" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mysqldump" class="headings">mysqldump</a></h2>
+<h3 id="介绍-1"><a href="#介绍-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:介绍-1" class="headings">介绍</a></h3>
+<p>​	属于逻辑备份，备份的是一个文本文件，内容为数据库所有的库，表，表中数据的sql语句，不受存储引擎的限制，结合innodb引擎的事务和mvcc机制可以实现热备；</p>
+<p>​	适合数据量较小的时候，速度较慢，也由于备份的是sql，对应sql兼容的其他数据库，可以做不同数据库软件的迁移；</p>
+<pre><code>[root@host2 ~]# mysqldump --help
+mysqldump  Ver 10.16 Distrib 10.2.25-MariaDB, for Linux (x86_64)
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Dumping structure and contents of MySQL databases and tables.
+Usage: mysqldump [OPTIONS] database [tables]
+OR     mysqldump [OPTIONS] --databases [OPTIONS] DB1 [DB2 DB3...]
+OR     mysqldump [OPTIONS] --all-databases [OPTIONS]
+
+-A 备份所有数据库，等价于--all-databases，备份中的语句包含create database 和 use database
+--databases 后跟的是要备份的某几个库
+database 后跟的是某库里的某几个表
+-F 【锁表后，备份前会滚动一次日志文件】，使得备份后的数据修改从新一个日志文件的某位置开启，重放时，从改位置重放即可；【mysqldump会加全局读锁，结合innodb的mvcc的话就不用咯】【结合master-data使用，只滚动一次，不然每备份一个库就滚动一次】
+
+-E,--events 备份所有的事件调度器
+-R,--routines 备份所有存储过程和函数
+
+--triggers备份表的触发器，默认选项
+--default-charachter-set=utf8 指定字符集
+
+--master-data=[1|2]，会在备份出的文件中加入change master语句，记录备份开始时的binlog日志位置，不用人为再执行语句进行记录，2选项会加入注释符，该语句不生效，1没有注释符；【前提是开启binlog】
+
+  --single-transaction 使得整个备份过程在一个事务里，这样，在默认隔离等级，可重复读的情况下，备份中数据看到的是备份开始那一刻的快照，实现数据一致性；前提需是innodb引擎；
+  
+                      Creates a consistent snapshot by dumping all tables in a
+                      single transaction. Works ONLY for tables stored in
+                      storage engines which support multiversioning (currently
+                      only InnoDB does);
+                      
+ -f 忽略sql错误，继续执行
+ -q 不查缓存，直接输出，加快备份
+ --hexo-blob 十六进制格式存储二进制列，有bin，blob，bit数据类型时使用，避免乱码；
+</code></pre><h3 id="myisam"><a href="#myisam" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:myisam" class="headings">myisam</a></h3>
+<p>​	存储引擎是myisam时，只能温备，因为备份前要加全局读锁，期间只读不能写，<strong>属于温备</strong> --lock-all-tables</p>
+<p><strong>生产中建议备份选项：</strong></p>
+<pre><code>mysqldump -uroot -A -F -E -R -x --master-data=1 --flush-privileges --triggers --defautl-character-set=utf8 --hex-blob &gt; $BACK_DIR/fullbak_$BACKUP_TIME.sql
+
+就是将innodb引擎时的--single-transaction换成了-x全局锁表，因为innodb有mvcc，支持可重复读事务等级，不需要锁表哦
+</code></pre><h3 id="innodb"><a href="#innodb" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:innodb" class="headings">innodb</a></h3>
+<p>​	存储引擎是innodb时，--single-tracation，使得备份在一个事务内部，<strong>事务隔离等级可重复读，再加上mvcc的机制，实现了热备，备份期间可以继续读写，修改的是数据的多个副本，后续根据事务日志，binlog可以逐步重放数据，</strong></p>
+<p><strong>生产中备份选项：</strong></p>
+<pre><code>mysqldump -uroot -A -F -E -R --single-transaction --master-data=1 --flush-privileges --triggers --default-character-set=utf8 --hexo-blob &gt; $BACK_DIR/fullbak_$BACK_TIME.sql
+
+# 全库备份，刷新日志，备份event scheduler，procedure，function，开始备份事务，记录binlog位置，刷新权限，备份触发器，字符集utf8，十六进制转存二进制避免乱码，
+# 热备，不影响数据库读写，不影响业务，需要开启binlog
+# 备份出文件，一般是变量表示的带时间，备份位置的.sql文件
+</code></pre><h3 id="备份-1"><a href="#备份-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:备份-1" class="headings">备份：</a></h3>
+<p>1、连入mysql，可本地，可选程</p>
+<pre><code>[root@host2 ~]# mysqldump -uroot -A -F -E -R --single-transaction --master-data=1 --flush-privileges --default-character-set=utf8 --hex-blob &gt; /root/`date +%F`.sql
+
+# 设置需要的选项，用msyqldump命令直接备份出sql文件，sql文件可以防止网络文件系统上，异机存储；
+# 导出的是备份开始前一刻的数据镜像，
+</code></pre><p>2、查看导出的sql文件</p>
+<pre><code>-- MySQL dump 10.16  Distrib 10.2.25-MariaDB, for Linux (x86_64)
+--
+-- Host: localhost    Database: 
+-- ------------------------------------------------------
+-- Server version       10.2.25-MariaDB-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Position to start replication or point-in-time recovery from
+--
+
+CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000006', MASTER_LOG_POS=385;
+# change master，记录了备份开始前，滚动日志后，新日志文件的文件名和位置；
+</code></pre><h3 id="恢复-1"><a href="#恢复-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:恢复-1" class="headings">恢复：</a></h3>
+<p>1、模拟损坏</p>
+<pre><code># 直接删除数据目录下所有文件，模拟数据损坏；
+[root@host2 ~]# rm -rf /data/mysql/*
+
+# pid文件因为单独存放，仍可以通过pid文件停止实例，
+[root@host2 ~]# service mysql stop
+Redirecting to /bin/systemctl stop mysql.service
+
+# 但启动报错
+[root@host2 ~]# service mysql start
+Redirecting to /bin/systemctl start mysql.service
+Job for mysqld.service failed because the control process exited with error code. See &quot;systemctl status mysqld.service&quot; and &quot;journalctl -xe&quot; for details.
+</code></pre><p>2、在一个新安装的数据库实例中恢复，（此处是同一个实例，重新初始化数据目录）</p>
+<pre><code>[root@host2 ~]# /usr/local/mysql/scripts/mysql_install_db --datadir=/data/mysql/ --user=mysql
+# 启动后，可以看出，此为一个完全初始化数据库，没有任务业务数据
+[root@host2 ~]# service mysqld start
+Starting mysqld (via systemctl):                           [  OK  ]
+[root@host2 ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+4 rows in set (0.00 sec)
+</code></pre><p>3、用全备sql文件恢复，并重放binlog</p>
+<pre><code># 实际是把sql文件中sql全部执行了一遍，生成和原库一样的数据；
+# 看到，已经恢复到了快照一刻的数据；
+
+[root@host2 ~]# mysql &lt; 2020-09-27.sql 
+[root@host2 ~]# mysql
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| db1                |
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
+
+# 根据change master记录的日志位置，开始重放binlog，可以看到快照后的数据也恢复
+# 快照后，create database db2，创建了一个库；
+[root@host2 ~]# mysqlbinlog --start-position=385 mysql-bin.000006 | mysql
+[root@host2 ~]# mysql
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| db1                |
+| db2                |
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+
+</code></pre><h2 id="xtrabackup有问题暂略"><a href="#xtrabackup有问题暂略" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:xtrabackup有问题暂略" class="headings">xtrabackup（有问题，暂略）</a></h2>
+<p>暂定是xtrabackup和mariadb版本兼容问题，用mariadbackup试试；</p>
+<h3 id="介绍-2"><a href="#介绍-2" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:介绍-2" class="headings">介绍</a></h3>
+<p>percona公司开源的对innodb和xtardb存储引擎做物理层数据备份的工具，percona是mysql数据库的发行版公司，xtradb是基于innodb</p>
+<p><a href="https://www.percona.com/software/mysql-database/percona-xtrabackup" target="_blank" rel="noopener">https://www.percona.com/software/mysql-database/percona-xtrabackup</a></p>
+<h4 id="特点"><a href="#特点" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:特点" class="headings"><strong>特点：</strong></a></h4>
+<ul>
+<li>热备</li>
+<li>速度快，可靠性高</li>
+<li>可压缩，节省存储空间和流量</li>
+<li>具有备份检验功能</li>
+<li>开源，free</li>
+<li>不和mysql server进程交互，直接备份物理数据层</li>
+</ul>
+<h3 id="安装"><a href="#安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装" class="headings">安装</a></h3>
+<h4 id="程序组成"><a href="#程序组成" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:程序组成" class="headings">程序组成</a></h4>
+<p><strong>2.2版本之前</strong></p>
+<pre><code>innobackupex  		perl脚本
+xtrabackup:c/c++ 	二进制程序
+xbcrypt				加解密
+xbstream			支持并发写的流文件
+
+xtrabackup 用来备份innodb表，和xtradb表，
+innnobackupex 脚本备份非innodb表，同时调用xtrabackup备份innodb表，该脚本是对xtrabackup的一层封装；
+</code></pre><p><strong>2.4之后</strong></p>
+<pre><code>将脚本innobackupex功能集成到xtrabackup二进制程序中，
+向下兼容，原脚本做成了二进制程序的软链接
+</code></pre><h4 id="安装方式"><a href="#安装方式" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装方式" class="headings">安装方式</a></h4>
+<pre><code>[root@host2 ~]# yum install -y percona-xtrabackup
+
+[root@host2 ~]# rpm -ql !$
+rpm -ql percona-xtrabackup
+/usr/bin/innobackupex
+/usr/bin/xbcrypt
+/usr/bin/xbstream
+/usr/bin/xtrabackup
+/usr/share/doc/percona-xtrabackup-2.3.6
+/usr/share/doc/percona-xtrabackup-2.3.6/COPYING
+/usr/share/doc/percona-xtrabackup-2.3.6/README
+/usr/share/doc/percona-xtrabackup-2.3.6/VERSION
+/usr/share/man/man1/innobackupex.1.gz
+/usr/share/man/man1/xbcrypt.1.gz
+/usr/share/man/man1/xbstream.1.gz
+/usr/share/man/man1/xtrabackup.1.gz
+
+[root@host2 ~]# file /usr/bin/innobackupex 
+/usr/bin/innobackupex: symbolic link to `xtrabackup'
+[root@host2 ~]# file /usr/bin/xtrabackup 
+/usr/bin/xtrabackup: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=2afaaf839107c7e1e47a80f3c314481b888b5778, stripped
+# 四个程序文件，以及对应man手册
+</code></pre><pre><code># epel源
+[root@host2 ~]# yum list percona-xtrabackup
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirrors.aliyun.com
+ * extras: mirrors.aliyun.com
+ * updates: mirrors.aliyun.com
+Available Packages
+percona-xtrabackup.x86_64                          2.3.6-1.el7                          epel
+
+yum install -y percona-xtarbackup epel源
+
+# 官方下载
+https://www.percona.com/downloads/Percona-XtraBackup-LATEST/
+</code></pre><h3 id="xtrabackup备份过程解析"><a href="#xtrabackup备份过程解析" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:xtrabackup备份过程解析" class="headings">xtrabackup备份过程解析</a></h3>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200927192059049.png" alt="image-20200927192059049"></p>
+<h3 id="全备与恢复"><a href="#全备与恢复" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:全备与恢复" class="headings">全备与恢复</a></h3>
+<p><strong>备份</strong></p>
+<ol>
+<li>在原数据库做全备；</li>
+</ol>
+<p><strong>恢复</strong></p>
+<ol>
+<li>在要恢复的主机（一般是其他主机上的新的实例）
+<ol>
+<li>预准备阶段：回滚未完成的事务，已完成事务未应用到数据上的，将数据做对应修改</li>
+<li>复制到数据库目录：<strong>数据库目录要空，mysql进程不启动</strong></li>
+<li>复制后的数据文件，修改属性</li>
+<li>启动mysql进程</li>
+</ol>
+</li>
+</ol>
+<h3 id="全备增量备份与恢复"><a href="#全备增量备份与恢复" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:全备增量备份与恢复" class="headings">全备、增量备份与恢复</a></h3>
+<p><strong>备份</strong></p>
+<ol>
+<li>首次全备</li>
+<li>模拟第一次修改数据，</li>
+<li>第一次增量备份</li>
+<li>模拟第二次修改数据</li>
+<li>第二次增量备份</li>
+<li>将全备、增量1、增量2的3次备份的三个文件都拷贝要目标主机，</li>
+</ol>
+<p><strong>还原</strong></p>
+<ol>
+<li>预准备阶段，</li>
+<li>合并第一次增量备份到全备</li>
+<li>合并第二次增量备份到全备</li>
+<li>将全部合并完成的数据文件，拷贝到数据目录，改权限，</li>
+<li>修改属主为myslq</li>
+<li>启动新实例mysql</li>
+</ol>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/mysql备份还原/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2021-03-09 12:30:39 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2021-03-09</text><text x="915" y="140" textLength="650" transform="scale(.1)">2021-03-09</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E5%8E%8B%E6%B5%8B%E4%B8%8E%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B/" class="related-link">mysql压测与生产环境配置示例</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" class="related-link">mysql介绍与安装</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E5%A4%8D%E5%88%B6%E9%9B%86%E7%BE%A4/" class="related-link">mysql复制集群</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86/" class="related-link">mysql日志管理</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%89%E9%A1%B9%E4%B8%8E%E5%8F%98%E9%87%8F/" class="related-link">mysql服务器选项与变量</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/mysql/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>mysql</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/%E7%96%91/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>疑</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/mysql%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" rel="prev">&lt; mysql介绍与安装</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/mysql%E5%A4%8D%E5%88%B6%E9%9B%86%E7%BE%A4/" rel="next">mysql复制集群 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

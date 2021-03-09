@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>mysql复制集群 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="mysql复制集群实验，包括主从复制、级联主从复制、级联主从半同步复制、gtid复制、复制加密等..." />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/mysql%E5%A4%8D%E5%88%B6%E9%9B%86%E7%BE%A4/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-08-28T12:27:40+00:00",
+        "dateModified": "2021-03-09T12:31:03+08:00",
+        "url": "https://latteStudio.github.io/posts/mysql%E5%A4%8D%E5%88%B6%E9%9B%86%E7%BE%A4/",
+        "headline": "mysql复制集群",
+        "description": "mysql复制集群实验，包括主从复制、级联主从复制、级联主从半同步复制、gtid复制、复制加密等...",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  7205 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20200928162959704.png","https://gitee.com/boogie96/img/raw/master/img/image-20200928163206599.png","https://gitee.com/boogie96/img/raw/master/img/image-20200928161748067.png","https://gitee.com/boogie96/img/raw/master/img/image-20200928165418205.png","https://gitee.com/boogie96/img/raw/master/img/image-20201005152444759.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="mysql复制集群" />
+<meta property="og:description" content="mysql复制集群实验，包括主从复制、级联主从复制、级联主从半同步复制、gtid复制、复制加密等..." />
+<meta property="og:url" content="https://latteStudio.github.io/posts/mysql%E5%A4%8D%E5%88%B6%E9%9B%86%E7%BE%A4/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20200928162959704.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-08-28T12:27:40&#43;00:00" />
+    <meta property="article:modified_time" content="2021-03-09T12:31:03&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">mysql复制集群</h1>
+
+            
+
+            
+                <div class="post-description p-summary">mysql复制集群实验，包括主从复制、级联主从复制、级联主从半同步复制、gtid复制、复制加密等...</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-08-28T12:27:40&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.8.28</time>
+    
+    
+        
+        <time datetime="2021-03-09T12:31:03&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2021.3.9</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-link p-category">数据库</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;7205</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;15&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:分库" href="#分库">分库</a>
+      <ol>
+        <li><a id="contents:垂直" href="#垂直">垂直</a></li>
+        <li><a id="contents:水平" href="#水平">水平</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:分表" href="#分表"><strong>分表</strong></a>
+      <ol>
+        <li><a id="contents:垂直-1" href="#垂直-1">垂直</a></li>
+        <li><a id="contents:水平-1" href="#水平-1">水平</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:路由" href="#路由">路由</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:主从复制" href="#主从复制">主从复制</a></li>
+    <li><a id="contents:级联主从复制" href="#级联主从复制">级联主从复制</a></li>
+    <li><a id="contents:主主复制" href="#主主复制">主主复制</a></li>
+    <li><a id="contents:半同步复制" href="#半同步复制">半同步复制</a>
+      <ol>
+        <li><a id="contents:半同步工作模型" href="#半同步工作模型">半同步工作模型</a></li>
+        <li><a id="contents:半同步配置" href="#半同步配置">半同步配置</a></li>
+        <li><a id="contents:半同步验证" href="#半同步验证">半同步验证</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:基于gitd的复制" href="#基于gitd的复制">基于gitd的复制</a>
+      <ol>
+        <li><a id="contents:gtid简介" href="#gtid简介">gtid简介</a></li>
+        <li><a id="contents:gtid架构配置" href="#gtid架构配置">gtid架构配置</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:复制相关增强配置" href="#复制相关增强配置">复制相关增强配置</a>
+      <ol>
+        <li><a id="contents:复制过滤器" href="#复制过滤器">复制过滤器</a></li>
+        <li><a id="contents:复制加密" href="#复制加密">复制加密</a></li>
+        <li><a id="contents:复制的监控与维护" href="#复制的监控与维护">复制的监控与维护</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="mysql分库分表"><a href="#mysql分库分表" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mysql分库分表" class="headings">mysql分库分表</a></h1>
+<h2 id="分库"><a href="#分库" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:分库" class="headings">分库</a></h2>
+<p>业务涉及较大的表时，数据表分库方法：</p>
+<ul>
+<li>垂直切分</li>
+<li>水平切分</li>
+</ul>
+<h3 id="垂直"><a href="#垂直" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:垂直" class="headings">垂直</a></h3>
+<p>将存放不同业务数据的表，分到不同数据库中，且不同的数据库可以是在不同的数据库实例中，如下：</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200928162959704.png" alt="image-20200928162959704"></p>
+<h3 id="水平"><a href="#水平" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:水平" class="headings">水平</a></h3>
+<p>按照时间或地区等标准做水平切分，如电商的交易数据，按照不同的省市地区或时间划分，分别存储不同于不同的库，（也可以是在不同的实例）</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200928163206599.png" alt="image-20200928163206599"></p>
+<h2 id="分表"><a href="#分表" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:分表" class="headings"><strong>分表</strong></a></h2>
+<p>一张表数据量较大时，数据表切分方法：</p>
+<ul>
+<li>垂直切分</li>
+<li>水平切分</li>
+</ul>
+<h3 id="垂直-1"><a href="#垂直-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:垂直-1" class="headings">垂直</a></h3>
+<p>对于数据量较大的表，可以将不常用字段切分，单独放在一个表中</p>
+<h3 id="水平-1"><a href="#水平-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:水平-1" class="headings">水平</a></h3>
+<p>对于数据量较大的表，可以按照时间，id取模等方式做水平的切分，分别存储于不同的数据表中；</p>
+<h2 id="路由"><a href="#路由" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:路由" class="headings">路由</a></h2>
+<p>分库分表之后，不同于单实例单库单表的查询，需要有一个sql路由，在php或java等发起数据读写请求时，根据某些条件，将查询路由到一个个被分开的数据库实例上；</p>
+<p>路由本身也要做高可用；</p>
+<p>类似dns查询，可以选择迭代或递归查询2种方式；</p>
+<p>可以做mysql路由中间件的有，mysql router、mycat、proxysql</p>
+<h1 id="mysql常用复制架构"><a href="#mysql常用复制架构" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mysql常用复制架构" class="headings">mysql常用复制架构</a></h1>
+<ul>
+<li>主从复制</li>
+<li>级联主从复制</li>
+<li>主主复制</li>
+<li>半同步复制</li>
+<li>基于gitd的复制</li>
+<li>复制相关配置
+<ul>
+<li>复制过滤器</li>
+<li>复制加密</li>
+<li>复制集群的监控与维护</li>
+</ul>
+</li>
+<li>读写分离
+<ul>
+<li>常用的读写分离路由软件</li>
+<li>proxy sql</li>
+</ul>
+</li>
+</ul>
+<h2 id="主从复制"><a href="#主从复制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:主从复制" class="headings">主从复制</a></h2>
+<p><a href="https://mariadb.com/kb/en/setting-up-replication/" target="_blank" rel="noopener">https://mariadb.com/kb/en/setting-up-replication/</a></p>
+<p><a href="https://dev.mysql.com/doc/refman/5.7/en/replication-configuration.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/replication-configuration.html</a></p>
+<p>主从架构图</p>
+<ol>
+<li>主节点数据更新时，相关操作会写入binlog</li>
+<li>主节点开启slave线程将自己的binlog发送给从节点的io线程</li>
+<li>从节点io线程接收到主节点的binlog之后，写入自己本地的中继日志，本质也算是binlog，</li>
+<li>从节点的sql线程，读取本地relay log中继日志，应用到数据库中，形成和主库一样的数据更新</li>
+</ol>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200928161748067.png" alt="image-20200928161748067"></p>
+<p>相关线程</p>
+<p>主节点：</p>
+<p>dump thread：主节点会为每一个从节点启动一个dump线程，发送自己的binlog</p>
+<p>master.info：保存了各个从节点连过来时的信息，如账户，密码，ip等</p>
+<p>从节点：</p>
+<p>io thread：向主节点请求binlog，并接收到本地，保存为relay log</p>
+<p>sql thread：从relay log中读取日志中sql，在本地重放</p>
+<p>relay-log.info：保存了当前salve节点已经复制的binlog和本地relay log的对应关系</p>
+<p>主从结构特点</p>
+<ol>
+<li>异步复制：主从数据同步有延时，数据不一致</li>
+<li>一主多从</li>
+<li>一从多主：一个实例做多个主节点的从</li>
+<li>级联复制</li>
+<li>主主</li>
+<li>环形复制</li>
+<li>复制时，binlog选择的格式：row，statements，mixed</li>
+</ol>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200928165418205.png" alt="image-20200928165418205"></p>
+<p>配置过程</p>
+<p>主节点</p>
+<ol>
+<li>启用binlog</li>
+<li>设置唯一的server_id</li>
+<li>创建具有复制数据权限的账户</li>
+<li><strong>在创建了用户后再备份</strong>，这样从库恢复后就带有该用户，不必再手动创建</li>
+<li>创建2个库，模拟备份后数据修改；</li>
+</ol>
+<pre><code>[mysqld]
+...
+log-bin=master-bin
+server_id=1
+[root@host2 ~]# service mysqld restart
+
+MariaDB [(none)]&gt; grant replication slave on *.* to repl@'192.168.80.102' identified by 'wang';
+Query OK, 0 rows affected (0.00 sec)
+
+
+[root@host2 ~]#  mysqldump -uroot -pwangbo  -A -F -E -R --single-transaction --master-data=1 --flush-privileges --default-character-set=utf8 --hex-blob &gt; /root/`date +%F`.sql
+[root@host2 ~]# ll
+total 492
+-rw-r--r--  1 root root 490508 Sep 28 18:17 2020-09-28.sql
+
+Query OK, 1 row affected (0.00 sec)
+
+MariaDB [(none)]&gt; create database test2;
+Query OK, 1 row affected (0.00 sec)
+
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| db3                |
+| db4                |
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test1              |
+| test2              |
++--------------------+
+</code></pre><p>从节点</p>
+<ol>
+<li>设置全局唯一server_id</li>
+<li>设置数据库只读</li>
+<li>设置relay log路径</li>
+<li>设置relay log 的index文件</li>
+<li><strong>用主节点全备sql文件恢复</strong></li>
+<li>在从节点用change master命令配置主节点的信息，如ip，端口，刚刚创建的账户等；（此时从节点就配置好了主节点信息）</li>
+<li>但从节点相关线程还没开启，所有主从同步没开始；</li>
+<li>从节点启动2个相关线程，</li>
+<li>检查线程状态，查看同步是否正常；</li>
+</ol>
+<pre><code># The MariaDB server
+[mysqld]
+server_id=2
+read_only=on
+relay_log=relay-log
+relay_log_index=relay-log.index
+
+[root@host3 ~]# vim /etc/my.cnf
+[root@host3 ~]# service mysqld restart
+Restarting mysqld (via systemctl):                         [  OK  ]
+# 设置后重启服务器
+
+# 应用全备sql，从节点恢复到了主节点备份时刻状态；
+[root@host3 ~]# mysql &lt; 2020-09-28.sql 
+[root@host3 ~]# mysql -uroot -pwangbo
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| db3                |
+| db4                |
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
++--------------------+
+
+# 此时还没有slave线程信息；
+MariaDB [(none)]&gt; show slave status;
+Empty set (0.00 sec)
+
+# 在从节点上配置主节点信息，ip，端口，从哪个位置应用binlog等
+MariaDB [(none)]&gt; CHANGE MASTER TO
+    -&gt;   MASTER_HOST='192.168.80.101',
+    -&gt;   MASTER_USER='repl',
+    -&gt;   MASTER_PASSWORD='wang',
+    -&gt;   MASTER_PORT=3306,
+    -&gt;   MASTER_LOG_FILE='mysql-bin.000011', 
+    -&gt;   MASTER_LOG_POS=385,
+    -&gt;   MASTER_CONNECT_RETRY=10;
+    
+# 此时因为2个线程没启动，尚未开始同步    
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: 
+                  Master_Host: 192.168.80.101
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: mysql-bin.000011
+          Read_Master_Log_Pos: 385
+               Relay_Log_File: relay-log.000001
+                Relay_Log_Pos: 4
+        Relay_Master_Log_File: mysql-bin.000011
+             Slave_IO_Running: No
+            Slave_SQL_Running: No
+
+# 启动2个线程
+MariaDB [(none)]&gt; start slave;
+Query OK, 0 rows affected (0.00 sec)
+
+# 错误：因为主从节点一致，配置文件了设置了没生效；
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: 
+                  Master_Host: 192.168.80.101
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: mysql-bin.000011
+          Read_Master_Log_Pos: 385
+               Relay_Log_File: relay-log.000001
+                Relay_Log_Pos: 4
+        Relay_Master_Log_File: mysql-bin.000011
+             Slave_IO_Running: No
+            Slave_SQL_Running: Yes
+         Last_IO_Error: Fatal error: The slave I/O thread stops because master and slave have equal MySQL server ids; these ids must be different for replication to work (or the --replicate-same-server-id option must be used on slave but this does not always make sense; please check the manual before using it).
+               Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it
+
+
+# 命令行临时修改生效了
+MariaDB [(none)]&gt; set global server_id=22;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; show variables like '%server%';
++---------------------------------+-----------------+
+| Variable_name                   | Value           |
++---------------------------------+-----------------+
+| character_set_server            | utf8            |
+| collation_server                | utf8_general_ci |
+| innodb_ft_server_stopword_table |                 |
+| server_id                       | 22              |
+
+
+# 重启slave的2个线程；
+MariaDB [(none)]&gt; stop slave;
+Query OK, 0 rows affected (0.00 sec)
+MariaDB [(none)]&gt; start slave;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.80.101
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: mysql-bin.000012
+          Read_Master_Log_Pos: 342
+               Relay_Log_File: relay-log.000005
+                Relay_Log_Pos: 641
+        Relay_Master_Log_File: mysql-bin.000012
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+
+# 此时已经和主节点数据一致了；
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| db3                |
+| db4                |
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test1              |
+| test2              |
++--------------------+
+
+# 主节点数据修改测试
+# 主节点删除2个库
+MariaDB [(none)]&gt; drop database db4;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; drop database db3;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test1              |
+| test2              |
++--------------------+
+
+# 从节点也随之删除，此时主从节点已经成功同步；
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| test1              |
+| test2              |
++--------------------+
+6 rows in set (0.00 sec)
+
+</code></pre><p><strong>serverid设置不生效原因</strong></p>
+<pre><code># 打印mysqld的启动参数发现，有2个server-id，
+[root@host3 ~]# mysqld --print-defaults
+mysqld would have been started with the following arguments:
+--server_id=2 --read_only=on --relay_log=relay-log --relay_log_index=relay-log.index --port=3306 --socket=/data/mysql/mysql.sock --skip-external-locking --key_buffer_size=256M --max_allowed_packet=1M --table_open_cache=256 --sort_buffer_size=1M --read_buffer_size=1M --read_rnd_buffer_size=4M --myisam_sort_buffer_size=64M --thread_cache_size=8 --query_cache_size=16M --thread_concurrency=8 --datadir=/data/mysql --skip_name_resolve=on --log-bin=mysql-bin --binlog_format=mixed --server-id=1 
+
+# 检查配置文件发现，原本配置文件默认有一个server-id=1，后来自己添加的server-id就没生效，将其注释，手动添加的server-id就会生效；
+[root@host3 ~]# vim /etc/my.cnf
+# required unique id between 1 and 2^32 - 1
+# defaults to 1 if master-host is not set
+# but will not function as a master if omitted
+#server-id      = 1
+
+[root@host3 ~]# service mysqld restart
+Restarting mysqld (via systemctl):                         [  OK  ]
+[root@host3 ~]# mysqld --print-defaults
+mysqld would have been started with the following arguments:
+--server_id=2 --read_only=on --relay_log=relay-log --relay_log_index=relay-log.index --port=3306 --socket=/data/mysql/mysql.sock --skip-external-locking --key_buffer_size=256M --max_allowed_packet=1M --table_open_cache=256 --sort_buffer_size=1M --read_buffer_size=1M --read_rnd_buffer_size=4M --myisam_sort_buffer_size=64M --thread_cache_size=8 --query_cache_size=16M --thread_concurrency=8 --datadir=/data/mysql --skip_name_resolve=on --log-bin=mysql-bin --binlog_format=mixed 
+</code></pre><p>主从复制注意点</p>
+<ul>
+<li>从服务器应该只读，避免有写操作，避免主从数据不一致：read-only=on</li>
+<li>reset slave</li>
+<li>reset salve all清楚所有从服务器信息</li>
+<li>sql_slave_skip_counter=N，从服务器忽略N个主服务器的复制事件，避免因几个sql错误阻塞了后续的主从复制；</li>
+<li>主节点数据量已经较大时，可以先用mysqldump备份出来，恢复到从节点，再从change master记录的binlog位置开始做主从同步，上步实验即是如此；</li>
+</ul>
+<p>主从复制中事务安全参数设置（一般是刷盘频率相关参数设置，）</p>
+<p>主节点：</p>
+<pre><code>sync_binlog=1 每次写后同步二进制日志到磁盘，性能差
+
+结合innodb引擎时：
+innodb_flush_log_at_trx_commit=1 每次事务提交后同步日志到磁盘
+sync_master_info=N N次事务后master.info同步到磁盘
+</code></pre><p>从节点：</p>
+<pre><code>skip_slave_start=on 
+sync_relay_log=N
+sync_relay_log_info=N 
+</code></pre><h2 id="级联主从复制"><a href="#级联主从复制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:级联主从复制" class="headings">级联主从复制</a></h2>
+<p>​	<strong>一主多从架构时，主节点会为每个从节点都开启一个dump线程，来发送自己的binlog，从节点较多的情况下，会加大主节点的压力，因此更合理的做法为，一主挂一从，再由从节点向其他从节点进行复制，以此减轻主节点的压力；</strong></p>
+<p><strong>实验步骤：</strong></p>
+<ol>
+<li>前提：
+<ol>
+<li>在配置好一主一从的情况下；</li>
+</ol>
+</li>
+<li>从节点：
+<ol>
+<li>从节点修改服务器参数；开启binlog，log_slave_updates，去掉read-only</li>
+<li>从节点做全备，并记录binlog位置；（可利用mysqldump）</li>
+<li>若用mysqldump做全备，将从节点的全备sql文件，复制到新加入的末端从节点，可以有多个</li>
+</ol>
+</li>
+<li>末端从节点：
+<ol>
+<li>利用中间从节点的全备做恢复；</li>
+<li>修改my.cnf，加入从节点配置参数；serverid、read-only，relay-log</li>
+<li>利用change master命令，连接到从节点，从备份时记录的日志位置开始做同步；</li>
+<li>启动末端从节点的slave进程；start slave</li>
+<li>检查slave线程和日志同步状态；</li>
+<li>在主节点做数据修改，检查主节点-》中间从节点-》末端从节点的数据是否能正常同步；</li>
+</ol>
+</li>
+</ol>
+<p>1、<strong>配置主节点：</strong></p>
+<pre><code>#修改主节点配置文件，并重启生效
+[root@host2 ~]# vim /etc/my.cnf
+[mysqld]
+server_id=2
+log-bin=on
+
+[root@host2 ~]# systemctl restart mariadb
+[root@host2 ~]# ll /var/lib/mysql/
+-rw-rw---- 1 mysql mysql      245 Oct  5 14:17 on.000001
+-rw-rw---- 1 mysql mysql       12 Oct  5 14:17 on.index
+
+#备份现有主节点数据
+[root@host2 ~]# mysqldump -uroot -A -F -E -R --single-transaction --master-data=1 --flush-privileges --default-character-set=utf8 --hex-blob &gt; /root/`date +%F`.sql
+
+#创建复制用的用户账户
+MariaDB [(none)]&gt; grant replication slave on *.* to repl@'192.168.80.%' identified by 'wang';
+
+</code></pre><p>2、<strong>配置中间从节点</strong></p>
+<pre><code>#修改配置文件并重启
+[root@host3 ~]# vim /etc/my.cnf
+[mysqld]
+server_id=3
+log-bin
+read-only=on
+relay-log=on
+
+[root@host3 ~]# systemctl restart mariadb
+
+#从主节点复制过来备份的sql文件，并恢复，使其达到主节点备份时刻的数据状态
+[root@host2 ~]# scp 2020-10-05.sql 192.168.80.102:/root/
+
+[root@host3 ~]# mysql &lt; 2020-10-05.sql 
+[root@host3 ~]# mysql
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| hellodb            |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+
+#配置主节点信息，使其从备份时刻的binlog位置开始读取binlog并应用到本地
+MariaDB [(none)]&gt; CHANGE MASTER TO
+    -&gt;   MASTER_HOST='192.168.80.101',
+    -&gt;   MASTER_USER='repl',
+    -&gt;   MASTER_PASSWORD='wang',
+    -&gt;   MASTER_PORT=3306,
+    -&gt;   MASTER_LOG_FILE='on.000002', 
+    -&gt;   MASTER_LOG_POS=245,
+    -&gt;   MASTER_CONNECT_RETRY=10;
+Query OK, 0 rows affected (0.01 sec)
+
+#配置好主节点信息，此时尚未开始复制，需要手动启动复制线程，启动后，io和sql线程状态变为yes即正常
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: 
+                  Master_Host: 192.168.80.101
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: on.000002
+          Read_Master_Log_Pos: 245
+               Relay_Log_File: on.000001
+                Relay_Log_Pos: 4
+        Relay_Master_Log_File: on.000002
+             Slave_IO_Running: No
+            Slave_SQL_Running: No
+
+MariaDB [(none)]&gt; start slave;            
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.80.101
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: on.000002
+          Read_Master_Log_Pos: 394
+               Relay_Log_File: on.000002
+                Relay_Log_Pos: 671
+        Relay_Master_Log_File: on.000002
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+
+# 主节点做数据修改，验证数据同步，主节点创建db1库，从节点可以看到db1随之创建，【主从配置成功】
+MariaDB [(none)]&gt; create database db1;
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| db1                |
+| hellodb            |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+</code></pre><p>3、<strong>末端从节点</strong></p>
+<pre><code>#修改中间从节点配置文件，关闭read-only选项，加入log_slave_updates选项，重启
+[root@host3 ~]# vim /etc/my.cnf
+[mysqld]
+server_id=3
+log-bin
+# read-only=on
+relay-log=on
+log_slave_updates
+[root@host3 ~]# systemctl restart mariadb
+
+#修改末端从节点参数文件
+[root@host4 ~]# vim /etc/my.cnf
+[mysqld]
+server_id=4
+log-bin
+read-only=on
+relay-log=on
+[root@host4 ~]# systemctl start mariadb
+
+#中间从节点，备份，并拷贝到末端节点上，然后恢复到末端节点
+[root@host3 ~]# mysqldump -uroot -A -F -E -R --single-transaction --master-data=1 --flush-privileges --default-character-set=utf8 --hex-blob &gt; /root/`date +%F`.sql
+[root@host3 ~]# scp 2020-10-05.sql 192.168.80.103:/root/
+[root@host4 ~]# mysql &lt; 2020-10-05.sql 
+
+
+#末端节点将中间节点指为主，并开启复制线程
+MariaDB [(none)]&gt; CHANGE MASTER TO
+    -&gt;   MASTER_HOST='192.168.80.102',
+    -&gt;   MASTER_USER='repl',
+    -&gt;   MASTER_PASSWORD='wang',
+    -&gt;   MASTER_PORT=3306,
+    -&gt;   MASTER_LOG_FILE='mariadb-bin.000003', 
+    -&gt;   MASTER_LOG_POS=245,
+    -&gt;   MASTER_CONNECT_RETRY=10;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: 
+                  Master_Host: 192.168.80.102
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: mariadb-bin.000003
+          Read_Master_Log_Pos: 245
+               Relay_Log_File: on.000001
+                Relay_Log_Pos: 4
+        Relay_Master_Log_File: mariadb-bin.000003
+             Slave_IO_Running: No
+            Slave_SQL_Running: No
+
+MariaDB [(none)]&gt; start slave;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.80.102
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: mariadb-bin.000003
+          Read_Master_Log_Pos: 245
+               Relay_Log_File: on.000002
+                Relay_Log_Pos: 531
+        Relay_Master_Log_File: mariadb-bin.000003
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+
+
+</code></pre><p>4、<strong>测试</strong></p>
+<pre><code>#建库后，主节点、中间节点，末端节点都出现了testdb，【级联配置成功】
+MariaDB [(none)]&gt; create database testdb;
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| db1                |
+| hellodb            |
+| mysql              |
+| performance_schema |
+| test               |
+| testdb             |
++--------------------+
+</code></pre><h2 id="主主复制"><a href="#主主复制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:主主复制" class="headings">主主复制</a></h2>
+<p>要注意的问题</p>
+<p>​	主主复制：2个节点互为主从，2个节点都可以写，每个节点的写操作都会同步到对方节点，<strong>容易造成数据不一致问题，因此较少使用；</strong></p>
+<ul>
+<li>
+<p>自动增长id设置，从而避免2个节点写入相同一行的数据，导致数据冲突不一致</p>
+</li>
+<li>
+<p>写入数据时，一个节点使用奇数 id</p>
+<ul>
+<li>
+<pre><code>auto_increment_offset=1
+auto_increment_increment=2
+# 从1开始增长，步长是2,1 3 5 7
+</code></pre></li>
+</ul>
+</li>
+<li>
+<p>另一个节点使用偶数id</p>
+<ul>
+<li>
+<pre><code>auto_increment_offset=2
+auto_increment_increment=2
+# 从2开始增长，步长是2 ，2 4 6 8...
+</code></pre></li>
+</ul>
+</li>
+</ul>
+<p>配置步骤</p>
+<ol>
+<li>各节点使用唯一的server id；</li>
+<li>都启动bin log和relay log</li>
+<li>创建用于复制权限的账户</li>
+<li>启动自动增长的id各为奇偶，避免冲突；</li>
+<li>都把对方指定为主节点，都启动复制线程；</li>
+</ol>
+<h2 id="半同步复制"><a href="#半同步复制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:半同步复制" class="headings">半同步复制</a></h2>
+<h3 id="半同步工作模型"><a href="#半同步工作模型" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:半同步工作模型" class="headings">半同步工作模型</a></h3>
+<p>​	默认情况下，mysql复制是异步的，即主库发送日志后即返回，可以提交事务做数据持久化变更，不关心从库是否正确接收并应用到本地，<strong>性能好，但是主库挂掉，从库又没来得及接受对应binlog的情况，就会丢失一部分数据，</strong></p>
+<p>​	<strong>半同步复制，主库的数据变更至少发送到一个从库上，并确认从库成功接收并应用后再返回，才能进行事务的提交，即数据变更至少保存2份，在2个节点上，从而提高了数据的安全性</strong>，常结合mha做高可用集群</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201005152444759.png" alt="image-20201005152444759"></p>
+<h3 id="半同步配置"><a href="#半同步配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:半同步配置" class="headings">半同步配置</a></h3>
+<p>​	1、<strong>配置主节点</strong></p>
+<pre><code>#默认没有开启半同步相关参数
+MariaDB [(none)]&gt; show global variables like '%semi%';
+Empty set (0.00 sec)
+
+#半同步相关的2个so模块
+[root@host4 ~]# rpm -ql mariadb-server |grep so |grep semi
+/usr/lib64/mysql/plugin/semisync_master.so
+/usr/lib64/mysql/plugin/semisync_slave.so
+
+#加载安装半同步复制的主节点模块，设置为启用，设置超时时间为1000毫秒
+MariaDB [(none)]&gt; install plugin rpl_semi_sync_master soname 'semisync_master.so';
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; set global rpl_semi_sync_master_enabled=1;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; set global rpl_semi_sync_master_timeout=1000;
+Query OK, 0 rows affected (0.00 sec)
+
+#此时查看相关变量，显示为on
+MariaDB [(none)]&gt; show global variables like '%semi%';
++------------------------------------+-------+
+| Variable_name                      | Value |
++------------------------------------+-------+
+| rpl_semi_sync_master_enabled       | ON    |
+| rpl_semi_sync_master_timeout       | 1000  |
+| rpl_semi_sync_master_trace_level   | 32    |
+| rpl_semi_sync_master_wait_no_slave | ON    |
++------------------------------------+-------+
+4 rows in set (0.00 sec)
+
+#此时从节点个数为0，需要配置从节点
+MariaDB [(none)]&gt; show global status like '%semi%';
++--------------------------------------------+-------+
+| Variable_name                              | Value |
++--------------------------------------------+-------+
+| Rpl_semi_sync_master_clients               | 0     |
+| Rpl_semi_sync_master_net_avg_wait_time     | 0     |
+| Rpl_semi_sync_master_net_wait_time         | 0     |
+| Rpl_semi_sync_master_net_waits             | 0     |
+| Rpl_semi_sync_master_no_times              | 0     |
+| Rpl_semi_sync_master_no_tx                 | 0     |
+| Rpl_semi_sync_master_status                | ON    |
+| Rpl_semi_sync_master_timefunc_failures     | 0     |
+| Rpl_semi_sync_master_tx_avg_wait_time      | 0     |
+| Rpl_semi_sync_master_tx_wait_time          | 0     |
+| Rpl_semi_sync_master_tx_waits              | 0     |
+| Rpl_semi_sync_master_wait_pos_backtraverse | 0     |
+| Rpl_semi_sync_master_wait_sessions         | 0     |
+| Rpl_semi_sync_master_yes_tx                | 0     |
++--------------------------------------------+-------+
+</code></pre><p>​	2、<strong>配置从节点</strong></p>
+<pre><code>#加载安装半同步复制模块的从节点模块，启用，重启复制线程使得配置生效
+MariaDB [(none)]&gt; install plugin rpl_semi_sync_slave soname 'semisync_slave.so';
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; set global rpl_semi_sync_slave_enabled=1;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; stop slave;
+Query OK, 0 rows affected (0.00 sec)
+MariaDB [(none)]&gt; start slave;
+Query OK, 0 rows affected (0.00 sec)
+
+#此时从节点半同步模块开启，主节点显示有1个从节点连接
+MariaDB [(none)]&gt; show global status like '%semi%';
++----------------------------+-------+
+| Variable_name              | Value |
++----------------------------+-------+
+| Rpl_semi_sync_slave_status | ON    |
++----------------------------+-------+
+
+MariaDB [(none)]&gt; show global status like '%semi%';
++--------------------------------------------+-------+
+| Variable_name                              | Value |
++--------------------------------------------+-------+
+| Rpl_semi_sync_master_clients               | 1     |
+| Rpl_semi_sync_master_net_avg_wait_time     | 0     |
+| Rpl_semi_sync_master_net_wait_time         | 0     |
+| Rpl_semi_sync_master_net_waits             | 0     |
+| Rpl_semi_sync_master_no_times              | 0     |
+| Rpl_semi_sync_master_no_tx                 | 0     |
+| Rpl_semi_sync_master_status                | ON    |
+| Rpl_semi_sync_master_timefunc_failures     | 0     |
+| Rpl_semi_sync_master_tx_avg_wait_time      | 0     |
+| Rpl_semi_sync_master_tx_wait_time          | 0     |
+| Rpl_semi_sync_master_tx_waits              | 0     |
+| Rpl_semi_sync_master_wait_pos_backtraverse | 0     |
+| Rpl_semi_sync_master_wait_sessions         | 0     |
+| Rpl_semi_sync_master_yes_tx                | 0     |
++--------------------------------------------+-------+
+
+</code></pre><h3 id="半同步验证"><a href="#半同步验证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:半同步验证" class="headings">半同步验证</a></h3>
+<pre><code>#半同步正常时，创建数据库立即完成
+MariaDB [(none)]&gt; create database semi1;
+Query OK, 1 row affected (0.00 sec)
+
+#此时显示半同步的从连接有1个
+MariaDB [(none)]&gt; show global status like '%semi%';
++--------------------------------------------+-------+
+| Variable_name                              | Value |
++--------------------------------------------+-------+
+| Rpl_semi_sync_master_clients               | 1     |
+| Rpl_semi_sync_master_net_avg_wait_time     | 671   |
+| Rpl_semi_sync_master_net_wait_time         | 1342  |
+| Rpl_semi_sync_master_net_waits             | 2     |
+| Rpl_semi_sync_master_no_times              | 0     |
+| Rpl_semi_sync_master_no_tx                 | 0     |
+| Rpl_semi_sync_master_status                | ON    |
+| Rpl_semi_sync_master_timefunc_failures     | 0     |
+| Rpl_semi_sync_master_tx_avg_wait_time      | 734   |
+| Rpl_semi_sync_master_tx_wait_time          | 1469  |
+| Rpl_semi_sync_master_tx_waits              | 2     |
+| Rpl_semi_sync_master_wait_pos_backtraverse | 0     |
+| Rpl_semi_sync_master_wait_sessions         | 0     |
+| Rpl_semi_sync_master_yes_tx                | 2     |
++--------------------------------------------+-------+
+14 rows in set (0.00 sec)
+
+
+#关闭从节点的半同步参数，重启复制线程后，才能生效
+MariaDB [(none)]&gt; set global rpl_semi_sync_slave_enabled=0;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; stop slave;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; start slave;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; show global status like '%semi%';
++----------------------------+-------+
+| Variable_name              | Value |
++----------------------------+-------+
+| Rpl_semi_sync_slave_status | OFF   |
++----------------------------+-------+
+
+#此时创建库，会经历1s的超时时长，超过设置的1s超时时间后，会自动降级为异步复制，【避免了从库挂掉，卡住，影响主库的正常写入】
+MariaDB [(none)]&gt; create database semi3;
+Query OK, 1 row affected (1.01 sec)
+#将从库重新开启半同步复制，创建库又立刻完成，【自动恢复为半同步复制】
+</code></pre><h2 id="基于gitd的复制"><a href="#基于gitd的复制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:基于gitd的复制" class="headings">基于gitd的复制</a></h2>
+<h3 id="gtid简介"><a href="#gtid简介" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:gtid简介" class="headings">gtid简介</a></h3>
+<p>​	global transaction id全局事务标识符；mysql5.6开始支持，<strong>不同于传统的复制方式，需要找到binlog的position，只需要配置主节点的ip，端口，账户，密码即可，会自动寻找同步点</strong></p>
+<p><strong>gitd组成：</strong></p>
+<p>​	server_uuid:transaction_id，一组复制集群中，全局位置，server_uuid来源于auto.cnf</p>
+<p><strong>gtid服务器相关选项</strong></p>
+<pre><code>gtid_mode 开启gtid模式
+enfore_gtid_consistency 保证gtid安全的参数
+
+</code></pre><h3 id="gtid架构配置"><a href="#gtid架构配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:gtid架构配置" class="headings">gtid架构配置</a></h3>
+<p>MariaDB has supported global transaction IDs (GTIDs) for replication since version 10.0.2.</p>
+<p><a href="https://mariadb.com/kb/en/gtid/#setting-up-a-new-slave-with-an-empty-server" target="_blank" rel="noopener">https://mariadb.com/kb/en/gtid/#setting-up-a-new-slave-with-an-empty-server</a></p>
+<p><a href="https://dev.mysql.com/doc/refman/5.6/en//replication-gtids-howto.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.6/en//replication-gtids-howto.html</a></p>
+<p>参考文档，mariadb和mysql的gitd实现机制和配置方式均不同</p>
+<p>注意配置10.0.2以后的yum源，centos7默认的mariadb5.5不支持</p>
+<pre><code>cat &gt; /etc/yum.repos.d/mariadb.repo &lt;&lt;'EOF'
+[mariadb]  
+name = MariaDB  
+baseurl =https://mirrors.tuna.tsinghua.edu.cn/mariadb/mariadb-10.3.23/yum/centos7-amd64/
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB  
+gpgcheck=1  
+EOF
+</code></pre><p>主节点：</p>
+<pre><code>[root@host2 ~]# vim /etc/my.cnf.d/server.cnf 
+# this is only for the mysqld standalone daemon
+[mysqld]
+server_id=2
+log-bin
+[root@host2 ~]# systemctl restart mariadb
+
+MariaDB [(none)]&gt; grant replication slave on *.* to repl@'192.168.80.%' identified by 'wang';
+#修改配置文件，创建复制用户
+</code></pre><p>从节点：</p>
+<pre><code>[root@host2 ~]# vim /etc/my.cnf.d/server.cnf 
+# this is only for the mysqld standalone daemon
+[mysqld]
+server_id=3
+[root@host2 ~]# systemctl restart mariadb
+#修改配置文件，指明主节点信息
+
+MariaDB [(none)]&gt;   CHANGE MASTER TO master_host=&quot;192.168.80.101&quot;, master_port=3306, master_user=&quot;repl&quot;, master_password = 'wang',master_use_gtid=current_pos;
+Query OK, 0 rows affected (0.006 sec)
+
+MariaDB [(none)]&gt; start slave;
+Query OK, 0 rows affected (0.004 sec)
+
+MariaDB [(none)]&gt; show slave status\G;
+
+#之后，主库创建数据库，测试主从库的数据同步，测试正常，截图略
+</code></pre><h2 id="复制相关增强配置"><a href="#复制相关增强配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:复制相关增强配置" class="headings">复制相关增强配置</a></h2>
+<h3 id="复制过滤器"><a href="#复制过滤器" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:复制过滤器" class="headings">复制过滤器</a></h3>
+<p>​	<strong>让从节点仅仅复制指定的数据库，或指定的表</strong></p>
+<p><strong>实现方式：</strong></p>
+<ul>
+<li>
+<p>主节点端：主节点上，设置只对特定的库做binlog的记录，<strong>没有binlog记录的库，崩溃时无法恢复</strong></p>
+<ul>
+<li>
+<pre><code>--binlog-ignore-db=db_name
+--binlog-do-db=db_name
+#相关配置参数
+</code></pre></li>
+</ul>
+</li>
+<li>
+<p>从节点端：主节点仍对所有的库的数据更改做binlog记录，从库也全都收，但sql thread读取relay log时，只读取特定的库或表的事件进行重放，<strong>缺点是：会造成网络io和磁盘存储的浪费</strong></p>
+<ul>
+<li>
+<pre><code>--replicate-do-db=db_name
+--replicate-ignore-db=db_name
+--replicate-do-table=db_name.tbl_name
+--replicate-ignore-table=db_name.tbl_name
+--replicate-wild-do-table=db_name.tbl_name
+--replicate-wild-ignore-table=db_name.tbl_name
+#从节点配置时，相关配置参数
+</code></pre></li>
+</ul>
+</li>
+</ul>
+<p><strong>配置方式</strong></p>
+<p>1、配置主从</p>
+<p>​	略</p>
+<p>2、采用主库忽略特定库的binlog方式</p>
+<pre><code>#主节点创建3个库
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| mysql              |
+| performance_schema |
+| test1              |
+| test2              |
+| test23             |
++--------------------+
+
+#修改主节点配置文件，主库不记录test1库的binlog，并重启
+[mysqld]
+...
+binlog-ignore-db=test1
+
+
+#主节点删除库
+MariaDB [(none)]&gt; drop database test23;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; drop database test2;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; drop database test1;
+Query OK, 0 rows affected (0.00 sec)
+
+#从节点对应的test1库没有删除，因为主节点设置了忽略
+MariaDB [(none)]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| performance_schema |
+| test1              |
++--------------------+
+</code></pre><p>3、采用从库忽略的方式</p>
+<pre><code>#主库选择db1库，并创建2个表
+MariaDB [db1]&gt; create table t1(id int);
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [db1]&gt; create table t2(id int);
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [db1]&gt; show tables;
++---------------+
+| Tables_in_db1 |
++---------------+
+| t1            |
+| t2            |
++---------------+
+
+# 修改从节点的配置文件，配置忽略db1.t1的数据变化
+[root@host3 ~]# cat /etc/my.cnf
+[mysqld]
+server_id=3
+log-bin
+read-only=on
+relay-log=on
+replicate-ignore-table=db1.t1
+[root@host3 ~]# systemctl restart mariadb
+
+# 主库做数据修改，检查从库的数据变化
+#创建了2个表，向表中插入数据后，
+MariaDB [db1]&gt; create table t1(id int);
+Query OK, 0 rows affected (0.01 sec)
+MariaDB [db1]&gt; create table t2(id int);
+Query OK, 0 rows affected (0.01 sec)
+
+MariaDB [db1]&gt; insert into t1 values(2);
+Query OK, 1 row affected (0.00 sec)
+
+MariaDB [db1]&gt; insert into t2 values(2);
+Query OK, 1 row affected (0.00 sec)
+
+#从库上，t1没有随之变化，因为设置了忽略
+MariaDB [db1]&gt; select * from t1;
+Empty set (0.00 sec)
+
+MariaDB [db1]&gt; select * from t2;
++------+
+| id   |
++------+
+|    2 |
++------+
+1 row in set 
+</code></pre><h3 id="复制加密"><a href="#复制加密" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:复制加密" class="headings">复制加密</a></h3>
+<p>​	默认情况下，复制的通信连接是明文的，具有安全隐患，因为可以采用ssl证书加密通信的方式来加强安全性；</p>
+<p><a href="https://dev.mysql.com/doc/refman/5.7/en/replication-solutions-encrypted-connections.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/5.7/en/replication-solutions-encrypted-connections.html</a></p>
+<p><a href="https://mariadb.com/kb/en/replication-with-secure-connections/" target="_blank" rel="noopener">https://mariadb.com/kb/en/replication-with-secure-connections/</a></p>
+<p><strong>配置实现：</strong></p>
+<ol>
+<li>主服务器开启ssl认证，配置ca和自己的证书和自己的私钥路径；</li>
+<li>创建的replication salve复制账户要求使用ssl连接</li>
+<li>从服务器使用change master to时指明ssl选项，包括自己的从服务器的一套证书，私钥</li>
+</ol>
+<p>生成证书和私钥：</p>
+<pre><code>#主节点上，创建存储证书，私钥的目录
+[root@host2 ~]# mkdir /etc/my.cnf.d/ssl
+[root@host2 ~]# cd /etc/my.cnf.d/ssl/
+[root@host2 ssl]# ll
+total 0
+
+#生成ca的私钥
+[root@host2 ssl]# (umask 066;openssl genrsa 2048 &gt; cakey.pem)
+Generating RSA private key, 2048 bit long modulus
+......+++
+........................................................+++
+e is 65537 (0x10001)
+[root@host2 ssl]# ll
+total 4
+-rw------- 1 root root 1679 Oct  6 13:44 cakey.pem
+
+#生成ca的自签名证书
+[root@host2 ssl]# openssl req -new -x509 -key cakey.pem -out cacert.pem -days 3650
+
+#分别对主和从节点生成私钥和证书请求文件
+[root@host2 ssl]# openssl req -newkey rsa:2048 -days 365 -nodes -keyout master.key &gt; master.csr
+[root@host2 ssl]# openssl req -newkey rsa:2048 -days 365 -nodes -keyout slave.key &gt; slave.csr
+
+#对主和从节点的2个证书请求文件进行签发
+[root@host2 ssl]#  openssl x509 -req -in master.csr  -CA cacert.pem -CAkey cakey.pem -set_serial 01 &gt; master.crt
+Signature ok
+
+Getting CA Private Key
+[root@host2 ssl]# openssl x509 -req -in slave.csr  -CA cacert.pem -CAkey cakey.pem -set_serial 02 &gt; slave.crt
+Signature ok
+
+#将从节点的私钥，证书，ca证书发到从节点上
+[root@host2 ssl]# scp slave.key slave.crt cacert.pem 192.168.80.102:/etc/my.cnf.d/ssl/
+
+[root@host3 ~]# mkdir /etc/my.cnf.d/ssl
+[root@host3 ~]# cd !$
+cd /etc/my.cnf.d/ssl
+[root@host3 ssl]# ll
+total 0
+[root@host3 ssl]# ll
+total 12
+-rw-r--r-- 1 root root 1334 Oct  6 13:55 cacert.pem
+-rw-r--r-- 1 root root 1200 Oct  6 13:55 slave.crt
+-rw-r--r-- 1 root root 1704 Oct  6 13:55 slave.key
+[root@host3 ssl]# 
+</code></pre><p>主节点：</p>
+<pre><code>#配置证书路径，并创建带有ssl选项的复制账户，require ssl
+[root@host2 ssl]# vim /etc/my.cnf
+[mysqld]
+...
+ssl
+ssl-ca=/etc/my.cnf.d/ssl/cacert.pem
+ssl-cert=/etc/my.cnf.d/ssl/master.crt
+ssl-key=/etc/my.cnf.d/ssl/master.key
+[root@host2 ssl]# systemctl restart mariadb
+
+MariaDB [(none)]&gt; grant replication slave on *.* to repl@'192.168.80.%' identified by 'wang' require ssl;
+Query OK, 0 rows affected (0.00 sec)
+</code></pre><p>从节点：</p>
+<pre><code>#从库修改配置文件，添加ssl选项，和从库相关的证书文件路径
+[root@host3 ssl]# vim /etc/my.cnf
+[mysqld]
+ssl
+ssl-ca=/etc/my.cnf.d/ssl/cacert.pem
+ssl-cert=/etc/my.cnf.d/ssl/slave.crt
+ssl-key=/etc/my.cnf.d/ssl/slave.key
+[root@host3 ssl]# systemctl restart mariadb
+
+#连入mysql，清空原有的主从配置
+MariaDB [(none)]&gt; stop slave;
+Query OK, 0 rows affected (0.01 sec)
+
+MariaDB [(none)]&gt; reset slave all;
+Query OK, 0 rows affected (0.01 sec)
+
+MariaDB [(none)]&gt; show slave status\G;
+Empty set (0.00 sec)
+
+#change master to添加ssl选项，并指明证书的路径
+MariaDB [(none)]&gt; CHANGE MASTER TO
+    -&gt;   MASTER_HOST='192.168.80.101',
+    -&gt;   MASTER_USER='repl',
+    -&gt;   MASTER_PASSWORD='wang',
+    -&gt;   MASTER_PORT=3306,
+    -&gt;   MASTER_LOG_FILE='on.000006', 
+    -&gt;   MASTER_LOG_POS=406,
+    -&gt;   MASTER_SSL=1,
+    -&gt;   MASTER_SSL_CA='/etc/my.cnf.d/ssl/cacert.pem',
+    -&gt;   MASTER_SSL_CERT='/etc/my.cnf.d/ssl/slave.crt',
+    -&gt;   MASTER_SSL_KEY='/etc/my.cnf.d/ssl/slave.key',
+    -&gt;   MASTER_CONNECT_RETRY=10;
+Query OK, 0 rows affected (0.00 sec)
+
+#启动线程，查看状态，
+MariaDB [(none)]&gt; start slave;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]&gt; show slave status\G;
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.80.101
+                  Master_User: repl
+                  Master_Port: 3306
+                Connect_Retry: 10
+              Master_Log_File: on.000006
+          Read_Master_Log_Pos: 406
+               Relay_Log_File: on.000002
+                Relay_Log_Pos: 522
+        Relay_Master_Log_File: on.000006
+             Slave_IO_Running: Yes
+            Slave_SQL_Running: Yes
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: 
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: db1.t1
+                Until_Log_Pos: 0
+#指明了ssl选项在用，以及证书路径                
+           Master_SSL_Allowed: Yes
+           Master_SSL_CA_File: /etc/my.cnf.d/ssl/cacert.pem
+           Master_SSL_CA_Path: 
+              Master_SSL_Cert: /etc/my.cnf.d/ssl/slave.crt
+            Master_SSL_Cipher: 
+               Master_SSL_Key: /etc/my.cnf.d/ssl/slave.key
+        Seconds_Behind_Master: 0
+Master_SSL_Verify_Server_Cert: No
+                Last_IO_Errno: 0
+                Last_IO_Error: 
+               Last_SQL_Errno: 0
+               Last_SQL_Error: 
+  Replicate_Ignore_Server_Ids: 
+             Master_Server_Id: 2
+</code></pre><h3 id="复制的监控与维护"><a href="#复制的监控与维护" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:复制的监控与维护" class="headings">复制的监控与维护</a></h3>
+<p>清理日志：</p>
+<pre><code>purge {binary|master} logs {to 'log_name' | before datetime_expr}
+reset master
+reset slave all
+</code></pre><p>复制监控：</p>
+<pre><code>show master status
+show binary logs
+show binlog events
+show slave status
+show processlist
+
+#检查从库是否落后于主库，在show slave stauts中
+Seconds_Behind_Master: NULL
+
+#主从数据一致性检查工具
+percona-tools
+https://www.percona.com/software/database-tools/percona-toolkit
+
+#数据不一致修复方法
+删除从库，从头重新复制
+</code></pre>
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/mysql%E5%A4%8D%E5%88%B6%E9%9B%86%E7%BE%A4/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/mysql复制集群/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2021-03-09 12:31:03 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2021-03-09</text><text x="915" y="140" textLength="650" transform="scale(.1)">2021-03-09</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E5%8E%8B%E6%B5%8B%E4%B8%8E%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B/" class="related-link">mysql压测与生产环境配置示例</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" class="related-link">mysql介绍与安装</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/" class="related-link">mysql备份还原</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86/" class="related-link">mysql日志管理</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/mysql%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%89%E9%A1%B9%E4%B8%8E%E5%8F%98%E9%87%8F/" class="related-link">mysql服务器选项与变量</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/mysql/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>mysql</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/mysql-replication/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>mysql-replication</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/mysql%E5%A4%87%E4%BB%BD%E8%BF%98%E5%8E%9F/" rel="prev">&lt; mysql备份还原</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/mysql%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86/" rel="next">mysql日志管理 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

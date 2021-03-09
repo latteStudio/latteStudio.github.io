@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>ansible之playbook与roles | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="ansible之playbook介绍与roles，yaml简介..." />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/ansible%E4%B9%8Bplaybook%E4%B8%8Eroles/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-10-25T15:54:32+00:00",
+        "dateModified": "2021-03-09T12:29:15+08:00",
+        "url": "https://latteStudio.github.io/posts/ansible%E4%B9%8Bplaybook%E4%B8%8Eroles/",
+        "headline": "ansible之playbook与roles",
+        "description": "ansible之playbook介绍与roles，yaml简介...",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  11504 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20201008173331897.png","https://gitee.com/boogie96/img/raw/master/img/image-20201008174605585.png","https://gitee.com/boogie96/img/raw/master/img/image-20201010181654569.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="ansible之playbook与roles" />
+<meta property="og:description" content="ansible之playbook介绍与roles，yaml简介..." />
+<meta property="og:url" content="https://latteStudio.github.io/posts/ansible%E4%B9%8Bplaybook%E4%B8%8Eroles/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20201008173331897.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-10-25T15:54:32&#43;00:00" />
+    <meta property="article:modified_time" content="2021-03-09T12:29:15&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">ansible之playbook与roles</h1>
+
+            
+
+            
+                <div class="post-description p-summary">ansible之playbook介绍与roles，yaml简介...</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-10-25T15:54:32&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.10.25</time>
+    
+    
+        
+        <time datetime="2021-03-09T12:29:15&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2021.3.9</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/" class="category-link p-category">自动化部署</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;11504</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;23&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:playbook概念" href="#playbook概念">playbook概念</a></li>
+    <li><a id="contents:playbook执行逻辑" href="#playbook执行逻辑">playbook执行逻辑</a></li>
+    <li><a id="contents:yaml概念" href="#yaml概念">yaml概念</a></li>
+    <li><a id="contents:yaml语法" href="#yaml语法">yaml语法</a></li>
+    <li><a id="contents:yaml的playbook示例" href="#yaml的playbook示例">yaml的playbook示例</a></li>
+    <li><a id="contents:常见数据交换格式" href="#常见数据交换格式">常见数据交换格式</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:核心元素" href="#核心元素">核心元素</a>
+      <ol>
+        <li><a id="contents:hosts" href="#hosts">hosts</a></li>
+        <li><a id="contents:remote_user" href="#remote_user">remote_user</a></li>
+        <li><a id="contents:tasks列表和actions" href="#tasks列表和actions">tasks列表和actions</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:playbook层级" href="#playbook层级">playbook层级</a>
+      <ol>
+        <li><a id="contents:hosts-1" href="#hosts-1">hosts</a></li>
+        <li><a id="contents:remote_user-1" href="#remote_user-1">remote_user</a></li>
+        <li><a id="contents:tasks" href="#tasks">tasks</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:运行playbook" href="#运行playbook">运行playbook</a></li>
+    <li><a id="contents:playbook-vs-shellscripts" href="#playbook-vs-shellscripts">playbook vs shellscripts</a></li>
+    <li><a id="contents:playbook示例" href="#playbook示例">playbook示例</a></li>
+    <li><a id="contents:notify与handlers" href="#notify与handlers">notify与handlers</a></li>
+    <li><a id="contents:playbook与tags" href="#playbook与tags">playbook与tags</a></li>
+    <li><a id="contents:playbook传参3种方式" href="#playbook传参3种方式">playbook传参3种方式</a></li>
+    <li><a id="contents:playbook执行过程" href="#playbook执行过程">playbook执行过程！</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:变量分类" href="#变量分类">变量分类</a></li>
+    <li><a id="contents:变量定义注册" href="#变量定义注册">变量定义、注册</a>
+      <ol>
+        <li><a id="contents:使用setup中变量" href="#使用setup中变量">使用setup中变量</a></li>
+        <li><a id="contents:命令行-e传变量值" href="#命令行-e传变量值">命令行-e传变量值</a></li>
+        <li><a id="contents:vars批量定义变量" href="#vars批量定义变量">vars批量定义变量</a></li>
+        <li><a id="contents:主机变量" href="#主机变量">主机变量</a></li>
+        <li><a id="contents:主机组变量" href="#主机组变量">主机组变量</a></li>
+        <li><a id="contents:普通变量" href="#普通变量">普通变量</a></li>
+        <li><a id="contents:公共变量" href="#公共变量">公共变量</a></li>
+        <li><a id="contents:命令行变量" href="#命令行变量">命令行变量</a></li>
+        <li><a id="contents:变量文件" href="#变量文件">变量文件</a></li>
+        <li><a id="contents:定义本地facts" href="#定义本地facts">定义本地facts</a></li>
+        <li><a id="contents:register注册变量" href="#register注册变量">register注册变量</a></li>
+        <li><a id="contents:set_fact注册变量" href="#set_fact注册变量">set_fact注册变量</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:变量引用" href="#变量引用">变量引用</a>
+      <ol>
+        <li><a id="contents:变量过滤" href="#变量过滤">变量过滤</a></li>
+        <li><a id="contents:引用json字典" href="#引用json字典">引用json字典</a></li>
+        <li><a id="contents:引用json数组" href="#引用json数组">引用json数组</a></li>
+        <li><a id="contents:引用facts变量" href="#引用facts变量">引用facts变量</a></li>
+        <li><a id="contents:变量输出" href="#变量输出">变量输出</a></li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:概念" href="#概念">概念</a></li>
+    <li><a id="contents:示例算术运算" href="#示例算术运算">示例算术运算</a></li>
+    <li><a id="contents:示例条件判断" href="#示例条件判断">示例条件判断</a></li>
+    <li><a id="contents:示例迭代with_items" href="#示例迭代with_items">示例迭代with_items</a></li>
+    <li><a id="contents:template的for循环-if判断" href="#template的for循环-if判断">template的for循环 if判断</a></li>
+    <li><a id="contents:示例template-for和if" href="#示例template-for和if">示例template for和if</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:概念-1" href="#概念-1">概念</a></li>
+    <li><a id="contents:roles目录结构" href="#roles目录结构">roles目录结构</a></li>
+    <li><a id="contents:创建role步骤" href="#创建role步骤">创建role步骤</a></li>
+    <li><a id="contents:playbook调用roles" href="#playbook调用roles">playbook调用roles</a></li>
+    <li><a id="contents:完整roles架构示例" href="#完整roles架构示例">完整roles架构示例</a></li>
+    <li><a id="contents:playbook中-tags使用" href="#playbook中-tags使用">playbook中 tags使用</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:tasks各个步骤" href="#tasks各个步骤">tasks各个步骤</a></li>
+    <li><a id="contents:参考yaml" href="#参考yaml">参考yaml</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:执行过程总结" href="#执行过程总结">执行过程总结</a></li>
+    <li><a id="contents:ansible优化速度" href="#ansible优化速度">ansible优化速度</a>
+      <ol>
+        <li><a id="contents:配置开启ssh长连接" href="#配置开启ssh长连接">配置开启ssh长连接</a></li>
+        <li><a id="contents:开启pipline" href="#开启pipline">开启pipline</a></li>
+        <li><a id="contents:修改ansible执行策略" href="#修改ansible执行策略">修改ansible执行策略</a></li>
+        <li><a id="contents:设置facts缓存" href="#设置facts缓存">设置facts缓存</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:查看ansible执行过程示例" href="#查看ansible执行过程示例">查看ansible执行过程示例</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="playbook基础"><a href="#playbook基础" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook基础" class="headings">playbook基础</a></h1>
+<h2 id="playbook概念"><a href="#playbook概念" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook概念" class="headings">playbook概念</a></h2>
+<p>​	playbook是由一个或多个play组成的列表；play的作用：<strong>将预定义的一组主机，装扮成事先通过ansible中的task定义好的角色，task是调用ansible的module，将多个play组织在一个playbook中，让其按照编排的顺序执行</strong></p>
+<p>​	yaml语言编写</p>
+<h2 id="playbook执行逻辑"><a href="#playbook执行逻辑" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook执行逻辑" class="headings">playbook执行逻辑</a></h2>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201008173331897.png" alt="image-20201008173331897"></p>
+<h2 id="yaml概念"><a href="#yaml概念" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:yaml概念" class="headings">yaml概念</a></h2>
+<p>yaml之于json</p>
+<p>类比：markdown之于html，都提高了后者的写的便捷性；</p>
+<p><a href="https://yaml.org/" target="_blank" rel="noopener">https://yaml.org/</a></p>
+<p>​	yaml是一种可读性强，用来表达资料序列的格式，作者clark evans</p>
+<p>​	yaml ain`t markup language</p>
+<p>or</p>
+<p>​	yet another markup language</p>
+<ul>
+<li>可读性好</li>
+<li>和脚本语言结合性好</li>
+<li>有一个一致的信息模型</li>
+<li>易于实现</li>
+<li>可基于流处理</li>
+<li>表达能力强，扩展性好</li>
+</ul>
+<h2 id="yaml语法"><a href="#yaml语法" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:yaml语法" class="headings">yaml语法</a></h2>
+<ul>
+<li>同一个yaml文件，用---区分多个档案</li>
+<li>#为注释</li>
+<li>缩进必须统一！空格和tab不能混用</li>
+<li>缩进级别需一致</li>
+<li>yaml区分大小写</li>
+<li>对应playbook，一个完整代码块至少包含name和task</li>
+<li>一个name只能有一个task</li>
+<li>文件扩展名.yml或.yaml</li>
+</ul>
+<p>yaml文件示例：</p>
+<pre><code>list列表
+
+- apple
+- mango
+- orange
+
+dictionary字典
+
+name:wang
+job:sre leader
+字典的等同写法
+(name:wang,job:sre leader)
+
+
+</code></pre><h2 id="yaml的playbook示例"><a href="#yaml的playbook示例" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:yaml的playbook示例" class="headings">yaml的playbook示例</a></h2>
+<p>​	不仅有tasks还有pre_tasks和post_tasks</p>
+<pre><code>---
+    - hosts: 192.168.100.59,192.168.100.65
+      remote_user: root
+      pre_tasks: 
+        - name: set epel repo for Centos 7
+          yum_repository: 
+            name: epel7
+            description: epel7 on CentOS 7
+            baseurl: http://mirrors.aliyun.com/epel/7/$basearch/
+            gpgcheck: no
+            enabled: True
+
+      tasks: 
+# install nginx and run it
+        - name: install nginx
+          yum: name=nginx state=installed update_cache=yes
+        - name: start nginx
+          service: name=nginx state=started
+
+      post_tasks: 
+        - shell: echo &quot;deploy nginx over&quot;
+          register: ok_var
+        - debug: msg=&quot;{{ ok_var.stdout }}&quot;
+</code></pre><h2 id="常见数据交换格式"><a href="#常见数据交换格式" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:常见数据交换格式" class="headings">常见数据交换格式</a></h2>
+<ul>
+<li>xml</li>
+<li>json</li>
+<li>yaml</li>
+</ul>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201008174605585.png" alt="image-20201008174605585"></p>
+<h1 id="playbook组成"><a href="#playbook组成" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook组成" class="headings">playbook组成</a></h1>
+<h2 id="核心元素"><a href="#核心元素" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:核心元素" class="headings">核心元素</a></h2>
+<ul>
+<li>
+<p>hosts：远程主机列表</p>
+</li>
+<li>
+<p>tasks：任务集</p>
+</li>
+<li>
+<p>variables：内置变量和自定义变量</p>
+</li>
+<li>
+<p>templates：模版</p>
+</li>
+<li>
+<p>handler结合notity：触发条件和对应操作</p>
+</li>
+<li>
+<p>tags：通过标签，用于跳过playbook中某些代码段</p>
+<ul>
+<li>
+<pre><code>ansible-playbook -t tagsname useradd.yml
+</code></pre></li>
+</ul>
+</li>
+</ul>
+<h3 id="hosts"><a href="#hosts" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:hosts" class="headings">hosts</a></h3>
+<p>​	hosts定义了在哪些远程主机上，以某个特定用户身份执行任务，需要在主机清单中实现定义；</p>
+<pre><code>192.168.80.102
+www.b.com
+bbs.b.com
+
+web:db 或
+web:&amp;db 且，取交集
+web:!db 在web组，不在db组的
+
+示例：
+- hosts: websrvs:dbsrvs
+</code></pre><h3 id="remote_user"><a href="#remote_user" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:remote_user" class="headings">remote_user</a></h3>
+<p>​	以远程主机上的哪个用户执行任务，用于host和task中，也可以用来执行sudo后的身份</p>
+<pre><code>- hosts: web
+ remote_user: root #指定全局的remoteuser为 root
+ tasks:
+  - name: test-ping
+    ping: 
+    remote_user: wang #该ping任务用wang用户，且使用sudo，sudo身份为root，且默认为root
+    sudo: yes
+    sudo_user: root
+    
+</code></pre><h3 id="tasks列表和actions"><a href="#tasks列表和actions" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tasks列表和actions" class="headings">tasks列表和actions</a></h3>
+<p>​	play的主体部分为task lists，任务列表中定义的任务，按照次序在各个hosts中顺序执行，在hosts中定义的所有主机上，</p>
+<p>​	task作用在于根据定义的参数、变量，调用并执行相应的模块，<strong>具有幂等性，因此多次执行是安全的</strong></p>
+<p>​	每个task都应该设置合理，明确，见名知意的名字</p>
+<p><strong>写task的2种格式：</strong></p>
+<pre><code>action: module arguments
+modules: arguments （建议）
+#shell和command模块后跟的arguments是命令，而非kv类型的键值对
+</code></pre><p>​	<strong>某个任务执行后状态为changed，可以结合notify通知给handler做进一步处理，</strong></p>
+<p>​	<strong>任务可以通过tags打标签，结合ansible-playbook的 -t参数进行调用或跳过调用</strong></p>
+<pre><code>tasks:
+ - name: disable selinux
+   command: /sbin/setenforce 0
+# 任务名为关闭selinux，
+# 调用command模块，执行的命令为/sbin/setfnforce 0
+</code></pre><p>​	若命令或脚本的退出码不为0，可以采用以下方式忽略错误</p>
+<pre><code>tasks:
+ - name: test-ignore-error
+   shell: /usr/bin/some-command || /bin/true
+   
+或者：
+
+tasks:
+ - name: test-ignore-error-2
+   shell: /usr/bin/some-command
+   ignore_errors: true
+</code></pre><h2 id="playbook层级"><a href="#playbook层级" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook层级" class="headings">playbook层级</a></h2>
+<ul>
+<li>playbook可以包含多个play
+<ul>
+<li>一个play至少包含，一个hosts，一个tasks
+<ul>
+<li>一个tasks包含多个task，每个task基本都是调用的一个个ansible模块</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="hosts-1"><a href="#hosts-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:hosts-1" class="headings">hosts</a></h3>
+<p>​	定义要执行任务的主机，支持通配符，正则匹配，来表示一批相同特征的主机；</p>
+<h3 id="remote_user-1"><a href="#remote_user-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:remote_user-1" class="headings">remote_user</a></h3>
+<p>​	<strong>remote_user是ssh连接到各个节点的用户身份，不一定是执行任务的身份；become相关参数可以切换为别的身份来执行任务，没指定时默认是用remote_user执行任务</strong></p>
+<p>​	如：可以remote_user是ssh连接过去，用nginx的身份启动nginx进程，借助become-user=nginx实现</p>
+<p>​	remote_user的连接认证，可以通过ssh免密认证，指定密钥文件认证，指定密码认证，<strong>密码和密码文件一般可以写在主机清单的变量中，可以命令行传入！</strong></p>
+<h3 id="tasks"><a href="#tasks" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tasks" class="headings">tasks</a></h3>
+<p>​	ps：shell和command模块的不具有幂等性的解决方法，<strong>以初始化mysql数据库为例：</strong></p>
+<pre><code>tasks:
+ - name: init mysql datadir
+   file: path=/data/mysql state=directory owner=mysql group=mysql mode=0755
+   shell: &quot;/usr/local/mysql/bin/mysql_install_db --datadir=/data/mysql --user=mysql creates=/mysql/data/ibdata1&quot;
+
+# 借助了creates参数实现；
+# 第一次/mysql/data/ibdata1不存在，会支持初始化数据库目录的动作；之后再次执行，由于ibdata1文件已经存在，ansible不会再次执行该步动作；
+
+# 介绍如下，shell和command参数，都可以通过该2个参数控制，实现类似的【幂等性】
+[root@host2 ~]# ansible-doc -s shell
+- name: Execute shell commands on targets
+  shell:
+      creates:               # A filename, when it already exists, this step will *not* be
+                               run.
+
+      removes:               # A filename, when it does not exist, this step will *not* be
+                               run.
+
+</code></pre><h2 id="运行playbook"><a href="#运行playbook" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:运行playbook" class="headings">运行playbook</a></h2>
+<pre><code>ansible-playbook filename.yaml ... [options]
+
+常见options
+--check -C
+假装执行，列出如果执行会发生的变化，并不真正的在主机上执行
+--list-hosts
+列出要执行任务的主机
+--list-tags
+列出tag
+--list-tasks
+列出task
+--limit 主机列表
+只对主机列表里的主机执行
+-v -vv -vvv
+显示不同等级的执行过程信息
+</code></pre><h2 id="playbook-vs-shellscripts"><a href="#playbook-vs-shellscripts" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook-vs-shellscripts" class="headings">playbook vs shellscripts</a></h2>
+<p>shell脚本</p>
+<pre><code>#!/bin/bash
+
+yum install -y --quiet httpd
+
+cp /tmp/httpd.conf /etc/httpd/conf/httpd.conf
+
+cp /tmp/vhosts.conf /etc/httpd/conf.d/
+
+service httpd start 
+chkconfig httpd on
+</code></pre><p>playbook</p>
+<pre><code>---
+- hosts: all
+  remote_user: root
+  tasks:
+   - name: &quot;安装httpd&quot;
+     yum: name=httpd
+   - name: &quot;复制配置文件&quot;
+     copy: src=/tmp/httpd.conf dest=/etc/httpd/conf/
+    - name: &quot;复制虚拟主机配置文件&quot;
+      copy: src=/tmp/vhosts/conf dest=/etc/httpd/conf.d/
+     - name: &quot;启动，设置开启启动&quot;
+       service: name=httpd state=started enabled=yes
+</code></pre><h2 id="playbook示例"><a href="#playbook示例" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook示例" class="headings">playbook示例</a></h2>
+<p>1、创建用户</p>
+<pre><code>[root@host2 ansible-playbooks]# cat sysuser.yaml 
+- hosts: all
+  remote_user: root
+  tasks:
+   - name: create mysql user
+     user: name=mysql system=yes uid=36
+   - name: create a group
+     group: name=httpd system=yes
+# 创建yaml文件如上：
+
+# 先检查执行结果
+[root@host2 ansible-playbooks]# ansible-playbook -C sysuser.yaml 
+
+PLAY [all] *********************************************************************************
+
+TASK [Gathering Facts] *********************************************************************
+ok: [192.168.80.102]
+ok: [192.168.80.103]
+
+TASK [create mysql user] *******************************************************************
+changed: [192.168.80.103]
+changed: [192.168.80.102]
+
+TASK [create a group] **********************************************************************
+changed: [192.168.80.103]
+changed: [192.168.80.102]
+
+PLAY RECAP *********************************************************************************
+192.168.80.102             : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+192.168.80.103             : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+# 列出所有任务
+[root@host2 ansible-playbooks]# ansible-playbook --list-tasks sysuser.yaml 
+
+playbook: sysuser.yaml
+
+  play #1 (all): all	TAGS: []
+    tasks:
+      create mysql user	TAGS: []
+      create a group	TAGS: []
+ 
+# 列出所有主机
+[root@host2 ansible-playbooks]# ansible-playbook --list-hosts sysuser.yaml 
+
+playbook: sysuser.yaml
+
+  play #1 (all): all	TAGS: []
+    pattern: [u'all']
+    hosts (2):
+      192.168.80.102
+      192.168.80.103
+
+# 最终执行
+[root@host2 ansible-playbooks]# ansible-playbook sysuser.yaml
+</code></pre><p>2、安装httpd</p>
+<pre><code>[root@host2 ansible-playbooks]# cat httpd.yaml 
+- hosts: all
+  remote_user: root
+  tasks:
+   - name: install httpd
+     yum: name=httpd state=present
+   - name: copy conf file
+     copy: src=/tmp/httpd.conf dest=/etc/httpd/conf/
+   - name: start service
+     service: name=httpd state=started enabled=yes
+
+1，确定要执行的主机，为all
+2，默认task，先收集信息，确认主机都可达
+3，后续3个task，为用户定义任务，
+4，最终，每个host的执行结果，4个task都ok，2个changed，0个失败，0个不可达，0个跳过，忽略等等
+# 最终执行
+[root@host2 ansible-playbooks]# ansible-playbook httpd.yaml 
+
+PLAY [all] *********************************************************************************
+
+TASK [Gathering Facts] *********************************************************************
+ok: [192.168.80.103]
+ok: [192.168.80.102]
+
+TASK [install httpd] ***********************************************************************
+changed: [192.168.80.102]
+changed: [192.168.80.103]
+
+TASK [copy conf file] **********************************************************************
+ok: [192.168.80.103]
+ok: [192.168.80.102]
+
+TASK [start service] ***********************************************************************
+changed: [192.168.80.103]
+changed: [192.168.80.102]
+
+PLAY RECAP *********************************************************************************
+192.168.80.102             : ok=4    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+192.168.80.103             : ok=4    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+</code></pre><h2 id="notify与handlers"><a href="#notify与handlers" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:notify与handlers" class="headings">notify与handlers</a></h2>
+<p>​	根据幂等性，执行某task后，状态可能会changed或其他，当某个task执行后返回状态为changed，**即该步任务对目标主机造成了某些改变；**changed这个状态可以被notify捕捉，从而触发对应的handler动作；</p>
+<p>​	举例说明：</p>
+<ol>
+<li>在template和copy2个task后，紧跟着定义的一个notify，<strong>意思是：这2个task执行后为changed的话，该notify会被触发，后执行其中的handlers进行后续操作</strong></li>
+<li>changed状态发生情况：第一次执行；或，要复制的2个文件hash值发送变化时，为changed，此时notify会触发；</li>
+<li>notify的执行为所有task执行完毕之后，<strong>才会根据自己的task状态决定是不是触发handlers，且有多次只执行一次</strong></li>
+<li>例如：2个文件都改变，template和copy的执行状态都为changed，2个notify都会被触发，但是其中相同的handler：restart-nginx只会被执行一次；</li>
+</ol>
+<pre><code>tasks:
+ - name: copy template conf file to remote_hosts
+   template: src=/tmp/nginx.conf.j2 dest=/etc/nginx/nginx.conf
+   notify:
+    - restart-nginx
+    - test-web
+   copy=: src=/tmp/index.html dest=/usr/share/nginx/html/index.html
+   notify: 
+    - restart-nginx
+
+handlers:
+ - name: restart-nginx
+   service: name=nginx stated=restarted
+  - name: test-web
+    shell: curl -I http:IP/index.html |grep 200 || /bin/false
+</code></pre><p>​	给某预期的情况定义notify，该notify发生时，触发handlers定义的操作，<strong>handler本质也还是tasks列表</strong></p>
+<pre><code>[root@host2 ansible-playbooks]# vim test-handlers.yaml 
+[root@host2 ansible-playbooks]# cat !$
+cat test-handlers.yaml
+- hosts: 192.168.80.102
+  remote_user: root
+  tasks:
+   - name: add group nginx
+     group: name=nginx state=present
+   - name: add user nginx
+     user: name=nginx state=present group=nginx
+   - name: install nginx
+     yum: name=nginx state=present
+   - name: config
+     copy: src=/tmp/nginx.txt dest=/etc/nginx/nginx.conf
+     notify:
+      - restart-nginx
+      - check-nginx-process
+  handlers:
+   - name: restart-nginx
+     service: name=nginx state=restarted enabled=yes
+   - name: check-nginx-process
+     shell: killall -0 nginx &gt; /tmp/nginx.log
+
+handlers定义和tasks同等级，本质也是一个一个的task
+notify定义在某个task的尾部，通过引用handlers名字调用handlers
+</code></pre><h2 id="playbook与tags"><a href="#playbook与tags" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook与tags" class="headings">playbook与tags</a></h2>
+<pre><code>[root@host2 ansible-playbooks]# cat test-tag.yaml 
+- hosts: 192.168.80.103
+  remote_user: root
+  tasks:
+   - name: install nginx
+     yum: name=nginx state=present
+   - name: copy conf file
+     copy: src=/tmp/nginx.txt dest=/root
+     tags: conf
+   - name: start nginx
+     service: name=httpd state=started enabled=yes
+     tags: service
+# 给不同的task打上不同的tag，执行时，可以利用tag挑选出同类的任务执行
+
+[root@host2 ansible-playbooks]# ansible-playbook -t conf -C  test-tag.yaml 
+
+PLAY [192.168.80.103] **********************************************************************
+
+TASK [Gathering Facts] *********************************************************************
+ok: [192.168.80.103]
+
+TASK [copy conf file] **********************************************************************
+changed: [192.168.80.103]
+
+PLAY RECAP *********************************************************************************
+192.168.80.103             : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0  
+</code></pre><h2 id="playbook传参3种方式"><a href="#playbook传参3种方式" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook传参3种方式" class="headings">playbook传参3种方式</a></h2>
+<pre><code>---
+
+- hosts: test
+  tasks:
+   - yum: name=httpd state=present
+   - yum: 
+      name: httpd
+      state: installed
+    - yum:
+      args:
+       name: httpd
+       state: installed
+</code></pre><h2 id="playbook执行过程"><a href="#playbook执行过程" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook执行过程" class="headings">playbook执行过程！</a></h2>
+<ol>
+<li>先收集各个节点的信息，gather facts</li>
+<li>执行一个个play</li>
+<li>执行play中定义的一个个task</li>
+<li>根据幂等性，不需要任务的task会不执行</li>
+<li>最后有play recap，整体执行信息汇总输出</li>
+<li><strong>默认是同步阻塞，</strong></li>
+</ol>
+<h1 id="playbook变量"><a href="#playbook变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook变量" class="headings">playbook变量</a></h1>
+<h2 id="变量分类"><a href="#变量分类" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:变量分类" class="headings">变量分类</a></h2>
+<p>​	大致分为七类：</p>
+<ol>
+<li>模块执行结果的输出，注册为变量</li>
+<li>在本地，直接定义字典类型的变量：/etc/ansible/facts.d/*.fact</li>
+<li>role中专门定义变量的文件var</li>
+<li>命令行传递变量</li>
+<li>借助with_items迭代，将多个task的结果赋值给一个变量</li>
+<li>inventory主机清单中，定义的主机变量、主机组变量，</li>
+<li>内置变量</li>
+</ol>
+<h2 id="变量定义注册"><a href="#变量定义注册" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:变量定义注册" class="headings">变量定义、注册</a></h2>
+<p><strong>命名</strong></p>
+<p>​	字母、数字、下划线组成，<strong>必须</strong>字母开头；</p>
+<p><strong>格式</strong></p>
+<p>​	k=v</p>
+<p><strong>调用方式</strong></p>
+<p>​	通过{{ var_name }} 调用变量，**注意前后空格，**有时需要&quot;{{ var_name }}&quot;才生效</p>
+<p>​	ansible-playbook test.yaml -e &quot;host=www user=wang&quot;</p>
+<p><strong>1、变量来源</strong></p>
+<ol>
+<li>
+<p>ansible setup facts 可以调用远程主机的所有变量</p>
+</li>
+<li>
+<p>在/etc/ansible/hosts定义</p>
+<ol>
+<li>公共变量：针对主机组所有主机生效</li>
+<li>普通变量：对某主机组中主机单独定义</li>
+</ol>
+</li>
+<li>
+<p>通过命令行指定变量，优先级最高</p>
+<ol>
+<li>ansible-playbook -e var=value</li>
+</ol>
+</li>
+<li>
+<p>playbook中定义</p>
+<ol>
+<li>
+<pre><code>vars:
+ - var1: v1
+ - var2: v2
+</code></pre></li>
+</ol>
+</li>
+<li>
+<p>在独立的变量yaml文件中定义</p>
+</li>
+<li>
+<p>在role中定义</p>
+</li>
+</ol>
+<h3 id="使用setup中变量"><a href="#使用setup中变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:使用setup中变量" class="headings">使用setup中变量</a></h3>
+<pre><code># 利用setup模块，可以收集，远程主机各种信息，如：地址，系统版本，内核版本，硬件架构等；
+# 在执行playbook的默认第一步行为就是：gather facts，收集信息
+# 这些信息，在后续的playbook，jinja2模块中，都可以直接引用；
+
+[root@host2 ~]# ansible 192.168.80.102 -m setup |less
+192.168.80.102 | SUCCESS =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_all_ipv4_addresses&quot;: [
+            &quot;192.168.80.102&quot;, 
+            &quot;192.168.10.102&quot;
+        ], 
+        &quot;ansible_all_ipv6_addresses&quot;: [
+            &quot;fe80::eb02:a6b5:be84:952&quot;, 
+            &quot;fe80::7822:f591:feb0:47ea&quot;
+        ], 
+        &quot;ansible_apparmor&quot;: {
+            &quot;status&quot;: &quot;disabled&quot;
+        }, 
+        &quot;ansible_architecture&quot;: &quot;x86_64&quot;, 
+        &quot;ansible_bios_date&quot;: &quot;07/29/2019&quot;, 
+        &quot;ansible_bios_version&quot;: &quot;6.00&quot;, 
+        &quot;ansible_cmdline&quot;: {
+            &quot;BOOT_IMAGE&quot;: &quot;/vmlinuz-3.10.0-862.el7.x86_64&quot;, 
+            &quot;biosdevname&quot;: &quot;0&quot;, 
+            &quot;net.ifnames&quot;: &quot;0&quot;, 
+            &quot;quiet&quot;: true, 
+            &quot;rhgb&quot;: true, 
+            &quot;ro&quot;: true, 
+            &quot;root&quot;: &quot;UUID=046ebf1d-861c-42bb-a48f-9641dfc9afec&quot;
+        }, 
+        
+# 结合filter参数，可以过滤需要的变量
+[root@host2 ~]# ansible 192.168.80.102 -m setup -a &quot;filter=*arch*&quot;
+192.168.80.102 | SUCCESS =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_architecture&quot;: &quot;x86_64&quot;, 
+        &quot;ansible_userspace_architecture&quot;: &quot;x86_64&quot;, 
+        &quot;discovered_interpreter_python&quot;: &quot;/usr/bin/python&quot;
+    }, 
+    &quot;changed&quot;: false
+}
+[root@host2 ~]# ansible 192.168.80.102 -m setup -a &quot;filter=*bios*&quot;
+192.168.80.102 | SUCCESS =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_bios_date&quot;: &quot;07/29/2019&quot;, 
+        &quot;ansible_bios_version&quot;: &quot;6.00&quot;, 
+        &quot;discovered_interpreter_python&quot;: &quot;/usr/bin/python&quot;
+    }, 
+    &quot;changed&quot;: false
+}
+</code></pre><p>​	使用fqdn变量</p>
+<pre><code>[root@host2 vardir]# cat setup.yaml 
+- hosts: all
+  remote_user: root
+  tasks:
+   - name: create log file
+     file: name=/var/log/{{ ansible_fqdn }} state=touch
+
+# 通过调用setup中ansibl_fqdn变量，获取每个主机的主机名，并创建文件
+
+[root@host2 vardir]# ansible-playbook setup.yaml 
+
+[root@host3 ~]# ll /var/log/host3.b.com 
+-rw-r--r-- 1 root root 0 Oct  9 16:45 /var/log/host3.b.com
+[root@host4 ~]# ll /var/log/host4.b.com 
+-rw-r--r-- 1 root root 0 Oct  9 16:45 /var/log/host4.b.com
+</code></pre><h3 id="命令行-e传变量值"><a href="#命令行-e传变量值" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:命令行-e传变量值" class="headings">命令行-e传变量值</a></h3>
+<p>yaml中定义变量名，命令行中传值</p>
+<pre><code>[root@host2 vardir]# cat var-pkname.yaml 
+- hosts: all
+  remote_user: root
+  tasks:
+   - name: install pk
+     yum: name={{ pkname }} state=present
+
+[root@host2 vardir]# ansible-playbook  -e pkname=libaio var-pkname.yaml 
+
+</code></pre><h3 id="vars批量定义变量"><a href="#vars批量定义变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:vars批量定义变量" class="headings">vars批量定义变量</a></h3>
+<p>在playbook文件中，vars定义一批变量</p>
+<pre><code>[root@host2 vardir]# cat vars.yaml 
+- hosts: all
+  remote_user: root
+  vars:
+   - username: user1
+   - groupname: group1
+  tasks:
+   - name: create-u
+     user: name={{ username }} state=present
+   - name: create-g
+     group: name={{ groupname }} state=present
+
+</code></pre><h3 id="主机变量"><a href="#主机变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:主机变量" class="headings">主机变量</a></h3>
+<p>​	在inventory主机清单中，定义主机时，给主机添加的变量</p>
+<pre><code>语法格式；
+[websrvs] 
+www1.magedu.com http_port=80 maxRequestsPerChild=808
+www2.magedu.com http_port=8080 maxRequestsPerChild=909 
+
+示例：
+[root@host2 vardir]# vim /etc/ansible/hosts
+[test]
+192.168.80.102 http_port=80
+192.168.80.103 http_port=8080
+
+[root@host2 vardir]# cat var.yaml 
+---
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: test1
+     debug: msg=&quot;var is {{ http_port }}&quot;
+
+
+[root@host2 vardir]# ansible-playbook var.yaml 
+
+PLAY [test] **********************************************************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************************
+ok: [192.168.80.103]
+ok: [192.168.80.102]
+
+TASK [test1] *********************************************************************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;msg&quot;: &quot;var is 80&quot;
+}
+ok: [192.168.80.103] =&gt; {
+    &quot;msg&quot;: &quot;var is 8080&quot;
+}
+
+</code></pre><h3 id="主机组变量"><a href="#主机组变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:主机组变量" class="headings">主机组变量</a></h3>
+<pre><code>语法格式：
+[websrvs]
+www1.magedu.com
+www2.magedu.com 
+ 
+[websrvs:vars] 
+ntp_server=ntp.magedu.com 
+nfs_server=nfs.magedu.com 
+
+示例；
+#定义的var变量，该test组内主机，都可以引用，为组内共享变量
+[root@host2 vardir]# vim /etc/ansible/hosts 
+[test]
+192.168.80.102 http_port=80
+192.168.80.103 http_port=8080
+
+[test:vars]
+var=hello-test
+
+[root@host2 vardir]# cat var.yaml 
+---
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: test1
+     debug: msg=&quot;var is {{ http_port }}{{ var }}&quot;
+
+
+[root@host2 vardir]# ansible-playbook var.yaml 
+
+PLAY [test] **********************************************************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************************
+ok: [192.168.80.103]
+ok: [192.168.80.102]
+
+TASK [test1] *********************************************************************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;msg&quot;: &quot;var is 80hello-test&quot;
+}
+ok: [192.168.80.103] =&gt; {
+    &quot;msg&quot;: &quot;var is 8080hello-test&quot;
+}
+
+</code></pre><h3 id="普通变量"><a href="#普通变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:普通变量" class="headings">普通变量</a></h3>
+<pre><code>语法格式：
+[websrvs]
+192.168.99.101 http_port=8080 hname=www1 
+192.168.99.102 http_port=80    hname=www2 
+
+示例：
+定义的hname为每个主机独有的变量
+[root@host2 vardir]# vim /etc/ansible/hosts 
+[test]
+192.168.80.102 http_port=80 hname=www1
+192.168.80.103 http_port=8080 hname=www2
+
+[root@host2 vardir]# cat var.yaml 
+---
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: test1
+     debug: msg=&quot;var is {{ http_port }}{{ var }}-{{ hname }}&quot;
+
+
+[root@host2 vardir]# ansible-playbook var.yaml 
+
+PLAY [test] **********************************************************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************************
+ok: [192.168.80.102]
+ok: [192.168.80.103]
+
+TASK [test1] *********************************************************************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;msg&quot;: &quot;var is 80hello-test-www1&quot;
+}
+ok: [192.168.80.103] =&gt; {
+    &quot;msg&quot;: &quot;var is 8080hello-test-www2&quot;
+}
+</code></pre><h3 id="公共变量"><a href="#公共变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:公共变量" class="headings">公共变量</a></h3>
+<p>​	同，组变量</p>
+<pre><code>[websvrs:vars] 
+http_port=808
+mark=“_” 
+
+[websrvs]
+192.168.99.101 http_port=8080 hname=www1
+192.168.99.102 http_port=80 hname=www2 
+
+ansible  websvrs  –m hostname –a ‘name={{ hname }}{{ mark }}{{ http_port }}’ 
+</code></pre><h3 id="命令行变量"><a href="#命令行变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:命令行变量" class="headings">命令行变量</a></h3>
+<pre><code>-e选项，传入变量，采用hostname模块修改主机名，因为变量一致，所以修改后主机名一致，一般还需要引入每个主机自己的独有变量，如可以在定义主机清单的时候定义
+[root@host2 vardir]# ansible test -e role=www -m hostname -a 'name={{ role }}.host.com'
+192.168.80.103 | CHANGED =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_domain&quot;: &quot;host.com&quot;, 
+        &quot;ansible_fqdn&quot;: &quot;www.host.com&quot;, 
+        &quot;ansible_hostname&quot;: &quot;www&quot;, 
+        &quot;ansible_nodename&quot;: &quot;www.host.com&quot;, 
+        &quot;discovered_interpreter_python&quot;: &quot;/usr/bin/python&quot;
+    }, 
+    &quot;changed&quot;: true, 
+    &quot;name&quot;: &quot;www.host.com&quot;
+}
+192.168.80.102 | CHANGED =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_domain&quot;: &quot;host.com&quot;, 
+        &quot;ansible_fqdn&quot;: &quot;www.host.com&quot;, 
+        &quot;ansible_hostname&quot;: &quot;www&quot;, 
+        &quot;ansible_nodename&quot;: &quot;www.host.com&quot;, 
+        &quot;discovered_interpreter_python&quot;: &quot;/usr/bin/python&quot;
+    }, 
+    &quot;changed&quot;: true, 
+    &quot;name&quot;: &quot;www.host.com&quot;
+}
+
+ansible test -e role=www -m hostname -a 'name={{ role }}.{{ host }}.com'
+</code></pre><h3 id="变量文件"><a href="#变量文件" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:变量文件" class="headings">变量文件</a></h3>
+<pre><code># 以yaml或json格式的文件，定义变量
+ [root@host2 vardir]# cat vars.yaml 
+---
+var1: httpd
+var2: nginx
+
+# 在playbook中，用vars_files引用文件路径，然后就可以按需引用其中的变量，
+# 文件路径，可以绝对，可以相对
+[root@host2 vardir]# cat vars-use.yaml 
+- hosts: all
+  remote_user: root
+  vars_files:
+   - vars.yaml
+  tasks:
+   - name: create httpd log
+     file: name=/root/{{ var1 }}.log state=touch
+   - name: create nginx log
+     file: name=/root/{{ var2 }}.log state=touch
+   
+ 
+ [root@host2 vardir]# ansible-playbook vars-use.yaml 
+</code></pre><h3 id="定义本地facts"><a href="#定义本地facts" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:定义本地facts" class="headings">定义本地facts</a></h3>
+<p>​	ansible会自动收集/etc/ansible/facts.d/*.fact文件中数据到facts中，**以ansible_local作为顶级key，**支持文件格式为ini，json</p>
+<p>​	eg：</p>
+<pre><code>[root@host2 facts.d]# pwd
+/etc/ansible/facts.d
+[root@host2 facts.d]# cat my.fact 
+{
+	&quot;family&quot;: {
+		&quot;dad&quot;: {
+			&quot;name&quot;: &quot;zhangsan&quot;,
+      			&quot;age&quot;: &quot;666&quot;
+		},
+     		&quot;mom&quot;: {
+			&quot;name&quot;: &quot;lisi&quot;,
+  			&quot;age&quot;: &quot;233&quot;
+		}
+	}
+}
+# 定义本地facts如上
+# 过滤时发现，本地fact在ansibl_facts下一级，并以ansible_local作为次级key，
+# 注意：my为本地fact的文件名，要加上
+[root@host2 facts.d]# ansible localhost -m setup -a 'filter=ansible_local'
+localhost | SUCCESS =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_local&quot;: {
+            &quot;my&quot;: {
+                &quot;family&quot;: {
+                    &quot;dad&quot;: {
+                        &quot;age&quot;: &quot;666&quot;, 
+                        &quot;name&quot;: &quot;zhangsan&quot;
+                    }, 
+                    &quot;mom&quot;: {
+                        &quot;age&quot;: &quot;233&quot;, 
+                        &quot;name&quot;: &quot;lisi&quot;
+                    }
+                }
+            }
+        }
+    }, 
+    &quot;changed&quot;: false
+}
+
+# 引用路径：
+[root@host2 facts.d]# cat /root/var_jason.yaml 
+---
+- hosts: localhost
+  tasks:
+   - shell: echo hello-world
+     register: var1
+   - debug: var=var1
+   - debug: var=var1['stdout']
+   - debug: var=var1.stdout_lines[0]
+   - debug: var=ansible_eth1.ipv6[0].address
+   - debug: var=ansible_local.my.family.dad.name
+</code></pre><h3 id="register注册变量"><a href="#register注册变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:register注册变量" class="headings">register注册变量</a></h3>
+<pre><code>#register捕捉标准输出的信息，注册为变量var1
+#再通过debug模块输出该变量
+
+[root@host2 ~]# cat reg.yaml 
+---
+- hosts: localhost
+  tasks:
+   - shell: echo hello
+     register: var1
+   - debug: var=var1
+
+</code></pre><h3 id="set_fact注册变量"><a href="#set_fact注册变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:set_fact注册变量" class="headings">set_fact注册变量</a></h3>
+<pre><code>[root@host2 ~]# cat set.yaml 
+---
+- hosts: localhost
+  tasks:
+   - shell: echo hello
+   - set_fact: var1=&quot;my var&quot;
+   - debug: var=var1
+</code></pre><h2 id="变量引用"><a href="#变量引用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:变量引用" class="headings">变量引用</a></h2>
+<h3 id="变量过滤"><a href="#变量过滤" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:变量过滤" class="headings">变量过滤</a></h3>
+<p>​	每个节点的收集的facts都是json格式数据，通过setup模块的filter参数可以过滤出特定key的fact，如下过滤ipv4相关的变量信息</p>
+<pre><code>[root@host2 ~]# ansible 192.168.80.102 -m setup -a 'filter=*ipv4'
+192.168.80.102 | SUCCESS =&gt; {
+    &quot;ansible_facts&quot;: {
+        &quot;ansible_default_ipv4&quot;: {
+            &quot;address&quot;: &quot;192.168.80.102&quot;, 
+            &quot;alias&quot;: &quot;eth0&quot;, 
+            &quot;broadcast&quot;: &quot;192.168.80.255&quot;, 
+            &quot;gateway&quot;: &quot;192.168.80.2&quot;, 
+            &quot;interface&quot;: &quot;eth0&quot;, 
+            &quot;macaddress&quot;: &quot;00:0c:29:1b:4e:70&quot;, 
+            &quot;mtu&quot;: 1500, 
+            &quot;netmask&quot;: &quot;255.255.255.0&quot;, 
+            &quot;network&quot;: &quot;192.168.80.0&quot;, 
+            &quot;type&quot;: &quot;ether&quot;
+        }
+    }, 
+    &quot;changed&quot;: false
+}
+</code></pre><h3 id="引用json字典"><a href="#引用json字典" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:引用json字典" class="headings">引用json字典</a></h3>
+<pre><code>[root@host2 ~]# cat var_jason.yaml 
+---
+- hosts: 192.168.80.102
+  tasks:
+   - shell: echo hello-world
+     register: var1
+   - debug: var=var1
+   - debug: var=var1['stdout']
+
+# shell这个task执行后结果，标准输出为hello-world，用register捕捉，注册为变量，变量名为var1，
+# debug模块，输出该变量，输出为json数据，并附带了其他信息，组成了var1的一组字典信息；
+
+# 第2个debug模块，通过调用该变量的key为stdout，输出其值，
+TASK [debug] *******************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;var1&quot;: {
+        &quot;changed&quot;: true, 
+        &quot;cmd&quot;: &quot;echo hello-world&quot;, 
+        &quot;delta&quot;: &quot;0:00:00.004388&quot;, 
+        &quot;end&quot;: &quot;2020-10-15 10:33:01.317302&quot;, 
+        &quot;failed&quot;: false, 
+        &quot;rc&quot;: 0, 
+        &quot;start&quot;: &quot;2020-10-15 10:33:01.312914&quot;, 
+        &quot;stderr&quot;: &quot;&quot;, 
+        &quot;stderr_lines&quot;: [], 
+        &quot;stdout&quot;: &quot;hello-world&quot;, 
+        &quot;stdout_lines&quot;: [
+            &quot;hello-world&quot;
+        ]
+    }
+}
+
+TASK [debug] *******************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;var1['stdout']&quot;: &quot;hello-world&quot;
+}
+
+</code></pre><h3 id="引用json数组"><a href="#引用json数组" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:引用json数组" class="headings">引用json数组</a></h3>
+<p>​	以上面输出为例，stdout_line的值部分又是一个数组列表；</p>
+<pre><code>[root@host2 ~]# cat var_jason.yaml 
+---
+- hosts: 192.168.80.102
+  tasks:
+   - shell: echo hello-world
+     register: var1
+   - debug: var=var1
+   - debug: var=var1['stdout']
+   - debug: var=var1.stdout_lines[0]
+# 数据用数字的数组下标引用
+
+
+TASK [debug] *******************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;var1['stdout']&quot;: &quot;hello-world&quot;
+}
+
+TASK [debug] *******************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;var1.stdout_lines[0]&quot;: &quot;hello-world&quot;
+}
+
+</code></pre><p>eg2：</p>
+<pre><code>ipv6&quot;: [
+                {
+                    &quot;address&quot;: &quot;fe80::eb02:a6b5:be84:952&quot;, 
+                    &quot;prefix&quot;: &quot;64&quot;, 
+                    &quot;scope&quot;: &quot;link&quot;
+                }
+            ], 
+
+
+
+# facts输出中，ansible_eth1的ipv6字典项值为数组，每个数组值又为一组字典
+# 引用方式如下
+cat var_jason.yaml 
+---
+- hosts: 192.168.80.102
+  tasks:
+   - shell: echo hello-world
+     register: var1
+   - debug: var=var1
+   - debug: var=var1['stdout']
+   - debug: var=var1.stdout_lines[0]
+   - debug: var=ansible_eth1.ipv6[0].address
+   
+TASK [debug] *******************************************************************************
+ok: [192.168.80.102] =&gt; {
+    &quot;ansible_eth1.ipv6[0].address&quot;: &quot;fe80::7822:f591:feb0:47ea&quot;
+}
+</code></pre><h3 id="引用facts变量"><a href="#引用facts变量" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:引用facts变量" class="headings">引用facts变量</a></h3>
+<p>​	收集后数据为json数组，顶级有2个key，一个是ansible_facts，一个是changed，节点信息都在ansible_facts中，引用时，ansible_facts可以省略，可以直接从其下一级的key开始引用</p>
+<pre><code>如：ansible_eth0，&quot;ansible_architecture&quot;: &quot;x86_64&quot;, 
+    &quot;ansible_bios_date&quot;: &quot;07/29/2019&quot;, 
+    &quot;ansible_bios_version&quot;: &quot;6.00&quot;, 
+    &quot;ansible_cmdline&quot;: {
+</code></pre>
+<h3 id="变量输出"><a href="#变量输出" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:变量输出" class="headings">变量输出</a></h3>
+<p>​	采用debug模块的var或msg参数可以输出，变量，做调试之用</p>
+<pre><code>[root@host2 ~]# cat var_jason.yaml 
+---
+- hosts: localhost
+  tasks:
+   - debug: 'msg=&quot;ip-value is: {{ ansible_eth0.ipv4.address }}&quot;'
+   - debug: var=ansible_eth0.ipv4.address
+# 注意，msg外部要加上单引号
+</code></pre><p>输出结果如下：</p>
+<pre><code>[root@host2 ~]# ansible-playbook var_jason.yaml 
+
+PLAY [localhost] ***************************************************************************
+
+TASK [Gathering Facts] *********************************************************************
+ok: [localhost]
+
+TASK [debug] *******************************************************************************
+ok: [localhost] =&gt; {
+    &quot;msg&quot;: &quot;ip-value is: 192.168.80.101&quot;
+}
+
+TASK [debug] *******************************************************************************
+ok: [localhost] =&gt; {
+    &quot;ansible_eth0.ipv4.address&quot;: &quot;192.168.80.101&quot;
+</code></pre><h1 id="模板template"><a href="#模板template" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:模板template" class="headings">模板template</a></h1>
+<p><a href="https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html</a></p>
+<h2 id="概念"><a href="#概念" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:概念" class="headings">概念</a></h2>
+<p>​	<strong>template功能：根据模块文件，动态生成对应的配置文件</strong></p>
+<ul>
+<li>
+<p>templa文件必须放在templates目录下，以.j2结尾</p>
+</li>
+<li>
+<p>yaml或yml文件需和templates目录平级，目录结构如下：</p>
+<ul>
+<li>
+<pre><code>./
+temnginx.yaml
+templates
+    nginx.conf.j2
+</code></pre></li>
+</ul>
+</li>
+</ul>
+<p>​	文本文件；嵌套有脚本（使用模版编程语言编写），jinja2语言，有如下形式：</p>
+<ul>
+<li>字符串：单引号或双引号</li>
+<li>数字：整数、浮点数</li>
+<li>列表：[item1,item2,...]</li>
+<li>元组：(item1,item2)</li>
+<li>字典：[k1:v1,k2:v2]</li>
+<li>布尔型：true，false</li>
+<li>算术运算： + - * / // % **</li>
+<li>比较运算：== != &gt; &gt;= &lt; &lt;=</li>
+<li>逻辑运算：and or not</li>
+<li>流表达式： for if when</li>
+</ul>
+<h2 id="示例算术运算"><a href="#示例算术运算" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:示例算术运算" class="headings">示例算术运算</a></h2>
+<p>​	如下为，根据每个主机的cpu核数不同，利用templates模版文件，生成不同work_processor配置选项的示例</p>
+<p>​	<strong>采用了算术运算</strong></p>
+<pre><code>[root@host2 template]# ansible test -m setup |grep processor
+        &quot;ansible_processor&quot;: [
+        &quot;ansible_processor_cores&quot;: 2, 
+        &quot;ansible_processor_count&quot;: 2, 
+        &quot;ansible_processor_threads_per_core&quot;: 1, 
+        &quot;ansible_processor_vcpus&quot;: 4, 
+        &quot;ansible_processor&quot;: [
+        &quot;ansible_processor_cores&quot;: 1, 
+        &quot;ansible_processor_count&quot;: 2, 
+        &quot;ansible_processor_threads_per_core&quot;: 1, 
+        &quot;ansible_processor_vcpus&quot;: 2, 
+# 2个主机，一个为4核，一个为2核        
+</code></pre><pre><code># 根据如下目录结构，编写对应文件
+[root@host2 template]# tree
+.
+├── temnginx.yaml
+└── templates
+    └── nginx.conf.j2
+
+# yaml文件，为playbook，其中利用templates模块调用了nginx.conf的模版文件    
+[root@host2 template]# cat temnginx.yaml 
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: template config to remote-hosts
+     template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+# 模版文件如下，为原有nginx.conf修改而来，修改了其中worker_processes，利用了setup变量每个主机的cpu核数，的平方做为参数值
+[root@host2 template]# head templates/nginx.conf.j2 
+user nginx;
+worker_processes {{ ansible_processor_vcpus**2 }};
+
+# 成功执行
+[root@host2 template]# ansible-playbook temnginx.yaml 
+
+PLAY [test] **********************************************************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************************
+ok: [192.168.80.102]
+ok: [192.168.80.103]
+
+TASK [template config to remote-hosts] *******************************************************************************************************
+changed: [192.168.80.103]
+changed: [192.168.80.102]
+
+PLAY RECAP ***********************************************************************************************************************************
+192.168.80.102             : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+192.168.80.103             : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+</code></pre><pre><code># 查看2台主机，生成的配置文件，分别为4，和16，为2和4的平方
+[root@host4 ~]# head /etc/nginx/nginx.conf 
+
+user nginx;
+worker_processes 4;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+
+[root@host3 ~]# head /etc/nginx/nginx.conf
+
+user nginx;
+worker_processes 16;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+</code></pre><h2 id="示例条件判断"><a href="#示例条件判断" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:示例条件判断" class="headings">示例条件判断</a></h2>
+<p>​	根据变量，facts，或此前任务的执行结果来做某task执行的前提时，需要用when实现，<strong>直接在某task后添加when子句+条件即可</strong></p>
+<p>​	jinja2语法示例：</p>
+<pre><code>tasks:
+ - name: &quot;shutdown redhat flavored systems&quot;
+   command: /sbin/shudown -h now
+   when: ansible_os_family == &quot;redhat&quot;
+</code></pre><p><strong>通过os版本做判断条件</strong></p>
+<pre><code>[root@host2 template]# cat when.yaml 
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: add group nginx
+     tags: user
+     group: name=nginx state=present
+   - name: add user nginx
+     user: name=nginx state=present group=nginx
+   - name: install nginx
+     yum: name=nginx state=present
+   - name: stop nginx
+     service: name=nginx state=stoped
+     when: ansible_distribution_major_version == &quot;7&quot;
+     
+# 在执行stop nginx时，加了when条件，只有版本是7的centos上的nginx会被停止     
+</code></pre><h2 id="示例迭代with_items"><a href="#示例迭代with_items" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:示例迭代with_items" class="headings">示例迭代with_items</a></h2>
+<p>​	有需要重复执行的任务，可以采用迭代机制；<strong>迭代的引用固定变量名为item，task中使用with_items给定要迭代的元素列表</strong></p>
+<p>​	列表格式：字符串，字典</p>
+<p>1、迭代创建用户</p>
+<pre><code>在task中用with_items定义列表，用item变量引用，然后创建2个用户
+
+[root@host2 template]# cat items.yaml 
+- hosts: 192.168.80.102
+  remote_user: root
+  tasks:
+   - name: add serveral users;
+     user: name={{ item }} state=present groups=wheel
+     with_items:
+      - testuser1
+      - testuser2
+
+testuser1:x:1003:1004::/home/testuser1:/bin/bash
+testuser2:x:1004:1005::/home/testuser2:/bin/bash
+[root@host3 ~]# cat /etc/passwd
+
+</code></pre><p>2、迭代copy多个文件</p>
+<pre><code>[root@host2 template]# touch /etc/file1
+
+[root@host2 template]# touch /etc/file2
+
+[root@host2 template]# cat !$
+cat /root/copy-multi.yaml
+---
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: create two file and copy
+     copy: src={{ item }} dest=/tmp
+     with_items:
+      - /etc/file1
+      - /etc/file2
+
+
+[root@host3 ~]# ll /tmp/file*
+-rw-r--r-- 1 root root 0 Oct 10 15:57 /tmp/file1
+-rw-r--r-- 1 root root 0 Oct 10 15:57 /tmp/file2
+
+</code></pre><p>3、迭代安装rpm包</p>
+<pre><code>[root@host2 template]# cat rpm-install.yaml 
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: install rpms
+     yum: name={{ item }} state=present
+     with_items:
+      - memcached
+      - php-fpm
+
+</code></pre><p>4、迭代-嵌套-子变量</p>
+<pre><code># item元素为字典形式，通过其key再引用每个key的值；
+
+[root@host2 template]# cat !$
+cat diedai.yaml
+- hosts: test
+  remote_user: root
+  tasks:
+   - name: add groups
+     group: name={{ item }} state=present
+     with_items:
+      - group1
+      - group2
+      - group3
+   - name: add users
+     user: name={{ item.name }} group={{ item.group }} state=present
+     with_items:
+      - { name: 'user1', group: 'group1' }
+      - { name: 'user2', group: 'group2' }
+      - { name: 'user3', group: 'group3' }
+
+
+[root@host2 template]# ansible-playbook diedai.yaml 
+
+PLAY [test] ********************************************************************************
+
+TASK [Gathering Facts] *********************************************************************
+ok: [192.168.80.103]
+ok: [192.168.80.102]
+
+TASK [add groups] **************************************************************************
+ok: [192.168.80.102] =&gt; (item=group1)
+ok: [192.168.80.103] =&gt; (item=group1)
+changed: [192.168.80.103] =&gt; (item=group2)
+changed: [192.168.80.102] =&gt; (item=group2)
+changed: [192.168.80.103] =&gt; (item=group3)
+changed: [192.168.80.102] =&gt; (item=group3)
+
+TASK [add users] ***************************************************************************
+changed: [192.168.80.103] =&gt; (item={u'group': u'group1', u'name': u'user1'})
+changed: [192.168.80.102] =&gt; (item={u'group': u'group1', u'name': u'user1'})
+changed: [192.168.80.102] =&gt; (item={u'group': u'group2', u'name': u'user2'})
+changed: [192.168.80.103] =&gt; (item={u'group': u'group2', u'name': u'user2'})
+changed: [192.168.80.102] =&gt; (item={u'group': u'group3', u'name': u'user3'})
+changed: [192.168.80.103] =&gt; (item={u'group': u'group3', u'name': u'user3'})
+
+
+
+[root@host3 ~]# id user1
+uid=1002(user1) gid=1003(group1) groups=1003(group1)
+[root@host3 ~]# id user2
+uid=1005(user2) gid=1006(group2) groups=1006(group2)
+[root@host3 ~]# id user3
+uid=1006(user3) gid=1007(group3) groups=1007(group3)
+</code></pre><h2 id="template的for循环-if判断"><a href="#template的for循环-if判断" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:template的for循环-if判断" class="headings">template的for循环 if判断</a></h2>
+<p>template文件中的if判断语法，</p>
+<p>​	示例格式：for遍历vhost，if做条件判断，根据其模版生成不同的server虚拟主机配置段</p>
+<pre><code>{% for vhost in nginx_vhosts %}
+
+server {
+
+listen {{ vhost.listen | default('80 default_server')}};
+
+{% if vhost.server_name if defined %}
+server_name {{ vhost.server_name }}
+{% endif %}
+
+{% if vhost.root is defined %}
+root {{ vhost.root }};
+{% endif %}
+
+}
+
+{% endfor %}
+</code></pre><h2 id="示例template-for和if"><a href="#示例template-for和if" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:示例template-for和if" class="headings">示例template for和if</a></h2>
+<p>yaml文件和对应j2模版如下：</p>
+<pre><code>[root@host2 nginx-web]# tree 
+.
+├── temnginx.yaml
+└── templates
+    └── nginx.conf.j2
+
+[root@host2 nginx-web]# cat temnginx.yaml 
+- hosts: all 
+  remote_user: root
+  vars:
+   nginx_vhosts:
+    - web1:
+      listen: 8080
+      server_name: &quot;web1.b.com&quot;
+      root: &quot;/data/web1&quot;
+    - web2:
+      listen: 8080
+      server_name: &quot;web2.b.com&quot;
+      root: &quot;/data/web2&quot;
+    - web3:
+      listen: 80
+      server_name: &quot;web3.b.com&quot;
+      root: &quot;/data/web3&quot;
+  tasks:
+   - name: copy template conf file
+     template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+# 用了for循环，生成3个server虚拟主机配置段
+# 用了if判断
+# 用了默认值设置
+[root@host2 nginx-web]# cat templates/nginx.conf.j2 
+{% for vhost in nginx_vhosts %}
+
+server {
+{% if vhost.listen is defined %}
+listen {{ vhost.listen }};
+{% endif %}
+
+server_name {{ vhost.server_name }};
+root {{ vhost.root | default('/data') }};
+}
+{% endfor  %}
+</code></pre><p>查看，生成的配置文件</p>
+<pre><code>[root@host2 nginx-web]# ansible-playbook temnginx.yaml 
+# 执行；
+[root@host3 ~]# cat /etc/nginx/nginx.conf
+
+server {
+listen 8080;
+
+server_name web1.b.com;
+root /data/web1;
+}
+
+server {
+listen 8080;
+
+server_name web2.b.com;
+root /data/web2;
+}
+
+server {
+listen 80;
+
+server_name web3.b.com;
+root /data/web3;
+}
+# 和yaml中，定义的vars变量一一对应；
+# 模版的好处：只修改变量部分，可以很高效的生成别的配置文件，
+# var可以采用其他方法定义，如单独的var文件
+[root@host2 nginx-web]# cat temnginx.yaml 
+- hosts: all 
+  remote_user: root
+  vars:
+   nginx_vhosts:
+    - web1:
+      listen: 8080
+      server_name: &quot;web1.b.com&quot;
+      root: &quot;/data/web1&quot;
+    - web2:
+      listen: 8080
+      server_name: &quot;web2.b.com&quot;
+      root: &quot;/data/web2&quot;
+    - web3:
+      listen: 80
+      server_name: &quot;web3.b.com&quot;
+      root: &quot;/data/web3&quot;
+</code></pre><p>采用默认值情况；web3的root变量没定义；</p>
+<pre><code>[root@host2 nginx-web]# cat temnginx.yaml 
+- hosts: all 
+  remote_user: root
+  vars:
+   nginx_vhosts:
+    - web1:
+      listen: 8080
+      server_name: &quot;web1.b.com&quot;
+      root: &quot;/data/web1&quot;
+    - web2:
+      listen: 8080
+      server_name: &quot;web2.b.com&quot;
+      root: &quot;/data/web2&quot;
+    - web3:
+      listen: 80
+      server_name: &quot;web3.b.com&quot;
+  tasks:
+   - name: copy template conf file
+     template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+     
+# web3的root采用默认字段，为/data     
+[root@host3 ~]# cat /etc/nginx/nginx.conf
+
+server {
+listen 8080;
+
+server_name web1.b.com;
+root /data/web1;
+}
+
+server {
+listen 8080;
+
+server_name web2.b.com;
+root /data/web2;
+}
+
+server {
+listen 80;
+
+server_name web3.b.com;
+root /data;
+}     
+</code></pre><h1 id="roles"><a href="#roles" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:roles" class="headings">roles</a></h1>
+<h2 id="概念-1"><a href="#概念-1" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:概念-1" class="headings">概念</a></h2>
+<p>​	ansible自1.2后引入的特性；<strong>用于层次化，结构化，组成playboo，roles能够根据层次型结构自动加载变量文件，task，handler等；</strong></p>
+<p>​	使用roles时需要在playbook中用include导入即可，</p>
+<p>​	<strong>roles就是将变量、文件、任务、模版、处理器按照一定组织结构放在单独目录中，并 用include导入的一种机制，</strong></p>
+<p>​	<strong>一般用于构建，基于主机构建服务的场景中，也可以构建守护进程</strong></p>
+<p>​	复杂场景，适合使用roles，代码复用度高</p>
+<p>简单说：role就是拆解大的playbook的一种方式，以一定规则组成目录结构，可以复用其中的小的task或play，通过include导入即可；</p>
+<h2 id="roles目录结构"><a href="#roles目录结构" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:roles目录结构" class="headings">roles目录结构</a></h2>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20201010181654569.png" alt="image-20201010181654569"></p>
+<pre><code>playbook.yaml
+roles/
+	project/
+		tasks/
+		files/
+		vars/
+		templates/
+		handlers/
+		default/
+		meta/
+		后2者不常用
+files：存放由copy，或script模块，调用的文件
+templates:template模块查找模版文件的目录
+tasks:定义task，role的基本元素，至少应包括一个名为main.yaml的文件；其他的文件通过include包含
+
+handlers:至少包含一个main.yaml，其他文件用include导入
+
+vars:定义变量，至少有一个main.yaml，其他用include导入
+
+meta:定义当前角色的特殊设定，和其依赖，至少一个main.yaml，其他文件include导入
+
+default:设定默认变量时，用此目录的main.yaml文件
+</code></pre><h2 id="创建role步骤"><a href="#创建role步骤" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:创建role步骤" class="headings">创建role步骤</a></h2>
+<ol>
+<li>创建以roles命令的目录；</li>
+<li>在roles目录中分别创建以各个角色名称命名的目录，如webservers等</li>
+<li>在每个角色的目录中分别创建：files、handlers、meta、taskstemplates、vars等目录，没有用到的目录可以创建为空，也可以不创建</li>
+<li>在playbook中，调用各个角色；</li>
+</ol>
+<pre><code>#示例目录结构如下，
+playbook为nginx-role.yaml
+roles目录下有一个role目录，为nginx
+nginx目录下，有一系列固定结构的目录
+[root@host2 workspace]# tree .
+.
+├── nginx-role.yaml
+└── roles
+    └── nginx
+        ├── files
+        │   └── main.yaml
+        ├── tasks
+        │   ├── groupadd.yaml
+        │   ├── install.yaml
+        │   ├── main.yaml
+        │   ├── restart.yaml
+        │   └── useradd.yaml
+        └── vars
+            └── main.yaml
+
+</code></pre><h2 id="playbook调用roles"><a href="#playbook调用roles" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook调用roles" class="headings">playbook调用roles</a></h2>
+<p>方法1：</p>
+<pre><code>- hosts: webservers
+  remote_user: root
+  roles:
+   - mysql
+   - memcached
+   - nginx
+   
+</code></pre><p>方法2：</p>
+<pre><code>- hosts:
+  remote_user:
+  roles;
+   - mysql
+   - { role: nginx,username: nginx }
+   键role指定调用nginx这个role
+   后续是给username这个变量传值为nginx
+</code></pre><p>方法3：</p>
+<pre><code>roles:
+ - { role: nginx,username: nginx,when: ansible_distribution_major_version == '7' }
+ #加入了when条件判断
+</code></pre><h2 id="完整roles架构示例"><a href="#完整roles架构示例" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:完整roles架构示例" class="headings">完整roles架构示例</a></h2>
+<pre><code># 顶层的playbook中，定义了调用了2个role
+[root@host2 workspace]# cat nginx-role.yaml 
+- hosts: test
+  remote_user: root
+  roles:
+   - nginx
+   - httpd
+
+
+# 以nginx的role为例，task的main.yaml调用了一个个小的task文件
+[root@host2 workspace]# cat roles/nginx/tasks/main.yaml 
+- include: groupadd.yaml
+- include: useradd.yaml
+- include: install.yaml
+- include: restart.yaml
+- include: filecp.yaml
+
+# tasks中其他yaml文件，将是将原来的task拆分，写到一个个文件中而已
+[root@host2 workspace]# cat roles/nginx/tasks/groupadd.yaml 
+- name: add group nginx
+  group: name=nginx state=present
+
+[root@host2 workspace]# cat roles/nginx/tasks/filecp.yaml 
+- name: file copy
+  copy: src=tom.conf dest=/tmp/tom.conf
+  
+# task中copy或scripts调用的文件，都放在files目录下  
+[root@host2 workspace]# cat roles/nginx/files/tom.conf 
+</code></pre><h2 id="playbook中-tags使用"><a href="#playbook中-tags使用" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:playbook中-tags使用" class="headings">playbook中 tags使用</a></h2>
+<pre><code>ansible-playbook --tags=&quot;nginx.httpd,mysql&quot; nginx-role.yaml
+#只调用带有对应标签的role
+
+# nginx-role.yaml中
+- hosts: test
+  remote_user: root
+  roles:
+   - { role: nginx,tags: [ 'nginx','web' ],when: ansible_distribution_major_version == '6' }
+   - { role: httpd,tags: [ 'httpd','web' ] }
+   - { role: mysql,tags: [ 'mysql','db' ] }
+   - { role: mariadb,tags: [ 'mysql','db' ] }
+   - { role: php }
+# tags是列表形式，注意括号前后的空格   
+</code></pre><h1 id="实验playbook编译安装httpd"><a href="#实验playbook编译安装httpd" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:实验playbook编译安装httpd" class="headings">实验：playbook编译安装httpd</a></h1>
+<h2 id="tasks各个步骤"><a href="#tasks各个步骤" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tasks各个步骤" class="headings">tasks各个步骤</a></h2>
+<ol>
+<li>get_url模块：下载源码包：apr apr-util httpd</li>
+<li>yum模块：下载依赖包和编译工具：gcc gcc++ zlib-devel openssl-devel等</li>
+<li>unarchive模块，解压源码包</li>
+<li>shell模块，依次编译apr apr-util httpd</li>
+<li>user模块，创建apache用户</li>
+<li>copy模块或template，准备配置文件，服务管理脚本等，</li>
+<li>shell模块，path变量配置，配置文件语法检测，服务启动等</li>
+</ol>
+<h2 id="参考yaml"><a href="#参考yaml" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:参考yaml" class="headings">参考yaml</a></h2>
+<pre><code>[root@host2 httpd]# cat httpd.yaml 
+- hosts: 192.168.80.102
+  remote_user: root
+  tasks:
+   - name: down source tar
+     get_url: url=&quot;{{ item }}&quot; dest=/root/pkg
+     with_items:
+      - https://mirrors.aliyun.com/apache/apr/apr-1.6.5.tar.gz
+      - https://mirrors.aliyun.com/apache/apr/apr-util-1.6.1.tar.gz
+      - https://mirrors.aliyun.com/apache/httpd/httpd-2.4.46.tar.gz
+     run_once: True
+   - name: unarchive
+     unarchive: src=&quot;/root/pkg/{{ item }}&quot; dest=/root
+     with_items:
+      - httpd-2.4.46.tar.gz
+      - apr-1.6.5.tar.gz
+      - apr-util-1.6.1.tar.gz
+
+   - name: install pcre prce-devel
+     yum: name=&quot;{{ item }}&quot; state=present
+     with_items:
+      - pcre
+      - pcre-devel
+      - expat-devel
+   - name: compile apr 
+     shell: cd /root/apr-1.6.5 &amp;&amp; ./configure --prefix=/usr/local/apr &amp;&amp; make &amp;&amp; make install
+   - name: compile apr-util
+     shell: cd /root/apr-util-1.6.1 &amp;&amp; ./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr &amp;&amp; make &amp;&amp; make install
+   - name: complie httpd
+     shell: |
+            cd /root/httpd-2.4.46
+            ./configure --prefix=/usr/local/apache --sysconfig=/etc/apache \
+            --enable-mpms-shared=all \
+            --with-z --with-pcre \
+            --with-apr=/usr/local/apr \
+            --with-apr-util=/usr/local/apr-util \
+            --with-mpm-event
+             make &amp;&amp; make install
+           
+
+</code></pre><h1 id="ansible执行过程"><a href="#ansible执行过程" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:ansible执行过程" class="headings">ansible执行过程</a></h1>
+<h2 id="执行过程总结"><a href="#执行过程总结" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:执行过程总结" class="headings">执行过程总结</a></h2>
+<ol>
+<li>读取配置文件，默认/etc/ansible/ansible.cfg</li>
+<li>加载inventory文件，包括主机变量，主机组变量</li>
+<li>执行默认，第一个任务，收集各个节点的信息
+<ol>
+<li>建立连接，获取家目录信息</li>
+<li>将要执行的收集任务，放在临时文件</li>
+<li>将临时文件传输到被控节点的临时目录</li>
+<li>ssh连接到远端执行收集任务</li>
+<li>删除任务文件</li>
+<li>收集信息返回给ansible端，<strong>此处各种变量可以被之后各步骤引用！</strong></li>
+<li>关闭连接</li>
+</ol>
+</li>
+<li>第二个任务，此处开始，为用户定义的任务
+<ol>
+<li>建立连接，获取家目录信息</li>
+<li>将要执行的任务放到临时文件中</li>
+<li>将临时文件，sftp传输到远端节点</li>
+<li>ssh连接到远端执行任务</li>
+<li>删除任务文件</li>
+<li>执行结果返回给ansible端，ansible输出到屏幕</li>
+<li>关闭连接</li>
+</ol>
+</li>
+<li>后续任务...，遵从同样的步骤</li>
+</ol>
+<p><strong>假设有10个任务，主机数量较多的时候，ansible会将主机分批次执行第一个任务，直到所有主机都执行完第一个任务后，再开始第二个任务，也是分批次执行，以此类推；</strong></p>
+<p>​	<strong>直到所有节点，执行完所有任务，ansible才会释放当前shell，此乃ansible默认的同步模式；并发默认为5 ，-f可以指定并发数</strong></p>
+<h2 id="ansible优化速度"><a href="#ansible优化速度" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:ansible优化速度" class="headings">ansible优化速度</a></h2>
+<h3 id="配置开启ssh长连接"><a href="#配置开启ssh长连接" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:配置开启ssh长连接" class="headings">配置开启ssh长连接</a></h3>
+<p>​	为避免需要长时间执行的任务，中途断开，可以配置长连接时间久一点；</p>
+<pre><code>[ssh_connection]
+
+# ssh arguments to use
+# Leaving off ControlPersist will result in poor performance, so use
+# paramiko on older platforms rather than removing it, -C controls compression use
+#ssh_args = -C -o ControlMaster=auto -o ControlPersist=60s
+</code></pre><h3 id="开启pipline"><a href="#开启pipline" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:开启pipline" class="headings">开启pipline</a></h3>
+<p>​	ansible在执行一个任务期间，将任务文件放到临时文件中后，会sftp复制传输到远端，然后ssh连接到远端执行该任务文件，共2次ssh连接，pipline为openssh支持的特性，<strong>可以在一次ssh连接中完成上述2步，</strong></p>
+<p>​	配置文件：/etc/ansible/ansible.cfg</p>
+<pre><code># Enabling pipelining reduces the number of SSH operations required to
+# execute a module on the remote server. This can result in a significant
+# performance improvement when enabled, however when using &quot;sudo:&quot; you must
+# first disable 'requiretty' in /etc/sudoers
+#
+# By default, this option is disabled to preserve compatibility with
+# sudoers configurations that have requiretty (the default on many distros).
+#
+#pipelining = False
+
+</code></pre><h3 id="修改ansible执行策略"><a href="#修改ansible执行策略" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:修改ansible执行策略" class="headings">修改ansible执行策略</a></h3>
+<p>​	ansible默认fork为5，假设共20台，一次5台执行任务，假设其中一台主机性能好，早早完成，该空出的并发名额会等待，其他四个小伙伴一起结束，再一起分配下一个5台主机执行任务，造成浪费</p>
+<p>​	ansible 2.0后，通过strategy设置为free，默认值是linear，使得空出来的名额，可以立即分配给后面的主机开始执行，</p>
+<pre><code>- hosts: all
+  strategy: free
+  tasks:
+  ...
+</code></pre><h3 id="设置facts缓存"><a href="#设置facts缓存" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:设置facts缓存" class="headings">设置facts缓存</a></h3>
+<p>​	收集各个节点的facts为默认行为，主机数量多时，收集facts会消耗一定时间；虽然可以禁止改行为，但其中变量一般很有用，所以，设置facst缓存很有必要：</p>
+<pre><code># plays will gather facts by default, which contain information about
+# the remote system.
+#
+# smart - gather by default, but don't regather if already gathered
+# implicit - gather by default, turn off with gather_facts: False
+# explicit - do not gather by default, must say gather_facts: True
+#gathering = implicit
+默认行为收集，在playbook中，可以通过gather_facts改变默认行为
+设置为smart为启用缓存，在空闲时收集，并缓存；
+
+缓存有redis和jsonfile两种形式；
+
+## jsonfile示例
+gathering=smart
+fact_caching_timeout =86400
+fact_caching=jsonfile
+fact_caching_connection= /path/to/factdir
+## 缓存1天，位置在/path/to/factdir目录下
+
+## 
+[root@host2 httpd]# ll /tmp/factdir/
+total 48
+-rw-r--r-- 1 root root 24549 Oct 14 16:26 192.168.80.102
+-rw-r--r-- 1 root root 24365 Oct 14 16:26 192.168.80.103
+[root@host2 httpd]# cat /tmp/factdir/192.168.80.102 | python -m json.tool
+</code></pre><h2 id="查看ansible执行过程示例"><a href="#查看ansible执行过程示例" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:查看ansible执行过程示例" class="headings">查看ansible执行过程示例</a></h2>
+<p>​	ansible或ansible-playbook的执行中，加入-vvv参数可以显示不同详细等级的执行信息，如下：</p>
+<pre><code>[root@host2 httpd]# ansible-playbook -vvv  httpd.yaml 
+
+# 先确认ansible读取的配置文件，插件路径，python解释器路径，可执行程序路径等
+
+ansible-playbook 2.9.13
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = [u'/root/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible-playbook
+  python version = 2.7.5 (default, Apr 11 2018, 07:36:10) [GCC 4.8.5 20150623 (Red Hat 4.8.5-28)]
+Using /etc/ansible/ansible.cfg as config file
+host_list declined parsing /etc/ansible/hosts as it did not pass its verify_file() method
+script declined parsing /etc/ansible/hosts as it did not pass its verify_file() method
+auto declined parsing /etc/ansible/hosts as it did not pass its verify_file() method
+Parsed /etc/ansible/hosts inventory source with ini plugin
+
+# 找出有几个play，
+PLAYBOOK: httpd.yaml *************************************************************************************************************************
+1 plays in httpd.yaml
+
+PLAY [192.168.80.102] ************************************************************************************************************************
+# 默认行为，收集节点信息，
+TASK [Gathering Facts] ***********************************************************************************************************************
+task path: /root/httpd/httpd.yaml:1
+&lt;192.168.80.102&gt; ESTABLISH SSH CONNECTION FOR USER: root
+
+</code></pre><p><strong>参考链接</strong></p>
+<ul>
+<li><a href="https://www.cnblogs.com/f-ck-need-u/p/7604386.html" target="_blank" rel="noopener">https://www.cnblogs.com/f-ck-need-u/p/7604386.html</a></li>
+<li><a href="https://www.cnblogs.com/f-ck-need-u/p/7580170.html#1-4-4-facts-" target="_blank" rel="noopener">https://www.cnblogs.com/f-ck-need-u/p/7580170.html#1-4-4-facts-</a></li>
+</ul>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/ansible%E4%B9%8Bplaybook%E4%B8%8Eroles/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/ansible之playbook与roles/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2021-03-09 12:29:15 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2021-03-09</text><text x="915" y="140" textLength="650" transform="scale(.1)">2021-03-09</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/ansible%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" class="related-link">ansible基础介绍与安装</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/ansible%E6%A8%A1%E5%9D%97%E4%B8%8E%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4/" class="related-link">ansible模块与基础命令</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/jenkins%E9%9B%86%E6%88%90sonarqube%E4%BB%A3%E7%A0%81%E5%AE%A1%E6%9F%A5/" class="related-link">jenkins集成sonarqube代码审查</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/jenkins%E4%B9%8Bpipline%E5%9F%BA%E7%A1%80/" class="related-link">jenkins之pipline基础</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%BB%A3%E7%90%86kibana/" class="related-link">nginx代理kibana</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/ansible/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>ansible</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/docker%E5%8D%95%E6%9C%BA%E7%BC%96%E6%8E%92docker-compose/" rel="prev">&lt; docker单机编排docker-compose</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/docker%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86/" rel="next">docker存储管理 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

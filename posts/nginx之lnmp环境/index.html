@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>nginx之LNMP环境 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="lnmp环境搭建以及wordpress和discuz的部署笔记..." />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/nginx%E4%B9%8Blnmp%E7%8E%AF%E5%A2%83/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-09-06T14:10:18+00:00",
+        "dateModified": "2020-10-19T18:15:01+08:00",
+        "url": "https://latteStudio.github.io/posts/nginx%E4%B9%8Blnmp%E7%8E%AF%E5%A2%83/",
+        "headline": "nginx之LNMP环境",
+        "description": "lnmp环境搭建以及wordpress和discuz的部署笔记...",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  6421 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20200830183739288.png","https://gitee.com/boogie96/img/raw/master/img/image-20200830185005646.png","https://gitee.com/boogie96/img/raw/master/img/image-20200830192059314.png","https://gitee.com/boogie96/img/raw/master/img/image-20200830193406260.png","https://gitee.com/boogie96/img/raw/master/img/image-20200830192528355.png","https://gitee.com/boogie96/img/raw/master/img/image-20200830210607405.png","https://gitee.com/boogie96/img/raw/master/img/image-20200830210913321.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831142234788.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831164716663.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831164943370.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831165018605.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831165031312.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831165308995.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831165716969.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831165857837.png","https://gitee.com/boogie96/img/raw/master/img/image-20200831173227975.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="nginx之LNMP环境" />
+<meta property="og:description" content="lnmp环境搭建以及wordpress和discuz的部署笔记..." />
+<meta property="og:url" content="https://latteStudio.github.io/posts/nginx%E4%B9%8Blnmp%E7%8E%AF%E5%A2%83/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20200830183739288.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-09-06T14:10:18&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-19T18:15:01&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">nginx之LNMP环境</h1>
+
+            
+
+            
+                <div class="post-description p-summary">lnmp环境搭建以及wordpress和discuz的部署笔记...</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-09-06T14:10:18&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.9.6</time>
+    
+    
+        
+        <time datetime="2020-10-19T18:15:01&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.19</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/web%E6%9C%8D%E5%8A%A1/" class="category-link p-category">web服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;6421</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;13&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:环境说明" href="#环境说明">环境说明</a></li>
+    <li><a id="contents:nginx编译安装" href="#nginx编译安装">nginx编译安装</a></li>
+    <li><a id="contents:php编译安装" href="#php编译安装">php编译安装</a></li>
+    <li><a id="contents:mysql二进制安装" href="#mysql二进制安装">mysql二进制安装</a></li>
+    <li><a id="contents:配置nginx到php-fpm的转发" href="#配置nginx到php-fpm的转发">配置nginx到php-fpm的转发</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:单机部署" href="#单机部署">单机部署</a></li>
+    <li><a id="contents:多机分离部署" href="#多机分离部署">多机分离部署</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:wordpress临时笔记" href="#wordpress临时笔记">wordpress临时笔记</a></li>
+    <li><a id="contents:wordpress笔记梳理后" href="#wordpress笔记梳理后">wordpress笔记梳理后</a></li>
+    <li><a id="contents:安装discuz" href="#安装discuz">安装discuz</a></li>
+    <li><a id="contents:要点" href="#要点">要点</a></li>
+    <li><a id="contents:powerdns" href="#powerdns">powerdns</a></li>
+    <li><a id="contents:phpmyadmin" href="#phpmyadmin">phpmyadmin</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="lnmp"><a href="#lnmp" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:lnmp" class="headings">LNMP</a></h1>
+<h2 id="环境说明"><a href="#环境说明" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:环境说明" class="headings">环境说明</a></h2>
+<ul>
+<li>CentOS Linux release 7.5.1804 (Core) minimal install版本</li>
+<li>192.168.80.101：nginx 1.14.2</li>
+<li>192.168.80.102：mysql 5.7.30</li>
+<li>192.168.80.103：php 5.5.38</li>
+<li>全部为分离部署</li>
+</ul>
+<h2 id="nginx编译安装"><a href="#nginx编译安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:nginx编译安装" class="headings">nginx编译安装</a></h2>
+<p>1，安装依赖包</p>
+<pre><code>yum install -y lrzsz gcc gcc++ pcre-devel openssl-devel zlib-devel
+
+# lrzsz用来上传本地下载好的源码包
+</code></pre><p>2，下载源码包，解压，进入解压后目录</p>
+<pre><code>[root@nginx src]# ll
+total 992
+-rw-r--r-- 1 root root 1015384 Aug 24 09:23 nginx-1.14.2.tar.gz
+[root@nginx src]# tar -xf nginx-1.14.2.tar.gz 
+[root@nginx src]# cd nginx-1.14.2
+[root@nginx nginx-1.14.2]# pwd
+/usr/local/src/nginx-1.14.2
+</code></pre><p>3，三步走</p>
+<pre><code>#configure，根据需要启动或禁用相应的模块，指定worker进程的用户为nignx，指定安装目录为/usr/local/nginx
+
+[root@nginx nginx-1.14.2]# ./configure --prefix=/usr/local/nginx --user=nginx --group=nginx --with-http_ssl_module --with-http_v2_module --with-http_dav_module --with-http_stub_status_module --with-threads --with-file-aio --with-stream_realip_module --with-stream_ssl_module --with-stream --with-pcre --with-http_gzip_static_module --with-http_realip_module
+
+
+#make
+
+#make install
+
+#安装后目录
+[root@nginx nginx]# pwd
+/usr/local/nginx
+[root@nginx nginx]# ll
+total 0
+drwxr-xr-x 2 root root 333 Aug 30 16:35 conf
+drwxr-xr-x 2 root root  40 Aug 30 16:35 html
+drwxr-xr-x 2 root root   6 Aug 30 16:35 logs
+drwxr-xr-x 2 root root  19 Aug 30 16:35 sbin
+</code></pre><p>4，安装完成后</p>
+<pre><code>用户创建
+[root@nginx nginx]# groupadd -g 2000 nginx
+[root@nginx nginx]# useradd -u 2000 nginx -g nginx
+[root@nginx nginx]# id nginx
+uid=2000(nginx) gid=2000(nginx) groups=2000(nginx)
+
+
+环境变量配置
+[root@nginx nginx]# vim /etc/profile.d/nginx.sh
+[root@nginx nginx]# cat /etc/profile.d/nginx.sh
+export PATH=/usr/local/nginx/sbin:$PATH
+
+[root@nginx nginx]# source /etc/profile.d/nginx.sh 
+[root@nginx nginx]# echo $PATH
+/usr/local/nginx/sbin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+
+启动测试               
+[root@nginx nginx]# nginx
+[root@nginx nginx]# ss -nlt
+State      Recv-Q Send-Q                                                 Local Address:Port                                                                Peer Address:Port              
+LISTEN     0      128                                                                *:80                                                                             *:*  
+
+[root@nginx nginx]# curl localhost
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+...
+</code></pre><h2 id="php编译安装"><a href="#php编译安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:php编译安装" class="headings">php编译安装</a></h2>
+<p>1，安装依赖包</p>
+<pre><code>yum install -y bzip2-devel libmcrypt-devel openssl-devel libxml2-devel gcc gcc++ 
+devel包不要写成level，写错过！
+</code></pre><p>2，下载源码包，解压，进入解压后目录</p>
+<pre><code>[root@php src]# ll
+total 17372
+-rw-r--r-- 1 root root 17785731 Aug 19 15:26 php-5.5.38.tar.gz
+[root@php src]# tar -xf php-5.5.38.tar.gz 
+[root@php src]# cd php-5.5.38
+</code></pre><p>3，三步走</p>
+<pre><code>#configure：启用php-fpm方式，用mysqlnd连接数据库，指定安装目录，等，
+
+[root@php php-5.5.38]# ./configure --prefix=/usr/local/php --with-openssl --with-mbstring --enable-sockets --with-freetype-dir --with-jpeg-dir --with-png-dir --with-libxml-dir=/usr --enable-xml --with-zlib --with-mcrypt --with-bz2 --with-mhash --with-config-file-path=/etc \--with-config-file-scan-dir=/etc/php.d --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --enable-fpm
+
+#make
+
+#make install
+</code></pre><p>php的configure脚本一些参数说明；</p>
+<pre><code>
+
+SAPI modules:
+
+  --with-apxs2=FILE       Build shared Apache 2.0 Handler module. FILE is the optional
+                          pathname to the Apache apxs tool apxs
+php编译为apache模式的方式时，指定，模块的路径
+  --enable-fpm            Enable building of the fpm SAPI executable
+php单独运行为fpm格式；
+
+General settings:
+
+  --with-config-file-path=PATH
+                          Set the path in which to look for php.ini [PREFIX/lib]
+php解释器的配置文件                        
+  --with-config-file-scan-dir=PATH
+                          Set the path where to scan for configuration files
+php-fpm的配置文件夹
+
+---
+php连接mysql方式2种；libmysql驱动连接、mysqlnd连接
+# libmysql时：需先安装mysql，mysql-devel
+# --with-mysql指定mysql安装路径
+# with-mysqli mysql_config 脚本路径
+# with-pdo-mysql mysql安装路径
+# 例如：
+./configure --prefix=/usr/local/php --with-mysql=/usrlocal/mysql --with-mysqli=/usr/local/mysql/bin/mysql_cofig 
+--with-pdo-mysql=/usr/local/mysql
+
+
+ --with-pdo-mysql=DIR    PDO: MySQL support. DIR is the MySQL base directory
+                          If no value or mysqlnd is passed as DIR, the
+                         directory /usr/local/freetds
+  --with-mysql=DIR        Include MySQL support.  DIR is the MySQL base
+                          directory, if no DIR is passed or the value is
+                          mysqlnd the MySQL native driver will be used
+
+  --with-mysqli=FILE      Include MySQLi support.  FILE is the path
+                          to mysql_config.  If no value or mysqlnd is passed
+                          as FILE, the MySQL native driver will be used
+                          
+                          
+# mysqlnd驱动连接时，不需提前安装mysql mysql-devel
+mysqlnd作为上面3项的值，然后enable-mysqlnd
+# 例子
+./configure --prefix=/usr/local/php --enable-mysqld --with-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd
+
+
+ --enable-mysqlnd        Enable mysqlnd explicitly, will be done implicitly
+                          when required by other extensions
+
+建议用mysqlnd
+
+# 扩展php支持类型的
+  --with-vpx-dir=DIR      GD: Set the path to libvpx install prefix
+  --with-jpeg-dir=DIR     GD: Set the path to libjpeg install prefix
+  --with-png-dir=DIR      GD: Set the path to libpng install prefix
+  --with-zlib-dir=DIR     GD: Set the path to libz install prefix
+  --with-xpm-dir=DIR      GD: Set the path to libXpm install prefix
+  --with-freetype-dir=DIR GD: Set the path to FreeType 2 install prefix
+加密，安装，压缩，等；
+  --with-libxml-dir=DIR   LIBXML: libxml2 install prefix
+  --with-openssl=DIR      Include OpenSSL support (requires OpenSSL &gt;= 0.9.6)
+  --with-kerberos=DIR     OPENSSL: Include Kerberos support
+  --with-pcre-regex=DIR   Include Perl Compatible Regular Expressions support.
+                          DIR is the PCRE install prefix BUNDLED
+  --without-sqlite3=DIR   Do not include SQLite3 support. DIR is the prefix to
+                          SQLite3 installation directory.
+  --with-zlib=DIR         Include ZLIB support (requires zlib &gt;= 1.0.9)
+  --with-zlib-dir=&lt;DIR&gt;   Define the location of zlib install directory
+</code></pre><p>4，安装后配置</p>
+<p>php的配置文件php.ini</p>
+<pre><code>准备php的配置文件；php的一般还有个/etc/php.d/目录
+
+[root@php php-5.5.38]# cp php.ini-production /etc/php.ini
+[root@php php-5.5.38]# pwd
+/usr/local/src/php-5.5.38
+</code></pre><p>php-fpmd服务脚本</p>
+<pre><code>准备php-fpm的服务脚本，加入执行权限
+
+[root@php php-5.5.38]# cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpmd
+[root@php php-5.5.38]# chmod +x /etc/init.d/php-fpmd 
+[root@php php-5.5.38]# chkconfig php-fpmd on
+
+</code></pre><p>php-fpmd的配置文件</p>
+<pre><code>准备php-fpm的配置文件；【和php的配置文件不一回事，类比java配置和tomcat的配置】
+
+[root@php php-5.5.38]# cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+
+注意：/usr/local/php是编译安装的目录；根据情况修改；
+</code></pre><p>修改监听端口为本机所有地址</p>
+<pre><code>[root@php php-5.5.38]# cd /usr/local/php/
+[root@php php]# ll
+total 0
+drwxr-xr-x 2 root root 132 Aug 30 16:54 bin
+drwxr-xr-x 2 root root  71 Aug 30 16:58 etc
+drwxr-xr-x 3 root root  17 Aug 30 16:54 include
+drwxr-xr-x 3 root root  17 Aug 30 16:54 lib
+drwxr-xr-x 4 root root  28 Aug 30 16:54 php
+drwxr-xr-x 2 root root  21 Aug 30 16:54 sbin
+drwxr-xr-x 4 root root  28 Aug 30 16:54 var
+[root@php php]# vim etc/php-fpm.conf
+
+# 取消127.0.0.1，即改成监听所有地址
+
+[root@php php]# service php-fpmd start
+Starting php-fpm  done
+[root@php php]# ss -nlt
+State      Recv-Q Send-Q                                                 Local Address:Port                                                                Peer Address:Port              
+LISTEN     0      128                                                                *:9000                                                                           *:*                  
+LISTEN     0      128                                                                *:22                                                                             *:*        
+
+</code></pre><p>修改php-fpm的进程用户</p>
+<p>​	nginx配置转发时，需要2者进程用户一致，避免权限问题；<strong>uid不同时，测试也可以，但最好保持一致</strong></p>
+<pre><code>[root@php php]# groupadd -g 2000 nginx
+[root@php php]# useradd -u 2000 nginx -g nginx
+[root@php php]# id nginx
+uid=2000(nginx) gid=2000(nginx) groups=2000(nginx)
+# 添加nginx用户，uid最好一致，
+
+[root@php php]# vim etc/php-fpm.conf
+[root@php php]# service php-fpmd restart
+Gracefully shutting down php-fpm . done
+Starting php-fpm  done
+
+# 改为nginx用户启动
+
+[root@php php]# ps aux|grep php
+root      81399  0.0  0.4  74912  4196 ?        Ss   17:02   0:00 php-fpm: master process (/usr/local/php/etc/php-fpm.conf)
+nginx     81400  0.0  0.3  74912  3744 ?        S    17:02   0:00 php-fpm: pool www
+nginx     81401  0.0  0.3  74912  3744 ?        S    17:02   0:00 php-fpm: pool www
+
+</code></pre><h2 id="mysql二进制安装"><a href="#mysql二进制安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:mysql二进制安装" class="headings">mysql二进制安装</a></h2>
+<p>1，下载二进制压缩包</p>
+<p>2，解压，解压后目录做软链接</p>
+<pre><code>[root@mysql local]# tar -xf mysql-5.7.30-el7-x86_64.tar.gz 
+[root@mysql local]# ll
+...
+drwxr-xr-x  9 root root       129 Aug 30 17:10 mysql-5.7.30-el7-x86_64
+-rw-r--r--  1 root root 727333633 Aug 20 16:16 mysql-5.7.30-el7-x86_64.tar.gz
+...
+[root@mysql local]# ln -sv mysql-5.7.30-el7-x86_64 mysql
+‘mysql’ -&gt; ‘mysql-5.7.30-el7-x86_64’
+</code></pre><p>3，配置环境变量</p>
+<pre><code>[root@mysql local]# vim /etc/profile.d/mysql.sh
+[root@mysql local]# source /etc/profile.d/mysql.sh
+[root@mysql local]# cat /etc/profile.d/mysql.sh 
+export PATH=/usr/local/mysql/bin:$PATH
+
+</code></pre><p>4，创建数据目录</p>
+<pre><code>[root@mysql local]# mkdir /data/mysql -pv
+mkdir: created directory ‘/data’
+mkdir: created directory ‘/data/mysql’
+</code></pre><p>5，创建用户</p>
+<pre><code>[root@mysql local]# useradd mysql
+[root@mysql local]# chown -R mysql.mysql /data/mysql/
+</code></pre><p>6，服务脚本</p>
+<pre><code>[root@mysql mysql]# cp support-files/mysql.server /etc/init.d/mysqld
+[root@mysql mysql]# pwd
+/usr/local/mysql
+
+</code></pre><p>7，配置文件</p>
+<pre><code># 将原有配置文件备份，并修改
+[root@mysql mysql]# cp /etc/my.cnf{,.bak}
+
+[root@mysql mysql]# ll /etc/my.cnf*
+-rw-r--r--. 1 root root 570 Jun  8  2017 /etc/my.cnf
+-rw-r--r--  1 root root 570 Aug 30 17:27 /etc/my.cnf.bak
+
+# 修改如下
+[root@mysql mysql]# vim /etc/my.cnf
+[root@mysql mysql]# cat /etc/my.cnf
+[mysqld]
+
+datadir=/data/mysql
+socket=/data/mysql/mysql.sock
+
+symbolic-links=0
+
+skip_name_resolve=on
+[mysqld_safe]
+log-error=/data/mysql/mariadb.log
+pid-file=/data/mysql/mariadb.pid
+
+#
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
+</code></pre><p>6，执行数据库初始化脚本</p>
+<pre><code>[root@mysql mysql]# mysql_install_db --datadir=/data/mysql --user=mysql
+2020-08-30 17:31:00 [WARNING] mysql_install_db is deprecated. Please consider switching to mysqld --initialize
+2020-08-30 17:31:00 [ERROR]   Child process: /usr/local/mysql-5.7.30-el7-x86_64/bin/mysqldterminated prematurely with errno= 32
+2020-08-30 17:31:00 [ERROR]   Failed to execute /usr/local/mysql-5.7.30-el7-x86_64/bin/mysqld --bootstrap --datadir=/data/mysql --lc-messages-dir=/usr/share/mysql --lc-messages=en_US
+-- server log begin --
+/usr/local/mysql-5.7.30-el7-x86_64/bin/mysqld: error while loading shared libraries: libaio.so.1: cannot open shared object file: No such file or directory
+
+
+# 数据库初始化脚本会报错，需要libaio库，安装即可
+[root@mysql mysql]# yum install -y libaio
+
+# mysql_install_db脚本废弃，仍会报错，改用mysqld --initialize，会生成随机密码
+[root@mysql mysql]# mysqld --initialize
+...
+[Note] A temporary password is generated for root@localhost: u5qu((8Cp&gt;xs
+
+
+</code></pre><p>7，本地连入，配置远程连接用户权限，建库，建用户</p>
+<pre><code>[root@mysql mysql]# service mysqld status
+ ERROR! MySQL is not running
+[root@mysql mysql]# chkconfig mysqld on
+
+[root@mysql mysql]# service mysqld start
+Starting MySQL.Logging to '/data/mysql/mariadb.log'.
+ SUCCESS! 
+[root@mysql mysql]# ss -nlt
+                                                                       :::*        
+# 连接，用初始化时，生成的随机密码；-S指定通信的socket，默认的/tmp/mysql.sock替换为了/data/mysql/mysql.sock
+
+[root@mysql mysql]# mysql -p&quot;u5qu((8Cp&gt;xs&quot; -S /data/mysql/mysql.sock
+
+# 需先修改密码
+mysql&gt; alter user root@'localhost' identified by 'wang';
+Query OK, 0 rows affected (0.01 sec)
+
+# 建立远程连接用户
+mysql&gt; grant all on *.* to root@'192.168.80.%' identified by 'wang';
+
+</code></pre><h2 id="配置nginx到php-fpm的转发"><a href="#配置nginx到php-fpm的转发" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:配置nginx到php-fpm的转发" class="headings">配置nginx到php-fpm的转发</a></h2>
+<p>1，配置转发的虚拟主机</p>
+<pre><code>[root@nginx conf]# cat vhosts/lnmp.conf 
+server {
+	listen 80;
+	server_name www.pc.com;
+	
+	location ~* \.php$ {
+		fastcgi_pass 192.168.80.103:9000;
+		fastcgi_param SCRIPT_FILENAME /php$fastcgi_script_name;
+		fastcgi_index index.php;
+		include fastcgi_params;
+	}
+
+}
+
+# 注意主配置文件中要include引入
+# ping和status转发未配置，php-fpm也未启用
+</code></pre><p>2，配置php-fpm环境</p>
+<pre><code># 改php-fpm进程用户为nginx，上面已经完成
+# 监听本机所有ip，上面已经完成
+user = nginx
+group = nginx
+
+# 允许nginx主机的ip连接
+listen.allowed_clients = 192.168.80.101
+
+
+# 重启
+[root@php php]# service php-fpmd restart
+Gracefully shutting down php-fpm . done
+Starting php-fpm  done
+
+# 写入index.php文件
+mkdir /php
+[root@php php]# cat /php/index.php 
+&lt;?php
+	phpinfo()
+
+?&gt;
+
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200830183739288.png" alt="image-20200830183739288"></p>
+<p><strong>至此，lnmp环境搭建完成</strong></p>
+<h1 id="discuz"><a href="#discuz" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:discuz" class="headings">Discuz</a></h1>
+<h2 id="单机部署"><a href="#单机部署" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:单机部署" class="headings">单机部署</a></h2>
+<p>nginx和php-fpm在同一台主机部署；<strong>nginx的【网页根目录文件】，和php-fpm的【脚本文件根目录文件】是同一个目录</strong>，此时页面正常，discuz正常搭建；</p>
+<p>1，下载程序包，解压，到网页根目录</p>
+<pre><code># nginx配置，分离部署失败时，采用单机部署，
+[root@php upload]# vim /etc/nginx/conf.d/lnmp.conf 
+server {
+        listen 80;
+        server_name www.test.com;
+
+        location / {
+                root /php; # /php是nginx的这个虚拟主机的网页文件根目录
+                index index.php index.html;
+        }
+        location ~* \.php$ {
+                fastcgi_pass 192.168.80.103:9000;
+                # 103就是本机地址，改为127.0.0.1也行，
+                # 注意php-fpm配置文件要允许192.168.80.103的自己的连接
+                fastcgi_param SCRIPT_FILENAME /php$fastcgi_script_name;
+                # /php也是转发php文件的存放php脚本文件的根目录
+                # 单机部署时，2者必须是同一个目录！！
+                fastcgi_index index.php;
+                include fastcgi_params;
+        }
+
+}
+
+# 网页目录，和脚本目录，/php
+# 将discuz解压后的upload该/php目录下
+[root@php upload]# pwd
+/php/upload
+[root@php upload]# ll
+total 76
+-rw-r--r--  1 root root 2739 May 31  2016 admin.php
+drwxr-xr-x 11 root root  163 May 31  2016 api
+-rw-r--r--  1 root root  727 May 31  2016 api.php
+drwxr-xr-x  2 root root   23 May 31  2016 archiver
+drwxrwxrwx  2 root root  141 Aug 30 19:32 config
+...
+</code></pre><p>2，浏览器打开http://www.test.com/uplaod</p>
+<p>会有下图错误，根据提示创建对应目录，文件，修改权限即可</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200830185005646.png" alt="image-20200830185005646"></p>
+<p>根据页面报错，做对应修改即可，命令如下</p>
+<pre><code>touch config/config_{global,ucenter}.php
+chmod a+w config/config_{global,ucenter}.php
+chmod a+w  data config data/{cache,avatar,plugindata,download,addonmd5,template,threadcache,attachment,log} data/attachment/{album,forum,group}
+chmod a+w uc_client/data/cache
+chmod a+w uc_server/data uc_server/data/{cache,avatar,backup,logs,tmp,view}
+</code></pre><p>修改后即可通过检查，根据提示，填入mysql的地址，即可成功安装；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200830192059314.png" alt="image-20200830192059314"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200830193406260.png" alt="image-20200830193406260"></p>
+<h2 id="多机分离部署"><a href="#多机分离部署" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:多机分离部署" class="headings">多机分离部署</a></h2>
+<p>问题：</p>
+<ul>
+<li>nginx和php-fpm同一个主机部署时， nginx的网页文件目录，和转发的php-fpm的脚本文件根目录是同一个！</li>
+<li>分开时：</li>
+<li>需要nginx和php-fpm主机，各在自己的网页根目录，放一份discuz的upload目录，</li>
+<li>都需要根据页面提示，创建文件，修改权限；</li>
+<li>但是，打开后，动静资源分离不当，页面混乱如下图：</li>
+<li>待解决；</li>
+</ul>
+<p>解决方案：</p>
+<ul>
+<li>NFS！</li>
+<li>既然必须要求nginx的网页根目录，和php的脚本文件根目录必须是同一个目录；</li>
+<li>那么，nginx和php-fpm分离的情况下，<strong>nfs就可以实现！！！</strong></li>
+<li>注意点：
+<ul>
+<li>本来转发时，就要求，php-fpm的进程用户和nginx的worker进程用户一致，都是nginx，同理若是apache，那都要是apache，</li>
+<li>做nfs共享目录时，2者nginx用户的uid必须保持一致！</li>
+<li>一般php做nfs共享，让nginx去挂载；discuz的程序目录选一边放置即可；</li>
+<li>nfs共享出的目录和客户端挂载的目录，要保持一致！</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200830192528355.png" alt="image-20200830192528355"></p>
+<h1 id="wordpress"><a href="#wordpress" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:wordpress" class="headings">Wordpress</a></h1>
+<h2 id="wordpress临时笔记"><a href="#wordpress临时笔记" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:wordpress临时笔记" class="headings">wordpress临时笔记</a></h2>
+<p><strong>wordpress采用多机分离部署：</strong></p>
+<p>nginx和php-fpm分离部署；</p>
+<p>1，下载源码包</p>
+<p>2，解压</p>
+<pre><code>tar -xf wordpress-3.9.32.tar.gz
+drwxr-xr-x   5 nobody nfsnobody     4096 Jun 11 06:14 wordpress
+-rw-r--r--   1 root   root       5795310 Aug 30 21:01 wordpress-3.9.32.tar.gz
+chown -R nginx.nginx /wordpress/
+
+</code></pre><p>3，创建数据库，和用户</p>
+<pre><code>mysql&gt; create database wordpress;
+mysql&gt; grant all on wordpress.* to wp@’192.168.80.%' identified by 'wp';
+
+</code></pre><p>4，遇到问题，</p>
+<ul>
+<li>1，是wordpress解压后目录，所放目录位置；
+<ul>
+<li>1种是解压后wordpress目录下的内容，直接网站根目录——访问的是http://ip/</li>
+<li>还1种是网站子目录，解压后wordpress目录放在网站根目录——访问的是http://ip/wordpress</li>
+</ul>
+</li>
+<li>2，还有就是版本兼容问题，一开始高版本的wordpress不兼容低版本的php，换成低版本的wordpress之后就可以了，或者把php换成高版本，<strong>总之版本要匹配；兼容</strong></li>
+</ul>
+<pre><code>官方描述：
+1种是直接网站根目录
+1种是网站子目录
+
+Upload the WordPress files to the desired location on your web server:
+
+If you want to integrate WordPress into the root of your domain (e.g. http://example.com/), move or upload all contents of the unzipped WordPress directory (excluding the WordPress directory itself) into the root directory of your web server.
+If you want to have your WordPress installation in its own subdirectory on your website (e.g. http://example.com/blog/), create the blog directory on your server and upload the contents of the unzipped WordPress package to the directory via FTP.
+
+Note: If your FTP client has an option to convert file names to lower case, make sure it’s disabled.
+Run the WordPress installation script by accessing the URL in a web browser. This should be the URL where you uploaded the WordPress files.
+If you installed WordPress in the root directory, you should visit: http://example.com/
+If you installed WordPress in its own subdirectory called blog, for example, you should visit: http://example.com/blog/
+</code></pre><pre><code>报错，显示，根据报错，怀疑为语法不兼容，换成低版本之后，即可；
+从5.4.2，换成3.9.32后即可；
+
+-rw-r--r--   1 root   root       5795310 Aug 30 21:01 wordpress-3.9.32.tar.gz
+-rw-r--r--   1 root   root      12872547 Aug 30 20:12 wordpress-5.4.2-zh_CN.tar.gz
+
+2020/08/30 20:53:11 [error] 10164#10164: *131 FastCGI sent in stderr: &quot;PHP message: PHP Parse error:  syntax error, unexpected '.', expecting '&amp;' or variable (T_VARIABLE) in /wordpress/blog/wp-includes/functions.php on line 1081&quot; while reading response header from upstream, client: 192.168.80.1, server: www.pc.com, request: &quot;GET /blog/ HTTP/1.1&quot;, upstream: &quot;fastcgi://192.168.80.103:9000&quot;, host: &quot;www.pc.com
+</code></pre><p>5，访问测试，访问http://www.pc.com/blog即打开wordpress的安装目录，填入数据库信息，一步步安装即可；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200830210607405.png" alt="image-20200830210607405"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200830210913321.png" alt="image-20200830210913321"></p>
+<p>1，php-fpm，部署，nfs服务，开放给nginx挂载，用于存放一份程序；</p>
+<pre><code>[root@php ~]# mkdir /www
+[root@php ~]# vim /etc/exports
+[root@php ~]# cat /etc/exports
+/wordpress 192.168.80.0/24(rw,no_root_squash,sync)
+/www 192.168.80.0/24(rw,no_root_squash,sync)
+</code></pre><p>2，nginx挂载，</p>
+<pre><code>mount.nfs 192.168.80.103:/www /www
+</code></pre><p>3，nginx配置转发的虚拟主机</p>
+<pre><code>server {
+        listen 80;
+        server_name www.word.com;
+
+        location / {
+                root /www;
+                index index.php index.html index.htm;
+        }
+        location ~* \.php$ {
+                fastcgi_pass 192.168.80.103:9000;
+                fastcgi_param SCRIPT_FILENAME /www$fastcgi_script_name;
+                fastcgi_index index.php;
+                include fastcgi_params;
+        }
+
+}
+</code></pre><p>4，解压wordpress目录带合适目录，选择网站根目录，或子目录；</p>
+<p>5，数据库，建立用户，建立数据库</p>
+<p>6，浏览器打开</p>
+<p>根据步骤，安装即可；</p>
+<h2 id="wordpress笔记梳理后"><a href="#wordpress笔记梳理后" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:wordpress笔记梳理后" class="headings">wordpress笔记梳理后</a></h2>
+<p>1，建立wordpress用到的数据库，和用户</p>
+<pre><code>mysql&gt; create database word;
+Query OK, 1 row affected (0.00 sec)
+
+mysql&gt; grant all on word.* to word@'192.168.80.%' identified by 'word';
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+</code></pre><p>2，在php-fpm主机上，配置nfs</p>
+<pre><code>yum install -y nfs-utils
+systemctl start nfs
+
+[root@php ~]# mkdir /data
+[root@php ~]# chown -R nginx.nginx /data/
+[root@php ~]# vim /etc/exports
+
+[root@php ~]# systemctl restart nfs
+[root@php ~]# showmount -e 192.168.80.103
+Export list for 192.168.80.103:
+/data      192.168.80.0/24
+
+</code></pre><p>3，nginx主机上，挂载php-fpm共享出的目录</p>
+<pre><code>[root@nginx ~]# mkdir /data
+#创建挂载点，和nfs共享出来的要相同
+[root@nginx ~]# yum install -y mount.nfs
+[root@nginx ~]# mount.nfs 192.168.80.103:/data /data
+[root@nginx ~]# 
+#下载mount.nfs工具，然后挂载；
+
+[root@nginx ~]# groupadd -g 2000 nginx
+[root@nginx ~]# useradd -u 2000 -g nginx nginx
+[root@nginx ~]# id nginx
+uid=2000(nginx) gid=2000(nginx) groups=2000(nginx)
+# 创建同id的nginx用户
+[root@nginx ~]# chown -R nginx.nginx /data/
+[root@nginx ~]# ll /data/ -d
+drwxr-xr-x 2 nginx nginx 6 Aug 31 11:00 /data/
+# 改为nginx属主
+
+</code></pre><p>4，nginx配置转发，虚拟主机为www.word.com，该虚拟主机网页文件根目录为/data，也是phpfpm读取php脚本文件的根目录，2者是同一个目录，为php-fpm主机nfs共享给nginx所用；</p>
+<pre><code>[root@nginx conf.d]# cat word.conf 
+server {
+
+	listen 80;
+	server_name www.word.com;
+	
+	root /data;
+	index index.php index.html;
+
+	location ~* \.php$ {
+		fastcgi_pass 192.168.80.103:9000;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME /data$fastcgi_script_name;
+		include fastcgi_params;
+	}
+}
+[root@nginx conf.d]# pwd
+/etc/nginx/conf.d
+# 为nginx仓库yum安装的版本；
+</code></pre><p>5，php-fpm修改配置文件</p>
+<pre><code>[root@php etc]# vim php-fpm.conf
+[root@php etc]# grep -v &quot;^;&quot; php-fpm.conf
+[global]
+[www]
+user = nginx
+group = nginx
+
+listen = 9000
+listen.allowed_clients = 192.168.80.101,192.168.80.103
+
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+
+[root@php etc]# pwd
+/usr/local/php/etc
+[root@php etc]# service php-fpmd restart
+Gracefully shutting down php-fpm . done
+Starting php-fpm  done
+
+# 主要修改，用户，组为nginx，监听本机所有ip，运行nginx的ip的连接；重启
+</code></pre><p>6，写入测试页面，在网页文件根目录下</p>
+<pre><code>[root@php data]# pwd
+/data
+[root@php data]# cat test.php 
+&lt;?php 
+	phpinfo()
+?&gt;
+</code></pre><p>7，改hosts文件，访问测试；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831142234788.png" alt="image-20200831142234788"></p>
+<p>8，下载wordpress，解压</p>
+<pre><code>[root@php ~]# tar -xf wordpress-3.9.32.tar.gz 
+[root@php ~]# ll
+drwxr-xr-x  5 nobody nfsnobody     4096 Jun 11 06:14 wordpress
+-rw-r--r--  1 root   root       5795310 Aug 30 21:01 wordpress-3.9.32.tar.gz
+-rw-r--r--  1 root   root      12872547 Aug 30 20:12 wordpress-5.4.2-zh_CN.tar.gz
+[root@php ~]# cp -a wordpress /data/
+
+[root@php ~]# chown -R nginx.nginx /data/wordpress/
+[root@php ~]# ll /data/
+total 4
+drwxr-xr-x 5 nginx nginx 4096 Jun 11 06:14 wordpress
+
+# php版本较低，改用低版本的wordpress
+</code></pre><p>9，访问，安装</p>
+<p>访问的是带有wordpress目录的</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831164716663.png" alt="image-20200831164716663"></p>
+<pre><code>
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831164943370.png" alt="image-20200831164943370"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831165018605.png" alt="image-20200831165018605"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831165031312.png" alt="image-20200831165031312"></p>
+<h2 id="安装discuz"><a href="#安装discuz" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装discuz" class="headings">安装discuz</a></h2>
+<p>1，解压discz，将解压后的upload目录放到网站根目录/data目录下；</p>
+<pre><code>[root@php ~]# unzip Discuz_X3.2_SC_UTF8.zip 
+[root@php ~]# ll
+total 30444
+-rw-------.  1 root   root          1391 Aug  8 12:02 anaconda-ks.cfg
+-rw-r--r--   1 root   root      12486773 Aug 20 17:00 Discuz_X3.2_SC_UTF8.zip
+drwxr-xr-x   2 root   root           102 May 31  2016 readme
+-rw-r--r--   1 root   root            21 Aug 31 14:20 test.php
+drwxr-xr-x  12 root   root          4096 May 31  2016 upload
+drwxr-xr-x   4 root   root            72 May 31  2016 utility
+drwxr-xr-x   5 nobody nfsnobody     4096 Jun 11 06:14 wordpress
+-rw-r--r--   1 root   root       5795310 Aug 30 21:01 wordpress-3.9.32.tar.gz
+-rw-r--r--   1 root   root      12872547 Aug 30 20:12 wordpress-5.4.2-zh_CN.tar.gz
+
+
+[root@php ~]# cp -a upload/ /data/
+[root@php ~]# ll /data/
+total 8
+drwxr-xr-x 12 root  root  4096 May 31  2016 upload
+drwxr-xr-x  5 nginx nginx 4096 Aug 31 16:49 wordpress
+
+#改属主
+[root@php ~]# chown -R nginx.nginx /data/upload/
+[root@php ~]# ll /data/
+total 8
+drwxr-xr-x 12 nginx nginx 4096 May 31  2016 upload
+drwxr-xr-x  5 nginx nginx 4096 Aug 31 16:49 wordpress
+
+</code></pre><p>2，浏览器访问，执行安装</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831165308995.png" alt="image-20200831165308995"></p>
+<p>填写数据库ip，数据库root的用户名和密码，指定数据库，稍后会在mysql里创建该库，用作discuz的数据库</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831165716969.png" alt="image-20200831165716969"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831165857837.png" alt="image-20200831165857837"></p>
+<p><strong>安装成功</strong></p>
+<h2 id="要点"><a href="#要点" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:要点" class="headings">要点</a></h2>
+<ul>
+<li>单机部署时（nginx和php-fpm同一个主机）数据库无所谓，网通就行；
+<ul>
+<li>nginx的虚拟主机的网站根目录要和php-fpm的脚本根目录是同一个目录！</li>
+<li>主语nginx的worker进程和php-fpm的进程用户是不是相同，都为nginx或apache（LAMP时）</li>
+<li>网站根目录下的文件属主要改为nginx，避免权限问题</li>
+<li>php-fpm要允许本机的连接，默认行为；</li>
+<li>然后在网站根目录下，放置解压后的wordpress或discuz的upload目录</li>
+<li>访问：http://域名/ [wordpress| upload]，执行wordpress或discuz的安装程序即可；</li>
+<li>wordpress需要提前创建数据库和用户</li>
+<li>discuz需提供数据库的root用户密码，在安装时创建；</li>
+</ul>
+</li>
+<li>多机部署时（nginx和php-fpm不同主机）
+<ul>
+<li>nginx的虚拟主机的网站根目录要和php-fpm的脚本根目录是同一个目录！</li>
+<li><strong>因此，通过nfs服务实现，2者挑一台做nfs服务端，另一端挂载</strong></li>
+<li>进程属主，目录权限，和单机类似</li>
+<li>nfs服务情况下，两端nignx或apache用户uid最好也保持一致</li>
+<li>php-fpm要监听本机所有ip，开放nginx主机过来的连接；</li>
+</ul>
+</li>
+</ul>
+<h2 id="powerdns"><a href="#powerdns" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:powerdns" class="headings">powerdns</a></h2>
+<p>1，下载程序包，解压</p>
+<pre><code>tar -xf poweradmin-2.1.7.tgz 
+
+mv poweradmin-2.1.7 poweradmin
+
+cp -a poweradmin /data/
+
+chown -R nginx.nginx /data/poweradmin/
+
+# 
+解压
+改解压后的目录名，去掉版本号
+复制到网站根目录
+改属主
+</code></pre><p>2，访问安装</p>
+<p>访问到install目录，报错；错误提示如下，估计又是php版本和程序包版本不兼容；</p>
+<p><a href="http://www.word.com/poweradmin/install/" target="_blank" rel="noopener">http://www.word.com/poweradmin/install/</a></p>
+<pre><code>2020/08/31 17:16:19 [error] 4395#4395: *76 FastCGI sent in stderr: &quot;PHP message: PHP Fatal error:  Call to undefined function _() in /data/poweradmin/inc/error.inc.php on line 25&quot; while reading response header from upstream, client: 192.168.80.1, server: www.word.com, request: &quot;GET /poweradmin/install/ HTTP/1.1&quot;, upstream: &quot;fastcgi://192.168.80.103:9000&quot;, host: &quot;www.word.com&quot;
+[root@nginx ~]# tail /var/log/nginx/error.log 
+</code></pre><h2 id="phpmyadmin"><a href="#phpmyadmin" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:phpmyadmin" class="headings">phpmyadmin</a></h2>
+<p>1，下载程序包，解压，将解压后目录放到网页文件根目录</p>
+<pre><code>  503  unzip phpMyAdmin-4.0.10.20-all-languages.zip 
+  505  mv phpMyAdmin-4.0.10.20-all-languages phpmyadmin
+  506  cp -a phpmyadmin/ /data/
+
+解压，改目录名去掉版本号，复制到网页根目录
+
+  512  cd phpmyadmin/
+  514  cp config.sample.inc.php config.inc.php 
+  521  chown -R nginx.nginx /data/
+准备config.inc.php问，改属主
+
+</code></pre><p>2，浏览器访问，执行安装</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200831173227975.png" alt="image-20200831173227975"></p>
+<p>php缺少mbstring扩展，在php.ini里取消mbstring扩展的注释，重启报错，原因在于php编译安装时，未编译该扩展；</p>
+<pre><code>[root@php phpmyadmin]# vim /etc/php.ini 
+[root@php phpmyadmin]# service php-fpmd restart
+Gracefully shutting down php-fpm . done
+Starting php-fpm [31-Aug-2020 17:29:07] NOTICE: PHP message: PHP Warning:  PHP Startup: Unable to load dynamic library '/usr/local/php/lib/php/extensions/no-debug-non-zts-20121212/php_mbstring.dll' - /usr/local/php/lib/php/extensions/no-debug-non-zts-20121212/php_mbstring.dll: cannot open shared object file: No such file or directory in Unknown on line 0
+ done
+
+</code></pre><h1 id="lnmp环境应用部署总结"><a href="#lnmp环境应用部署总结" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:lnmp环境应用部署总结" class="headings">lnmp环境、应用部署总结</a></h1>
+<ul>
+<li>lnmp环境部署（lamp同理，无非是用httpd配置一个fastcgi的转发虚拟主机）
+<ul>
+<li>单机部署</li>
+<li>多机分离部署</li>
+<li>需注意问题：见上面要点整理</li>
+</ul>
+</li>
+<li>应用部署
+<ul>
+<li>wordpress</li>
+<li>discuz</li>
+<li>powerdns</li>
+<li>phpmyadmin</li>
+<li>需注意问题：程序包版本和php的版本兼容问题；程序包需要的php扩展问题，<strong>编译安装php时尤其注意有无编译需要的扩展</strong></li>
+<li>遇到的问题有如：wordpress高版本需要高版本的php，phpmyadmin需要php有mbstring扩展；</li>
+<li>多看程序官方文档；</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/nginx%E4%B9%8Blnmp%E7%8E%AF%E5%A2%83/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/nginx之lnmp环境/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-19 18:15:01 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-19</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-19</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86/" class="related-link">nginx之七层代理</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8Btengine%E4%B8%8E%E9%AB%98%E5%B9%B6%E5%8F%91%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0/" class="related-link">nginx之tengine与高并发内核参数</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8B%E7%A8%8B%E5%BA%8F%E7%83%AD%E9%83%A8%E7%BD%B2/" class="related-link">nginx之程序热部署</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E4%B8%8E%E9%9D%99%E6%80%81web%E7%BB%93%E5%90%88%E9%85%8D%E7%BD%AE/" class="related-link">tomcat之与静态web结合</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8B%E9%80%9A%E7%94%A8%E5%9B%9B%E5%B1%82%E4%BB%A3%E7%90%86/" class="related-link">nginx之四层通用代理</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/lnmp/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>lnmp</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/nginx/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>nginx</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/httpd%E4%B9%8B%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" rel="prev">&lt; httpd之安装与配置</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/tomcat%E4%B9%8B%E5%9B%BE%E5%BD%A2%E7%AE%A1%E7%90%86%E4%B8%8E%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81/" rel="next">tomcat之图形管理与身份认证 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

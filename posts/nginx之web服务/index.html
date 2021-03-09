@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>nginx之web服务 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="nginx做web服务时相关配置实验笔记..." />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/nginx%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-09-06T13:32:53+00:00",
+        "dateModified": "2020-10-19T16:50:10+08:00",
+        "url": "https://latteStudio.github.io/posts/nginx%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/",
+        "headline": "nginx之web服务",
+        "description": "nginx做web服务时相关配置实验笔记...",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  4348 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/image-20200829135432750.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829125930510.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829130706120.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829130050689.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829130620762.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829131811128.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829133155082.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829133249076.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829181353322.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829204455962.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829205736810.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829211730744.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829212910994.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829205629478.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829211127225.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829201719078.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829202206145.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829202917980.png","https://gitee.com/boogie96/img/raw/master/img/image-20200829174851967.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="nginx之web服务" />
+<meta property="og:description" content="nginx做web服务时相关配置实验笔记..." />
+<meta property="og:url" content="https://latteStudio.github.io/posts/nginx%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/image-20200829135432750.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-09-06T13:32:53&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-19T16:50:10&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">nginx之web服务</h1>
+
+            
+
+            
+                <div class="post-description p-summary">nginx做web服务时相关配置实验笔记...</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-09-06T13:32:53&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.9.6</time>
+    
+    
+        
+        <time datetime="2020-10-19T16:50:10&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.19</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/web%E6%9C%8D%E5%8A%A1/" class="category-link p-category">web服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;4348</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;9&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:配置虚拟主机" href="#配置虚拟主机">配置虚拟主机</a>
+      <ol>
+        <li><a id="contents:三种虚拟主机" href="#三种虚拟主机">三种虚拟主机</a></li>
+        <li><a id="contents:网页访问控制" href="#网页访问控制">网页访问控制</a></li>
+        <li><a id="contents:网页认证" href="#网页认证">网页认证</a></li>
+        <li><a id="contents:状态页" href="#状态页">状态页</a></li>
+        <li><a id="contents:日志格式定义" href="#日志格式定义">日志格式定义</a></li>
+        <li><a id="contents:防盗链" href="#防盗链">防盗链</a></li>
+        <li><a id="contents:配置faviconico" href="#配置faviconico">配置favicon.ico</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:gzip压缩" href="#gzip压缩">gzip压缩</a></li>
+    <li><a id="contents:文件下载服务" href="#文件下载服务">文件下载服务</a></li>
+    <li><a id="contents:启用缓存" href="#启用缓存">启用缓存</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:速率限制" href="#速率限制">速率限制</a></li>
+    <li><a id="contents:并发限制" href="#并发限制">并发限制</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:rewritelastbreak" href="#rewritelastbreak">rewrite、last、break</a></li>
+    <li><a id="contents:return和rewrite区别" href="#return和rewrite区别"><strong>return和rewrite区别</strong></a></li>
+    <li><a id="contents:returnif" href="#returnif">return、if</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="虚拟主机"><a href="#虚拟主机" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:虚拟主机" class="headings">虚拟主机</a></h1>
+<h2 id="配置虚拟主机"><a href="#配置虚拟主机" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:配置虚拟主机" class="headings">配置虚拟主机</a></h2>
+<p>1，定义虚拟主机文件，主配置中引入</p>
+<pre><code>[root@host2 conf]# cat vhosts/bbs.conf 
+server {
+	listen 80;
+	server_name www.bbs.com;
+	
+	root /data/nginx/bbs;
+	index index.html;
+
+	location / {
+		root /data/nginx/bbs;
+		
+	}
+}
+# 写入网页文件
+[root@host2 conf]# cat /data/nginx/bbs/index.html 
+bbs-index
+
+# nginx.conf中引入，注意位置，和默认的localhost的server同级别，在http内部
+http {
+...
+include vhosts/*.conf;
+...
+}
+
+# nginx -t ; nginx -s reload
+</code></pre><p>2，访问</p>
+<p><strong>注意：默认虚拟主机是配置文件排位置第一的虚拟，所以为避免影响，include放在http段最下方，在主配置文件中最上方定义一个默认虚拟主机；</strong></p>
+<pre><code>[root@host1 ~]# curl www.bbs.com
+nginx-default-html
+# 没reload时，nginx还没启用bbs虚机，此时访问，默认的虚拟主机会匹配到处理
+# nginx默认虚拟主机，的默认首页
+[root@host2 conf]# cat /usr/local/nginx/html/index.html
+nginx-default-html
+
+# 重启后，
+[root@host1 ~]# curl www.bbs.com
+bbs-index
+[root@host1 ~]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+192.168.80.101 www.pc.com www.bbs.com www.load1.com
+</code></pre><h3 id="三种虚拟主机"><a href="#三种虚拟主机" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:三种虚拟主机" class="headings">三种虚拟主机</a></h3>
+<pre><code># 三种定义方式
+[root@host2 conf]# cat vhosts/*
+server {
+	listen 80;
+	server_name www.bbs.com;
+	
+	root /data/nginx/bbs;
+	index index.html;
+
+	location / {
+		root /data/nginx/bbs;
+		
+	}
+}
+基于主机头
+server {
+	listen 8080;
+	root /data/nginx/blog;
+	index index.html;
+}
+基于端口
+server {
+	listen 192.168.10.101:80;
+	root /data/nginx/mobile;
+	index index.html;
+}
+基于不同ip的
+server {
+	listen 80;
+	server_name www.pc.com;
+	root /data/nginx/pc;
+	index index.html;
+
+	location / {
+		
+	}
+
+}
+基于主机头
+
+# 写入主页
+-----------------
+[root@host2 conf]# ll /data/nginx/
+total 0
+drwxr-xr-x 2 root root 24 Aug 28 15:22 bbs
+drwxr-xr-x 2 root root 24 Aug 28 17:59 blog
+drwxr-xr-x 2 root root 24 Aug 28 17:59 mobile
+drwxr-xr-x 2 root root 24 Aug 28 17:15 pc
+[root@host2 conf]# cat /data/nginx/*/index.html
+bbs-index
+blog-index
+mobile-index
+pc-index
+
+# 访问测试
+------------------
+[root@host1 ~]# curl 192.168.10.101
+mobile-index
+[root@host1 ~]# curl 192.168.80.101:8080
+blog-index
+[root@host1 ~]# curl www.pc.com
+pc-index
+[root@host1 ~]# curl www.bbs.com
+bbs-index
+[root@host1 ~]# 
+
+</code></pre><h3 id="网页访问控制"><a href="#网页访问控制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:网页访问控制" class="headings">网页访问控制</a></h3>
+<p>模块：http_access：https://nginx.org/en/docs/http/ngx_http_access_module.html</p>
+<p>可基于ip，cidr的ip形式，unix socket做访问控制，一般先allow需要的小范围，最后deny大范围；</p>
+<p>基于ip的</p>
+<pre><code>server {
+        listen 80;
+        server_name www.bbs.com;
+
+        root /data/nginx/bbs;
+        index index.html;
+        allow 192.168.80.100;
+        deny all;
+...
+对bbs做限制配置
+
+
+[root@host3 ~]# curl www.bbs.com
+bbs-index
+[root@host3 ~]# curl www.bbs.com
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;403 Forbidden&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor=&quot;white&quot;&gt;
+&lt;center&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.14.2&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+# 只有100可以正常访问，其余ip不行
+</code></pre><h3 id="网页认证"><a href="#网页认证" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:网页认证" class="headings">网页认证</a></h3>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_auth_basic_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_auth_basic_module.html</a></p>
+<p>利用htpasswd工具，生成用户名，及密码；在需要的context配置，启用网页认证和用户密码文件，</p>
+<p>1，下载httpd-tools包</p>
+<pre><code>[root@host2 conf]# rpm -ql httpd-tools
+/usr/bin/ab
+/usr/bin/htdbm
+/usr/bin/htdigest
+/usr/bin/htpasswd
+...
+[root@host2 conf]# yum install -y httpd-tools
+</code></pre><p>2，生成用户密码文件</p>
+<pre><code>htpasswd -h
+查看用法
+
+[root@host2 conf]# htpasswd -cb nginx.user wang wang
+Adding password for user wang
+[root@host2 conf]# htpasswd -b nginx.user li li
+Adding password for user li
+[root@host2 conf]# cat nginx.user 
+wang:$apr1$kQLDR3lH$IxgAN1BpoCms8Q2iWjFyz0
+li:$apr1$SjOumK8J$vPIPEMN4CY3lBgED9Uwst/
+</code></pre><p>3，在context中引用</p>
+<pre><code> location /stat {
+        auth_basic           &quot;need auth!&quot;;
+        auth_basic_user_file nginx.user;
+        stub_status;
+#       access_log logs/bbs-stat.log log1;
+        }
+
+</code></pre><p>4，访问网页</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829135432750.png" alt="image-20200829135432750"></p>
+<h3 id="状态页"><a href="#状态页" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:状态页" class="headings">状态页</a></h3>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_stub_status_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</a></p>
+<p>eg：</p>
+<pre><code>  location /stat {
+                stub_status;
+        }
+# 加一个stat的location，启用stub_status指令；
+
+[root@host1 ~]# curl www.bbs.com/stat
+Active connections: 1 
+server accepts handled requests
+ 7 7 7 
+Reading: 0 Writing: 1 Waiting: 0 
+# 访问
+</code></pre><h3 id="日志格式定义"><a href="#日志格式定义" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:日志格式定义" class="headings">日志格式定义</a></h3>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_log_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_log_module.html</a></p>
+<p>官方eg</p>
+<pre><code>log_format compression '$remote_addr - $remote_user [$time_local] '
+                       '&quot;$request&quot; $status $bytes_sent '
+                       '&quot;$http_referer&quot; &quot;$http_user_agent&quot; &quot;$gzip_ratio&quot;';
+
+access_log /spool/logs/nginx-access.log compression buffer=32k;
+
+</code></pre><p>日志格式一般在http段定义，用名字标识，默认全局生效，下级范围如server，location默认继承http段日志的格式和路径，亦可以自定义格式和路径；日志组成一般是内建变量，</p>
+<p>在需要的上下文，如server，location，都可以引用http中定义的格式，自定义位置；</p>
+<p>默认的main日志格式和access.log日志位置对http下所有server，location等生效，当然可以被覆盖；</p>
+<p>1，定义格式</p>
+<pre><code>http {
+...
+    log_format log1 '$remote_addr $remote_user'
+			'$status &quot;$http_referer&quot;'
+			'&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';
+			
+注意写多行时，两边用''引起来			
+...
+}
+</code></pre><p>2，引用</p>
+<pre><code># 在bbs虚拟主机的stat的location引用，注意要先建立对应日志存放目录，
+# 此后只有访问bbs的stat的请求，会被单独记录到bbs-stat.log，
+# 其他虚拟主机的访问，包括bbs其他location的访问，仍是记录在默认的access.log中
+
+	location /stat {
+		stub_status;
+	access_log logs/bbs-stat.log log1;
+	}
+
+</code></pre><p><strong>json格式日志</strong></p>
+<p>​	定义log_format时，自拼凑为json格式日志，即自定义key，然后value是引用的内建变量，自然日志就为json格式了；</p>
+<pre><code>http段定义：
+【注意：1,json的key和值都用双引号引起来；2、每一对key-value后的逗号，除了最后一个；3，换行写时，每一行都用单引号引起来；】
+
+    log_format myjsonlog '{&quot;@timestamp&quot;:&quot;$time_iso8601&quot;,'
+        '&quot;clientip&quot;:&quot;$remote_addr&quot;,'
+        '&quot;host&quot;:&quot;$server_addr&quot;,'
+
+        '&quot;status&quot;:&quot;$status&quot;}';
+...
+虚拟主机pc 的 upload的location引用
+
+        location /upload {
+                root /data/html/pc/;
+                index index.html;
+                access_log  logs/pc-json-upload.log myjsonlog;
+...
+重载
+nginx -t ; nginx -s reload
+
+查看
+[root@host2 ~]# cat /usr/local/nginx/logs/pc-json-upload.log 
+{&quot;@timestamp&quot;:&quot;2020-08-25T11:18:49+08:00&quot;,&quot;clientip&quot;:&quot;192.168.80.100&quot;,&quot;host&quot;:&quot;192.168.80.101&quot;,&quot;status&quot;:&quot;200&quot;}
+{&quot;@timestamp&quot;:&quot;2020-08-25T11:18:49+08:00&quot;,&quot;clientip&quot;:&quot;192.168.80.100&quot;,&quot;host&quot;:&quot;192.168.80.101&quot;,&quot;status&quot;:&quot;200&quot;}
+{&quot;@timestamp&quot;:&quot;2020-08-25T11:18:50+08:00&quot;,&quot;clientip&quot;:&quot;192.168.80.100&quot;,&quot;host&quot;:&quot;192.168.80.101&quot;,&quot;status&quot;:&quot;200&quot;}
+
+json格式日志：
+	方便：elk处理，脚本统计处理等；
+</code></pre><h3 id="防盗链"><a href="#防盗链" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:防盗链" class="headings">防盗链</a></h3>
+<p>用户每个请求的请求头，一般都有referers字段，表示是从哪个网址跳转过来的，	一般网站图片等资源都要做放盗链，禁止小网站直接链接自己的资源，消耗自己带宽；</p>
+<p>valid_referers定义合法的来源目标，如谷歌，百度等搜索引擎，自己网站内部的跳转，其余的一般都禁止；</p>
+<p>eg：</p>
+<p>1，pc上定义合法的referer，只有bbs</p>
+<pre><code>[root@host2 conf]# cat vhosts/pc.conf 
+server {
+	listen 80;
+	server_name www.pc.com;
+	root /data/nginx/pc;
+	index index.html;
+valid_referers *.bbs.com;
+	location / {
+		if ($invalid_referer) {
+			return 403;
+		}
+	}
+
+}
+</code></pre><p>2，bbs和blog上写入网页，链接到pc.com</p>
+<pre><code>[root@host2 conf]# cat /data/nginx/bbs/index.html 
+bbs-index
+&lt;a href=&quot;http://www.pc.com&quot; target=&quot;_blank&quot;&gt;pc.com&lt;/a&gt;
+
+[root@host2 conf]# cat /data/nginx/blog/index.html 
+blog-index
+&lt;a href=&quot;http://www.pc.com&quot; target=&quot;_blank&quot;&gt;pc.com&lt;/a&gt;
+
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829125930510.png" alt="image-20200829125930510"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829130706120.png" alt="image-20200829130706120"></p>
+<p>上图，是点击链接，从blog.com跳转的请求，被拒绝；<strong>不仅如此，直接访问也不行了，因为只定义了从bbs跳转的为合法referer，</strong></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829130050689.png" alt="image-20200829130050689"></p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829130620762.png" alt="image-20200829130620762"></p>
+<p>上图，从bbs.com跳转的请求可以；</p>
+<h3 id="配置faviconico"><a href="#配置faviconico" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:配置faviconico" class="headings">配置favicon.ico</a></h3>
+<p>真实浏览器访问网站首页时，<strong>会自动请求favicon.ico图标</strong>，若没有，日志会记录一条404；</p>
+<pre><code>192.168.80.1 - - [29/Aug/2020:13:13:48 +0800] &quot;GET / HTTP/1.1&quot; 200 66 &quot;-&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36&quot;
+192.168.80.1 - - [29/Aug/2020:13:13:48 +0800] &quot;GET /favicon.ico HTTP/1.1&quot; 404 571 &quot;http://www.bbs.com/&quot; &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36&quot;
+</code></pre><p>配置一个favicon.ico</p>
+<pre><code>加个favicon.ico的location
+    location = /favicon.ico {
+                root /data/nginx/bbs;
+        }
+
+
+[root@host2 conf]# cp /usr/share/backgrounds/day.jpg /data/nginx/bbs/
+[root@host2 conf]# mv /data/nginx/bbs/day.jpg /data/nginx/bbs/favicon.ico
+[root@host2 conf]# nginx -t
+nginx: the configuration file /usr/local/nginx-1.14/conf/nginx.conf syntax is ok
+nginx: configuration file /usr/local/nginx-1.14/conf/nginx.conf test is successful
+[root@host2 conf]# nginx -s reload
+
+
+</code></pre><p>reload，浏览器访问，标签页上即有图标；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829131811128.png" alt="image-20200829131811128"></p>
+<p>或直接取消favicon找不到的报错；并不记录该日志</p>
+<pre><code>location = /favicon.ico {
+	log_not_found off;
+	access_log off;
+}
+</code></pre><h2 id="gzip压缩"><a href="#gzip压缩" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:gzip压缩" class="headings">gzip压缩</a></h2>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_gzip_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_gzip_module.html</a></p>
+<p>1，准备稍大文件做网页文件</p>
+<pre><code>[root@host2 conf]# cp /var/log/messages /data/nginx/bbs/mess.html
+[root@host2 conf]# ll -h !$
+ll -h /data/nginx/bbs/mess.html
+-rw------- 1 root root 279K Aug 29 13:28 /data/nginx/bbs/mess.html
+
+注意nginx用户的读权限
+[root@host2 conf]# chmod a+r /data/nginx/bbs/mess.html
+</code></pre><p>2，在需要的上下文配置启用压缩，及压缩比等属性</p>
+<pre><code> location / {
+                root /data/nginx/bbs;
+#       access_log logs/bbs-json.log myjsonlog;
+
+        gzip on;
+        gzip_comp_level 3;
+        gzip_disable &quot;fire&quot;;
+        gzip_min_length 200;
+        gzip_vary on;
+
+        }
+</code></pre><p>3，访问测试，查看响应头部信息</p>
+<p>压缩前：头部信息；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829133155082.png" alt="image-20200829133155082"></p>
+<p>压缩后访问，多了gzip标识头部，多了vary字段，大小从280多k变为40多k</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829133249076.png" alt="image-20200829133249076"></p>
+<h2 id="文件下载服务"><a href="#文件下载服务" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:文件下载服务" class="headings">文件下载服务</a></h2>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_autoindex_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_autoindex_module.html</a></p>
+<p><strong>利用autoindex指令</strong>可以在<strong>找不到默认的index.html情况下</strong>，展示该目录下所有文件，并可以提供下载；</p>
+<p>1，配置download的loaction</p>
+<pre><code>  location /download {
+                root /data/nginx/bbs; 
+                autoindex on;
+                autoindex_exact_size on;
+                autoindex_localtime on;
+                autoindex_format html;
+        }  
+</code></pre><p>2，放入文件，注意：一定不能有index.html，否则刷出的是首页文件，<strong>只有不存在首页文件时，才会显示目录，提供下载功能</strong></p>
+<pre><code>[root@host2 conf]# ll /data/nginx/bbs/download
+total 8
+-rw-r--r-- 1 root root 1077 Aug 29 18:06 fastcgi.conf
+-rw-r--r-- 1 root root 3099 Aug 29 18:06 nginx.conf
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829181353322.png" alt="image-20200829181353322"></p>
+<h2 id="启用缓存"><a href="#启用缓存" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:启用缓存" class="headings">启用缓存</a></h2>
+<pre><code>Syntax:	open_file_cache off;
+open_file_cache max=N [inactive=time];
+Default:	
+open_file_cache off;
+Context:	http, server, location
+
+eg:
+open_file_cache          max=1000 inactive=20s;
+open_file_cache_valid    30s;
+open_file_cache_min_uses 2;
+open_file_cache_errors   on;
+</code></pre><h1 id="客户端限制"><a href="#客户端限制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:客户端限制" class="headings">客户端限制</a></h1>
+<h2 id="速率限制"><a href="#速率限制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:速率限制" class="headings">速率限制</a></h2>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_limit_req_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_limit_req_module.html</a></p>
+<p>The <code>ngx_http_limit_req_module</code> module (0.7.21) is used to limit the request processing rate per a defined key, in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method.</p>
+<h2 id="并发限制"><a href="#并发限制" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:并发限制" class="headings">并发限制</a></h2>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_limit_req_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_limit_req_module.html</a></p>
+<p>The <code>ngx_http_limit_conn_module</code> module is used to limit the number of connections per the defined key, in particular, the number of connections from a single IP address.</p>
+<h1 id="url重写"><a href="#url重写" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:url重写" class="headings">URL重写</a></h1>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite</a></p>
+<h2 id="rewritelastbreak"><a href="#rewritelastbreak" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:rewritelastbreak" class="headings">rewrite、last、break</a></h2>
+<p>rewrite有四种标志；permanent类似return加301；redirect类似return加302；last表示匹配到继续执行匹配循环；break表示匹配到就跳出匹配循环；</p>
+<p>last配置不当容易造成死循环，但nginx默认限制了最大循环10次，然后返回500error；</p>
+<pre><code>Syntax:	rewrite regex replacement [flag];
+Default:	—
+Context:	server, location, if
+</code></pre><p>1、<strong>rewrite做http到https跳转</strong></p>
+<pre><code>   if ($scheme = http) {
+        #       return 301 https://www.pc.com;
+                rewrite / https://www.pc.com break;
+        }
+
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829204455962.png" alt="image-20200829204455962"></p>
+<p>2、<strong>break</strong></p>
+<p>2者对比发现：break是做了rewrite之后，不再理会其他的location，直接在本机找rewrite后的文件，本例中是找/2.txt，由于没有该文件，所以返回是404；</p>
+<p>而last，是做了rewrite之后，用rewrite后新的uri和各个location的配置再匹配一遍，如果匹配到了，就用匹配到后的配置处理，此例中：1.txt改写后变为2.txt，改写后的2.txt又匹配到了另外的2.txt的location，所以执行里面的指令，返回666给客户端；</p>
+<pre><code> location /1.txt {
+                rewrite /1.txt /2.txt break;
+        }
+        location /2.txt {
+                return 666;
+        }
+
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829205736810.png" alt="image-20200829205736810"></p>
+<p>存在/2.txt文件的情况下，会直接得到相应页面；<strong>注意：调试窗口，只有一个发起1.txt的请求，并无发起2.txt的请求，也就是说，是nginx内部完成重写，nginx找到改写后文件直接返回客户端，不需要客户端得到改写后的uri并重新发起请求！</strong></p>
+<p><strong>下图为rewrite情况，return不同！见下方对比；</strong></p>
+<pre><code> location /1.txt {
+                rewrite /1.txt /2.txt break;
+        }
+break标记位，在改成为2.txt后，直接找到本地的2.txt返回客户端；
+改写后的uri不会再和其他location做再次比较；
+不会返回客户端新的url或uri链接，
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829211730744.png" alt="image-20200829211730744"></p>
+<h2 id="return和rewrite区别"><a href="#return和rewrite区别" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:return和rewrite区别" class="headings"><strong>return和rewrite区别</strong></a></h2>
+<ul>
+<li>return
+<ul>
+<li>return主要使用于外部完整url链接的重定向</li>
+<li>服务器会返回客户端新的url，浏览器会对返回的url重新发起请求，地址栏url会变</li>
+<li><strong>code不可以随意写</strong>，一般是301,302，写的随便的如233，后面的url会被当初return的文本参数返回，而不是被当作url对待</li>
+</ul>
+</li>
+<li>rewrite
+<ul>
+<li>rewrite主要适用于内部部分uri变更的重定向，如video路径改成了mp4路径</li>
+<li>服务端不会返回客户端新的url，浏览器不会得到url并发新请求，地址栏地址不会变</li>
+<li>nginx内部完成路径的重写，并找到重写后的文件，直接返回给客户端；</li>
+</ul>
+</li>
+</ul>
+<p><strong>下图为return情况：</strong></p>
+<pre><code>  location /1.txt {
+                return 301 http://www.pc.com/3.txt;
+                301的code不能随便写，一开始写的233，后面的url不会当成url，而是当成文本；
+        }
+
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829212910994.png" alt="image-20200829212910994"></p>
+<p>3、<strong>last</strong></p>
+<pre><code>        location /2.txt {
+                return 666;
+        }
+        # location的顺序位置无所谓，都会从头再跟各个location比较一下；
+         location /1.txt {
+                rewrite /1.txt /2.txt last;
+        }
+
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829205629478.png" alt="image-20200829205629478"></p>
+<p>4、last的死循环</p>
+<pre><code>    location /2.txt {
+                rewrite /2.txt /1.txt last;
+        }
+        location /1.txt {
+                rewrite /1.txt /2.txt last;
+        }
+        
+        
+ # error.log给出了明显的报错；  
+2020/08/29 21:12:45 [error] 2334#2334: *210 rewrite or internal redirection cycle while processing &quot;/2.txt&quot;, client: 192.168.80.1, server: www.pc.com, request: &quot;GET /1.txt HTTP/1.1&quot;, host: &quot;www.pc.com
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829211127225.png" alt="image-20200829211127225"></p>
+<h2 id="returnif"><a href="#returnif" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:returnif" class="headings">return、if</a></h2>
+<p>可以返回301永久重定向，或：302临时重定向；</p>
+<p>1，pc虚拟配置，加一段location</p>
+<pre><code> location /return {
+                if ($scheme = http) {
+                        return 302 https://www.baidu.com;
+                }
+        }
+
+</code></pre><p>2，访问测试，访问return的uri时，会返回302状态码，返回百度的网址，然后<strong>浏览器会自己主动</strong>向百度发起请求；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829201719078.png" alt="image-20200829201719078"></p>
+<p>eg：</p>
+<p>访问http://www.taobao.com网址，会被重定向到https://www.taobao.com，实现全部https加密访问；</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829202206145.png" alt="image-20200829202206145"></p>
+<p>实现类型效果：</p>
+<p>1，同时配置http和https监听</p>
+<p>2，然后，对http的请求做return重定向到https；</p>
+<pre><code>server {
+        listen 80;
+        listen 443 ssl;
+        server_name www.pc.com;
+        root /data/nginx/pc;
+        index index.html;
+
+        ssl_certificate_key ssl/bbs.key;
+        ssl_certificate     ssl/bbs.crt;
+        ssl_session_cache shared:sslcache:20m;
+        ssl_session_timeout 10m;
+
+        if ($scheme = http) {
+                return 301 https://www.pc.com;
+        }
+        location /return {
+                if ($scheme = http) {
+                        return 302 https://www.baidu.com;
+                }
+        }
+}
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829202917980.png" alt="image-20200829202917980"></p>
+<h1 id="https加密"><a href="#https加密" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:https加密" class="headings">https加密</a></h1>
+<p><a href="https://nginx.org/en/docs/http/ngx_http_ssl_module.html" target="_blank" rel="noopener">https://nginx.org/en/docs/http/ngx_http_ssl_module.html</a></p>
+<p>真实公网证书，需到证书提供商申请，有单一域名、和通配域名，如*.gitee.io就是通配域名证书，所有gitee.io结尾的网站都可以被同一套证书加密；</p>
+<p>1，生成自签名ca，然后给需要的虚拟主机或这个nginx实例生成证书和key</p>
+<pre><code>openssl genrsa -out bbs.key 1024
+openssl req -new -x509 -days 365 -key bbs.key -out bbs.crt
+# 生成key，然后直接自签名；
+
+mkdir /usr/local/nginx/conf/ssl
+[root@host2 ssl]# pwd
+/usr/local/nginx/conf/ssl
+[root@host2 ssl]# ll
+total 8
+-rw-r--r-- 1 root root 1001 Aug 29 17:43 bbs.crt
+-rw-r--r-- 1 root root  891 Aug 29 17:40 bbs.key
+</code></pre><p>2，配置到bbs上</p>
+<pre><code>server {
+        listen 80;
+        listen 443 ssl;
+        server_name www.bbs.com;
+
+        ssl_certificate_key ssl/bbs.key; # 采用的是conf的相对路径
+        ssl_certificate     ssl/bbs.crt;
+        ssl_session_cache shared:sslcache:20m;
+        ssl_session_timeout 10m;
+
+...
+</code></pre><p>3，重载访问</p>
+<p>已经完成了https的访问，然后将根证书导入浏览器信任的根列表，<strong>再次访问显示证书无问题，但仍有红色警告</strong></p>
+<pre><code>[root@host2 ssl]# ss -lnt
+State      Recv-Q Send-Q Local Address:Port                Peer Address:Port              
+LISTEN     0      128                *:80                             *:*                  
+LISTEN     0      128                *:22                             *:*                  
+LISTEN     0      100        127.0.0.1:25                             *:*                  
+LISTEN     0      128                *:443                            *:*   
+# 443端口同时监听；
+</code></pre><p><img src="https://gitee.com/boogie96/img/raw/master/img/image-20200829174851967.png" alt="image-20200829174851967"></p>
+
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/nginx%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/nginx之web服务/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-19 16:50:10 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-19</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-19</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86/" class="related-link">nginx之七层代理</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8Btengine%E4%B8%8E%E9%AB%98%E5%B9%B6%E5%8F%91%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0/" class="related-link">nginx之tengine与高并发内核参数</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8B%E7%A8%8B%E5%BA%8F%E7%83%AD%E9%83%A8%E7%BD%B2/" class="related-link">nginx之程序热部署</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E4%B8%8E%E9%9D%99%E6%80%81web%E7%BB%93%E5%90%88%E9%85%8D%E7%BD%AE/" class="related-link">tomcat之与静态web结合</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8Blnmp%E7%8E%AF%E5%A2%83/" class="related-link">nginx之LNMP环境</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/nginx/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>nginx</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/nginx%E4%B9%8B%E9%80%9A%E7%94%A8%E5%9B%9B%E5%B1%82%E4%BB%A3%E7%90%86/" rel="prev">&lt; nginx之四层通用代理</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/ansible%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D%E4%B8%8E%E5%AE%89%E8%A3%85/" rel="next">ansible基础介绍与安装 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

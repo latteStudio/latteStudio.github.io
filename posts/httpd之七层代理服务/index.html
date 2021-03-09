@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>httpd之七层代理服务 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="httpd做七层代理服务，httpd可以代理同构协议http，也可以代理异构协议如factcgi等..." />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-10-15T16:06:11+00:00",
+        "dateModified": "2020-10-16T16:41:28+08:00",
+        "url": "https://latteStudio.github.io/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/",
+        "headline": "httpd之七层代理服务",
+        "description": "httpd做七层代理服务，httpd可以代理同构协议http，也可以代理异构协议如factcgi等...",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  5022 ,
+        "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary" />
+
+
+    
+
+
+
+<meta property="og:title" content="httpd之七层代理服务" />
+<meta property="og:description" content="httpd做七层代理服务，httpd可以代理同构协议http，也可以代理异构协议如factcgi等..." />
+<meta property="og:url" content="https://latteStudio.github.io/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://latteStudio.github.io/icons/apple-touch-icon.png" />
+    <meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-10-15T16:06:11&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-16T16:41:28&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">httpd之七层代理服务</h1>
+
+            
+
+            
+                <div class="post-description p-summary">httpd做七层代理服务，httpd可以代理同构协议http，也可以代理异构协议如factcgi等...</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-10-15T16:06:11&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.10.15</time>
+    
+    
+        
+        <time datetime="2020-10-16T16:41:28&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.16</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/web%E6%9C%8D%E5%8A%A1/" class="category-link p-category">web服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;5022</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;11&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:正代" href="#正代">正代</a></li>
+    <li><a id="contents:反代" href="#反代">反代</a>
+      <ol>
+        <li><a id="contents:同构反代http" href="#同构反代http">同构反代http</a></li>
+        <li><a id="contents:异构反代fastcgi" href="#异构反代fastcgi">异构反代fastcgi</a></li>
+      </ol>
+    </li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:主机组配置" href="#主机组配置">主机组配置</a></li>
+    <li><a id="contents:各个节点属性信息配置" href="#各个节点属性信息配置">各个节点属性信息配置</a></li>
+    <li><a id="contents:调度算法" href="#调度算法">调度算法</a></li>
+    <li><a id="contents:负载均衡状态页管理页" href="#负载均衡状态页管理页">负载均衡状态页、管理页</a></li>
+    <li><a id="contents:健康检查" href="#健康检查">健康检查</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:proxypass" href="#proxypass">ProxyPass</a></li>
+    <li><a id="contents:proxypassmatch" href="#proxypassmatch">ProxyPassMatch</a></li>
+    <li><a id="contents:proxyset" href="#proxyset">ProxySet</a></li>
+    <li><a id="contents:proxy容器" href="#proxy容器">Proxy容器</a></li>
+    <li><a id="contents:proxystatus" href="#proxystatus">ProxyStatus</a></li>
+    <li><a id="contents:proxyvia" href="#proxyvia">ProxyVia</a></li>
+    <li><a id="contents:proxypass指令顺序共享" href="#proxypass指令顺序共享">ProxyPass指令顺序、共享</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:结合alias" href="#结合alias">结合alias</a></li>
+    <li><a id="contents:结合redirect" href="#结合redirect">结合redirect</a></li>
+    <li><a id="contents:结合proxypass" href="#结合proxypass">结合proxypass</a></li>
+    <li><a id="contents:结合set-handler" href="#结合set-handler">结合set-handler</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="httpd代理"><a href="#httpd代理" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:httpd代理" class="headings">httpd代理</a></h1>
+<h2 id="正代"><a href="#正代" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:正代" class="headings">正代</a></h2>
+<p>​	httpd可以配置为正向代理，如局域网内部的正代上网出口，一般不常用，可以设置只允许部分局域网内部的ip进行正代上网；</p>
+<pre><code>ProxyRequests on
+#通过启用proxyrequests指令，即可启动正代服务；
+ProxyVia on
+&lt;Proxy &quot;*&quot;&gt;
+	Require host www.a.com
+&lt;/Proxy&gt;
+#proxy指令设置，允许正代的客户端ip，以及允许正代出去访问的url
+www.a.com 的主机，可以通过该httpd的代理，访问所有url，proxyvia，可以在响应首部加一个via字段
+客户端可通过这个知道中间经由了哪个客户端；
+
+
+eg：
+1，httpd配置正代：
+[root@www conf.d]# cat proxy.conf 
+ProxyRequests on
+Proxyvia on
+&lt;Proxy &quot;*&quot;&gt;
+	Require ip 192.168.80.100
+&lt;/Proxy&gt;
+[root@www conf.d]# pwd
+/etc/httpd/conf.d
+然后重启；
+
+2，客户端加代理，不加代理访问；
+[root@localhost ~]# curl -h |grep proxy
+     --noproxy       List of hosts which do not use proxy
+ -x, --proxy [PROTOCOL://]HOST[:PORT] Use proxy on given port
+
+
+[root@localhost ~]# curl -I www.baidu.com
+HTTP/1.1 200 OK
+...
+Server: bfe/1.0.8.1
+
+加了代理后，头部多了个via字段；
+# curl的-x参数，可以指定正向代理的信息；
+[root@localhost ~]# curl -I -x 192.168.80.101:80 www.baidu.com
+HTTP/1.1 200 OK
+...
+Pragma: no-cache
+Via: 1.1 www.b.com
+</code></pre><h2 id="反代"><a href="#反代" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:反代" class="headings">反代</a></h2>
+<p><a href="https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html" target="_blank" rel="noopener">https://httpd.apache.org/docs/2.4/howto/reverse_proxy.html</a></p>
+<p>​	httpd做反代的场景更常用，做反向代理时，分为同构协议反代，和异构协议反代，<strong>同构可以代理http协议，异构可以代理factcgi协议，和后端php服务器通信，常见于lamp环境；</strong></p>
+<p>​	反代服务器，屏蔽了后端的真实服务器，接收客户端请求，转发到后端服务器处理，接收后端发来的处理结果，再转给客户端；</p>
+<h3 id="同构反代http"><a href="#同构反代http" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:同构反代http" class="headings">同构反代http</a></h3>
+<p>​	1、如下，为同构，反代http协议时配置示例：</p>
+<pre><code>---
+host3上：配2个虚拟主机；
+[root@host3 conf.d]# cat vhosts.conf 
+&lt;Directory &quot;/data/host3/www1&quot;&gt;
+	Require all granted
+&lt;/Directory&gt;
+&lt;Directory &quot;/data/host3/www2&quot;&gt;
+	Require all granted
+&lt;/Directory&gt;
+&lt;VirtualHost *:80&gt;
+	ServerName www1.host3.com
+	DocumentRoot &quot;/data/host3/www1&quot;
+	
+&lt;/VirtualHost&gt;
+&lt;VirtualHost *:80&gt;
+	ServerName www2.host3.com
+	DocumentRoot &quot;/data/host3/www2&quot;
+	
+&lt;/VirtualHost&gt;
+
+---
+host2上：写入一个index，然后重启；
+[root@host2 httpd]# cat /var/www/html/index.html 
+host2-index
+[root@host2 httpd]
+
+---
+host1做client，访问host2
+[root@host1 ~]# curl http://www.host2.com
+host2-index
+此时为host2的主页
+
+
+---
+host2加上反代配置，注意重启生效；
+[root@host2 httpd]# cat conf.d/proxy.conf 
+ProxyPass &quot;/&quot; &quot;http://www1.host3.com&quot;
+ProxyPassReverse &quot;/&quot; &quot;http://www1.host3.com&quot;
+[root@host2 httpd]# 
+
+---
+此时host1再访问host2，就已经是被代理的网页了！
+[root@host1 ~]# curl http://www.host2.com
+www1.host3
+
+--
+【遇到的错误】
+上面的错误:加index.html访问出错；
+[root@host1 ~]# curl http://www.host2.com
+www1.host3
+[root@host1 ~]# curl http://www.host2.com/index.html
+&lt;!DOCTYPE HTML PUBLIC &quot;-//IETF//DTD HTML 2.0//EN&quot;&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;title&gt;502 Proxy Error&lt;/title&gt;
+...
+html&quot;&gt;GET&amp;nbsp;/index.html&lt;/a&gt;&lt;/em&gt;.&lt;p&gt;
+Reason: &lt;strong&gt;DNS lookup failure for: www1.host3.comindex.html&lt;/strong&gt;&lt;/p&gt;&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+
+如下：加了斜线后
+[root@host2 httpd]# cat conf.d/proxy.conf 
+ProxyPass &quot;/&quot; &quot;http://www1.host3.com/&quot;
+ProxyPassReverse &quot;/&quot; &quot;http://www1.host3.com/&quot;
+
+再访问正常；【还是等效替换的方法】
+原来的没加斜线，访问/index.html就-》host3.comindex.html，自然找不到，映射时加个斜线即-》host3.com/index.html，就对应/data/host3/www1/index.html了；
+
+[root@host1 ~]# curl http://www.host2.com/index.html
+www1.host3
+
+eg2:
+[root@host2 httpd]# cat conf.d/proxy.conf 
+ProxyPass &quot;/images&quot; &quot;http://www1.host3.com&quot;
+ProxyPassReverse &quot;/images&quot; &quot;http://www1.host3.com&quot;
+注意顺序，范围小的放前面！
+ProxyPass &quot;/&quot; &quot;http://www1.host3.com/&quot;
+ProxyPassReverse &quot;/&quot; &quot;http://www1.host3.com/&quot;
+
+[root@host1 ~]# curl http://www.host2.com/images/1.jpg
+1.jpg
+[root@host1 ~]# curl http://www.host2.com/images/2.jpg
+2.jpg
+</code></pre><p>​	2、配置时需注意问题：</p>
+<pre><code>【地址重定向时的反向代理，要多加一行ProxyPassReverse指令，后面的和ProxyPass保持一致即可；】
+
+举例说：
+ProxyPass &quot;/images&quot; &quot;http://www.a1.com&quot;
+ProxyPassReverse &quot;/images&quot; &quot;http://www.a1.com&quot;
+
+客户端请求http://www.a.com/images/a.gif 时；
+会反代到http://www.a1.com/a.gif
+如果a.gif被重定向到了b.gif
+
+那么没有ProxyPassReverse时，反代服务器返回给客户的重定向信息时：http://www.a1.com/b.gif,客户群请求该url，是无法访问到的，因为a1是内网地址，无法直接访问；
+如果加了ProxyPassReverse ，反代服务器返回给客户端的重定向信息是：http://www.a.com/images/b.gif;客户端访问该url，后，被被反代到a1.com 的b.gif，此时才正常；
+【反代，和重定向：反代是反代服务器代为访问，返回结果；重定向是返回重定向到的新url，由客户端自己去访问，】
+</code></pre><h3 id="异构反代fastcgi"><a href="#异构反代fastcgi" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:异构反代fastcgi" class="headings">异构反代fastcgi</a></h3>
+<p>​	如下，为反代配置示例：</p>
+<pre><code>eg:
+ProxyPass &quot;/&quot; &quot;http://www.a1.com/&quot;
+ProxyPassMatch &quot;^(.*\.php)$&quot; &quot;fcgi://127.0.0.1:9000/var/www/html/$1&quot;
+
+加了fcgi的协议头
+</code></pre><h1 id="后端主机组配置"><a href="#后端主机组配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:后端主机组配置" class="headings">后端主机组配置</a></h1>
+<h2 id="主机组配置"><a href="#主机组配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:主机组配置" class="headings">主机组配置</a></h2>
+<p>​	将一组后端服务器，定义为一个后端服务器组；此时采用各种调度算法，轮询，加权轮询，【可以实现负载分流，故障转移，线性扩缩容等功能】</p>
+<p>​	示例1：</p>
+<pre><code>&lt;Proxy balancer://myset&gt;
+	BalancerMember http://1.1.1.1:8080
+	BalancerMember http://2.2.2.2:8080
+	ProxySet lbmethod=bytraffic 
+	调度算法
+&lt;/Proxy&gt;
+# 用proxy指令定义一个后端服务器组：myset为组名，balancermember定义一各个后端节点，
+proxyset可以定义该后端服务器组的属性信息，如调度算法；
+
+
+
+ProxyPass &quot;/images/&quot; &quot;balancer://myset/&quot;
+ProxyPassReverse &quot;/images&quot; &quot;balancer://myset/&quot;
+proxypass处引用，后端服务器组的组名即可，【注意/加还是不加】
+
+
+#每个balancermember后可以定义每个后端节点属性信息，如权重、超时时长、是否禁用，是否是备用
+&lt;Proxy balancer://myset&gt;
+	BalancerMember http://1.1.1.1:8080
+	BalancerMember http://2.2.2.2:8080 Loadfactor=3 timeout=1 
+	权重为1:3
+	ProxySet lbmethod=byrequests
+	调度算法
+&lt;/Proxy&gt;
+
+eg:
+反代配置：示例参考官方doc，/的位置，不符合等效替代法了。。
+[root@host2 httpd]# cat conf.d/proxy.conf 
+#ProxyPass &quot;/images&quot; &quot;http://www1.host3.com&quot;
+#ProxyPassReverse &quot;/images&quot; &quot;http://www1.host3.com&quot;
+#ProxyPass &quot;/&quot; &quot;http://www1.host3.com/&quot;
+#ProxyPassReverse &quot;/&quot; &quot;http://www1.host3.com/&quot;
+&lt;Proxy balancer://back1&gt;
+	BalancerMember http://www1.host3.com
+	BalancerMember http://www2.host3.com
+	ProxySet lbmethod=byrequests
+&lt;/Proxy&gt;
+
+ProxyPass &quot;/img&quot; &quot;balancer://back1/&quot;
+ProxyPassReverse &quot;/img&quot; &quot;balancer://back1/&quot;
+
+后端服务器：
+[root@host3 conf.d]# tree /data/host3/
+/data/host3/
+├── www1
+│   └── 2.html
+└── www2
+    └── 2.html
+
+
+访问测试
+[root@host1 ~]# curl http://www.host2.com/img/2.html
+www222.html
+[root@host1 ~]# curl http://www.host2.com/img/2.html
+www111.html
+</code></pre><h2 id="各个节点属性信息配置"><a href="#各个节点属性信息配置" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:各个节点属性信息配置" class="headings">各个节点属性信息配置</a></h2>
+<p>​	主机组内，每个节点都可以设置属性信息，如权重、是否备用，是否禁用，</p>
+<pre><code>后端节点可以设置优先级、热备节点
+eg：
+&lt;Proxy balancer://myset&gt;
+	BalancerMember http://master1.com:8080
+	BalancerMember http;//master2.com:8080
+	BalancerMember http://back1.com:8080 lbset=1
+	BalancerMember http://back2.com:8080 lbset=1
+	BalancerMember http://hotstandby.com:8080 status=+H
+&lt;/Proxy&gt;
+
+
+master1 master2正常时，优先轮询调度；两个都失败时；
+back1 back2登场，因为lbset=1，设置它优先级低于 master1和2，默认lbset=0，数越大，优先级越低
+
+back1和2都坏了，hoststandby生效，因为设置了status=+H
+
+
+eg:
+[root@host2 conf.d]# cat proxy.conf 
+&lt;Proxy balancer://back1&gt;
+	BalancerMember http://www1.host3.com
+	BalancerMember http://www2.host3.com Loadfactor=2 Timeout=2
+	BalancerMember http://www.host1.com status=+H
+	ProxySet lbmethod=byrequests
+&lt;/Proxy&gt;
+
+ProxyPass &quot;/img&quot; &quot;balancer://back1/&quot;
+ProxyPassReverse &quot;/img&quot; &quot;balancer://back1/&quot;
+
+再启一台host1，做热备，重启，
+客户端测试，结果是
+www1 www2的权重轮询，2者都坏，host1就顶上了；
+lbset=1不生效？
+</code></pre><h2 id="调度算法"><a href="#调度算法" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:调度算法" class="headings">调度算法</a></h2>
+<p>httpd支持三种调度算法：</p>
+<ul>
+<li>bytraffice</li>
+<li>byrequests</li>
+<li>bybusyness</li>
+</ul>
+<pre><code>调度算法3种：
+byrequests 默认，基于请求次数计算权重
+bytraffic 基于io大小算权重
+bybusyness 基于挂起请求数，即后端的繁忙程度算权重
+</code></pre><h2 id="负载均衡状态页管理页"><a href="#负载均衡状态页管理页" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:负载均衡状态页管理页" class="headings">负载均衡状态页、管理页</a></h2>
+<pre><code>&lt;Location &quot;/balancer-manager&quot;&gt;
+    SetHandler balancer-manager
+    Require host localhost
+&lt;/Location&gt;
+
+&lt;Location &quot;/server-status&quot;&gt;
+	SetHandler server-status
+	Require ip 192.168.80.100
+&lt;/Location&gt;、
+
+摘自官方doc，直接贴，重启；
+
+浏览器访问该uri即可
+</code></pre><h2 id="健康检查"><a href="#健康检查" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:健康检查" class="headings">健康检查</a></h2>
+<p>​	1、提供检查功能的模块</p>
+<pre><code>ProxyPass指令自带ping指令，可判断后端节点是否可以ping通，但http服务只ping不够准确；
+
+mod_proxy_hcheck模块提供了对http服务检查的指令；
+
+[root@host2 httpd-2.4.27]# ll /usr/local/apache/modules/ |grep check
+-rwxr-xr-x 1 apache apache 105896 Aug 18 19:35 mod_proxy_hcheck.so
+[root@host2 httpd-2.4.27]# ./configure -h |grep hcheck
+  --enable-proxy-hcheck   reverse-proxy health-check module. Requires
+  默认不启用该模块，编译时需要明确指定编译该模块，
+</code></pre>
+<p>​	2、检查配置示例：</p>
+<pre><code>检查的方法：常见检查方法有2种，tcp检查，和http探测；
+hcmethod
+	TCP
+	OPTIONS
+	HEAD
+	GET
+
+检查的属性参数
+hcinterval 默认30s，检查间隔
+hcuri 检查哪个uri
+hcpasses=N 默认1，检查几次通过，认为检查，再次启动
+hcfails=N 默认1，检查几次失败，认为不可用
+
+eg:
+&lt;Proxy balancer://back1&gt;
+	BalancerMember http://www.a.com/ hcmethod=TCP hcinterval=5 hcpasses=3 hcfails=5
+	BalancerMember http://www.b.com/ hcmethod=GET hcuri=/status.php 
+	BalancerMember http://www.c.com/
+&lt;/Proxy&gt;
+
+ProxyPass &quot;/&quot; &quot;balancer://back1&quot;
+ProxyPassReverse &quot;/&quot; &quot;balancer://back1&quot;
+
+【注意：/斜线的问题】
+	访问反代的/1.jpg 对应balancer://back1+1.jpg
+	又对应，www.a.com/+1.jpg
+	所以最后访问的是www.a.com/1.jpg
+
+</code></pre><p>​	3、带有变量的检查方法</p>
+<p>参考文档：https://httpd.apache.org/docs/2.4/mod/mod_proxy_hcheck.html#proxyhcexpr</p>
+<pre><code># 通过ProxyHCExpr指令，设置变量，该变量利用正则对应匹配探测响应报文的头部或body部分，
+# 再在每个节点出引用该变量，作为判断节点是否健康的依据
+ProxyHCExpr ok234 {%{REQUEST_STATUS} =~ /^[234]/}
+ProxyHCExpr gdown {%{REQUEST_STATUS} =~ /^[5]/}
+ProxyHCExpr in_maint {hc('body') !~ /Under maintenance/}
+
+&lt;Proxy balancer://foo&gt;
+  BalancerMember http://www.example.com/  hcmethod=GET hcexpr=in_maint hcuri=/status.php
+  BalancerMember http://www2.example.com/ hcmethod=HEAD hcexpr=ok234 hcinterval=10
+  BalancerMember http://www3.example.com/ hcmethod=TCP hcinterval=5 hcpasses=2 hcfails=3
+  BalancerMember http://www4.example.com/
+&lt;/Proxy&gt;
+
+ProxyPass &quot;/&quot; &quot;balancer://foo&quot;
+ProxyPassReverse &quot;/&quot; &quot;balancer://foo&quot;
+</code></pre><h1 id="proxy相关指令"><a href="#proxy相关指令" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxy相关指令" class="headings">Proxy相关指令</a></h1>
+<p>实验中例子；</p>
+<pre><code>[root@host2 conf.d]# cat proxy.conf 
+#ProxyPass &quot;/images&quot; &quot;http://www1.host3.com&quot;
+#ProxyPassReverse &quot;/images&quot; &quot;http://www1.host3.com&quot;
+#ProxyPass &quot;/&quot; &quot;http://www1.host3.com/&quot;
+#ProxyPassReverse &quot;/&quot; &quot;http://www1.host3.com/&quot;
+ProxyStatus On
+ProxyVia on
+&lt;Location &quot;/doc&quot;&gt;
+	ProxyPass &quot;http://www1.host3.com&quot;
+&lt;/Location&gt;
+
+ProxyPassMatch &quot;^/(.*\.gif)$&quot; &quot;http://www.host1.com/$1&quot;
+&lt;Proxy balancer://back1&gt;
+	BalancerMember http://www1.host3.com 
+	BalancerMember http://www2.host3.com Loadfactor=2 Timeout=2
+	BalancerMember http://www.host1.com status=+H
+	ProxySet lbmethod=byrequests
+&lt;/Proxy&gt;
+
+ProxyPass &quot;/img&quot; &quot;balancer://back1/&quot;
+ProxyPassReverse &quot;/img&quot; &quot;balancer://back1/&quot;
+
+# 开启2个页面，后端主机组管理页面，和状态页面
+# 注意设置较为严格的访问权限
+&lt;Location &quot;/balancer-manager&quot;&gt;
+    SetHandler balancer-manager
+    Require host localhost
+    Require ip 192.168.80.100
+&lt;/Location&gt;
+&lt;Location &quot;/server-status&quot;&gt;
+	SetHandler server-status
+	Require ip 192.168.80.100
+&lt;/Location&gt;
+</code></pre><h2 id="proxypass"><a href="#proxypass" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxypass" class="headings">ProxyPass</a></h2>
+<pre><code>1，配置反代，应关闭正代
+ProxyRequests=off
+
+2,ProxyPass 语法
+Syntax:	ProxyPass [path] !|url [key=value [key=value ...]] [nocanon] [interpolate] [noquery]
+ProxyPass [path] !|url [key=valuse...]
+path为反代对客户端提供的url路径；
+url为后端服务器提供实际内容的url路径；
+若为！，表示path表示的路径，不做反代处理
+
+key=value是一些属性设置，设置后端节点的属性；
+
+
+3，示例：
+ProxyPass &quot;/images/&quot; &quot;http://www.b.com/&quot;
+或
+ProxyPass &quot;/images&quot; &quot;http://www.b.com&quot;
+可以看出；path和url部分，对于末尾斜线，要么都由，要么都没有；
+
+
+4，location容器中，不需要指定path，因为location本身就带了path配置
+&lt;Location &quot;/images&quot;&gt;
+	ProxyPass &quot;http://www.a.com&quot;
+&lt;/Location&gt;
+访问http://反代机器/images/1.jpg 会反代到http://www.a.com/1.jpg
+
+
+&lt;Location &quot;/doc&quot;&gt;
+	ProxyPass &quot;http://www1.host3.com&quot;
+&lt;/Location&gt;
+
+
+5，eg
+ProxyPass &quot;/images/1.jpg&quot; &quot;!&quot;
+ProxyPass &quot;/images/&quot; &quot;http://www.a.com/&quot;
+
+1.jpg不反代，其他都反代；
+
+
+
+
+
+----
+httpd用连接池组织后端的节点；节点属性相同的共享一个连接池；后端节点属性，kv值指定
+keepalive=on|off默认off，一般也是off
+
+lbset=N，后端节点优先级，数越大，优先级越小；
+httpd只有找不到上一个高优先级的节点之后，才会找下一个优先级的节点；
+ping=N，和后端tomat通过ajp协议ping探测的时间间隔；
+retry=N，检查到后端节点错误时，多久后重试
+timeout=ProxyTimeout，等待后端返回数据的超时时间；
+
+status=value，设置节点状态；
++为设置
+-为取消设置
+D:禁用节点
+H:备份节点
+I：无视该节点的错误
+S：节点维护期
+E：节点为错误状态
+N：节点drain模式，只接收已预订的sticky session
+
+
+
+---
+用了balancer://后，其中节点可共享一部分属性，用ProxySet设置；
+lbmethod= bytraffic byrequests bybusyness
+三种调度算法
+
+nofailover=on|off，是否开启故障状态，当后端节点之间，没有会话复制的时候，建议为on，不要失败转移，因为即便转移了，会话在新机器上也没有，直接返回错误才恰当
+stickysession：sesssion名称如：JSESSIOND PHPSESSION
+
+
+---
+eg:
+都不带斜线
+&lt;Proxy balancer://myset&gt;
+	BalancerMember http://www.a.com
+	BalancerMember http://www.b.com Loadfactor=3 Timeout=3
+	ProxySet lbmethod=byrequests
+&lt;/Proxy&gt;
+
+都带斜线
+ProxyRequests off
+ProxyPass &quot;/images/&quot; &quot;balancer://myset/&quot;
+ProxyPassReverse &quot;/images/&quot; &quot;balancer://myset/&quot;
+
+注意：斜线的一致原则，判断方法，位置等效替代；
+/images/1.jpg &gt; myset/1.jpg
+myset/1.jpg &gt; http://www.a.com/1.jpg
+此时a.com的1.jpg有文件，就可以了
+</code></pre><h2 id="proxypassmatch"><a href="#proxypassmatch" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxypassmatch" class="headings">ProxyPassMatch</a></h2>
+<p>支持正则的ProxyPass；</p>
+<p>eg：</p>
+<pre><code>ProxyPassMatch &quot;^/(.*\.jpg)$&quot; &quot;http://www.a.com/$1&quot;
+ProxyPassMatch &quot;^/(.*\.php)$&quot; &quot;fcgi://127.0.0.1:9000/var/www/a.com/$1&quot;
+
+两处都是分组匹配，注意/没有归到分组里；
+^/的/和/$1的/ ，2者对应；
+</code></pre><h2 id="proxyset"><a href="#proxyset" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxyset" class="headings">ProxySet</a></h2>
+<pre><code>设置后端节点的属性，一般设置在一个proxy节点组里；
+如该主机组的调度算法，是否开启长连接
+
+&lt;Proxy &quot;balancer://back1&quot;&gt;
+	BalancerMember &quot;http://www.a.com&quot;
+	BalancerMember &quot;http://www.b.com&quot; Loadfactor=2 Timeout=3
+	ProxySet lbmethod=bytraffic
+	ProxySet keealive=on
+	
+&lt;/Proxy&gt;
+
+ProxySet &quot;balancer://foo&quot; lbmethod=traffic timeout=15
+也可以单独设置；
+</code></pre><h2 id="proxy容器"><a href="#proxy容器" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxy容器" class="headings">Proxy容器</a></h2>
+<pre><code>&lt;proxy&gt;容器，用于封装proxy相关的指令；主要用来定义后端节点组，他们的属性，调度算法；
+然后再proxyPass中引用；
+
+&lt;Proxy &quot;*&quot;&gt;
+  Require host yournetwork.example.com
+&lt;/Proxy&gt;
+</code></pre><h2 id="proxystatus"><a href="#proxystatus" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxystatus" class="headings">ProxyStatus</a></h2>
+<pre><code>ProxyStatus {on|off|full}
+on=full，开启后，server-stauts页面会有代理相关信息
+需要开启状态页，定义一个location，并用set-handler指令开启状态页
+
+eg:
+ProxyStatus on
+&lt;Location &quot;/server-status&quot;&gt;
+	SetHandler server-stauts
+	Require all granted
+&lt;/Location&gt;
+
+浏览器打开状态页，会有代理相关信息；
+</code></pre><h2 id="proxyvia"><a href="#proxyvia" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxyvia" class="headings">ProxyVia</a></h2>
+<pre><code>ProxyVia on开启时，反代服务器会在给客户端的响应头部中加入一个字段：Via：值一般是反代服务器的ip
+告知客户端，你的请求是经由反代转发的，我其实是个反代；
+
+curl -I http://反代/index.html
+开启后，
+会发现多了个Via字段；
+
+
+[root@host1 ~]# curl  -I http://www.host2.com/hello.gif
+HTTP/1.1 200 OK
+...
+Content-Type: image/gif
+Via: 1.1 www.host2.com
+
+</code></pre><h2 id="proxypass指令顺序共享"><a href="#proxypass指令顺序共享" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:proxypass指令顺序共享" class="headings">ProxyPass指令顺序、共享</a></h2>
+<p><strong>顺序</strong></p>
+<p><strong>Proxypass 范围小的放前面、看的是在配置文件中出现的位置先后；location无所谓、看的是uri匹配长短</strong></p>
+<pre><code>proxypass根据出现的先后顺序生效；前面的被匹配生效了；
+后面的就不看了；
+
+但在location容器中，不看location的顺序，而看location中定义的uri的匹配的长度的长短；
+即，最长匹配原则
+
+eg：
+ProxyPass &quot;/images/1.jpg&quot; &quot;!&quot;
+ProxyPass &quot;/images&quot; &quot;http://www.a.com&quot;
+
+此时，请求1.jpg是不会被反代的，顺序一换；就会被反代；
+ProxyPass &quot;/images&quot; &quot;http://www.a.com&quot;
+ProxyPass &quot;/images/1.jpg&quot; &quot;!&quot;
+
+如果是在location里，顺序就不影响了
+&lt;Location &quot;/images&quot;&gt;
+	ProxyPass &quot;http://www.a.com&quot;
+&lt;/Location&gt;
+
+&lt;Location &quot;/images/1.jpg&quot;&gt;
+	ProxyPass &quot;!&quot;
+&lt;/Location&gt;
+此时仍会被第2个location处理，不被反代，因为它匹配的更长，
+</code></pre><p><strong>共享</strong></p>
+<pre><code>后端节点设置的属性会被共享的，
+
+eg:
+ProxyPass &quot;/apps&quot; &quot;http://www.a.com&quot; Timeout=10
+ProxyPass &quot;/pcs&quot; &quot;http://www.a.com&quot; Timeout=5
+
+访问/pcs/pc1.html
+会被第2个处理，但超时时间可是10，不是5；这就是共享；
+不太懂？
+</code></pre><h1 id="location指令总结"><a href="#location指令总结" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:location指令总结" class="headings">location指令总结：</a></h1>
+<p><a href="https://httpd.apache.org/docs/2.4/mod/core.html#location" target="_blank" rel="noopener">https://httpd.apache.org/docs/2.4/mod/core.html#location</a></p>
+<p>​	location 指令可以结合其他指令一起使用，如：alias，redirect，proxypass，以及单独使用，location指令的作用是定义一个uri路径对外提供，<strong>结合其他指令使用时，这个uri可以被映射到本地文件系统路径（alias）；可以被重定向到一个新的uri或完整的url（redirect）；可以被反代到其他服务器（proxypass），可以开启内置状态页（结合set-handler）；可以单独使用（结合directory，放开本地文件系统目录提供uri）</strong></p>
+<h2 id="结合alias"><a href="#结合alias" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:结合alias" class="headings">结合alias</a></h2>
+<pre><code>&lt;location &quot;uri路径&quot;&gt;
+	alias 本地文件系统路径
+&lt;/location&gt;
+</code></pre><h2 id="结合redirect"><a href="#结合redirect" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:结合redirect" class="headings">结合redirect</a></h2>
+<pre><code>&lt;location &quot;旧的uri路径&quot;&gt;
+	redirect 状态码 新的uri路径
+&lt;/location&gt;
+</code></pre><h2 id="结合proxypass"><a href="#结合proxypass" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:结合proxypass" class="headings">结合proxypass</a></h2>
+<pre><code>&lt;Location &quot;/images&quot;&gt;
+	ProxyPass &quot;http://www.a.com&quot;
+&lt;/Location&gt;
+</code></pre><h2 id="结合set-handler"><a href="#结合set-handler" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:结合set-handler" class="headings">结合set-handler</a></h2>
+<pre><code>&lt;Location &quot;/server-status&quot;&gt;
+	SetHandler server-status
+	Require ip 192.168.80.100
+&lt;/Location&gt;、
+</code></pre>
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/httpd%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/httpd之七层代理服务/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-16 16:41:28 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-16</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-16</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8Blamp%E7%8E%AF%E5%A2%83/" class="related-link">httpd之LAMP环境</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" class="related-link">httpd之web服务</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E4%B8%89%E7%A7%8Dmpm%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B/" class="related-link">httpd之三种mpm工作模型</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E4%B8%8E%E9%9D%99%E6%80%81web%E7%BB%93%E5%90%88%E9%85%8D%E7%BD%AE/" class="related-link">tomcat之与静态web结合</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/httpd%E4%B9%8B%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="related-link">httpd之安装与配置</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/httpd/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>httpd</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/httpd%E4%BB%A3%E7%90%86/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>httpd代理</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/httpd%E4%B9%8Blamp%E7%8E%AF%E5%A2%83/" rel="prev">&lt; httpd之LAMP环境</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/httpd%E4%B9%8Bweb%E6%9C%8D%E5%8A%A1/" rel="next">httpd之web服务 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>

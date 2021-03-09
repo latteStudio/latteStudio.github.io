@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head prefix="og: http://ogp.me/ns# article: http://ogp.me/ns/article#">
+    <meta charset="UTF-8" />
+
+    <meta name="generator" content="Hugo 0.79.1" /><meta name="theme-color" content="#fff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+    
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <title>tomcat之简介与安装 | latte Studio</title>
+
+    <link rel="stylesheet" href="/css/meme.min.6ee839ebe871493078f0e5a50ad2f711ca5c3eb967df636eec85b86acae78122.css"/>
+
+    
+    
+        <script src="/js/meme.min.f936694a66257ff5d62ce2cc69be181f3f41519f7754c902363df674dcf35228.js"></script>
+
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" media="print" onload="this.media='all'" />
+        <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB&#43;Garamond:ital,wght@0,400;0,500;0,700;1,400;1,700&amp;family=Noto&#43;Serif&#43;SC:wght@400;500;700&amp;family=Source&#43;Code&#43;Pro:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" /></noscript>
+
+    <meta name="author" content="latteStudio" /><meta name="description" content="tomcat简介与安装步骤..." />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2a6df4" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="latte Studio" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="latte Studio" />
+    <meta name="msapplication-starturl" content="../../" />
+    <meta name="msapplication-TileColor" content="#fff" />
+    <meta name="msapplication-TileImage" content="../../icons/mstile-150x150.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    
+    
+
+    
+    <link rel="canonical" href="https://latteStudio.github.io/posts/tomcat%E4%B9%8B%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%89%E8%A3%85/" />
+    
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "datePublished": "2020-09-06T14:03:58+00:00",
+        "dateModified": "2020-10-19T19:42:57+08:00",
+        "url": "https://latteStudio.github.io/posts/tomcat%E4%B9%8B%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%89%E8%A3%85/",
+        "headline": "tomcat之简介与安装",
+        "description": "tomcat简介与安装步骤...",
+        "inLanguage" : "zh-CN",
+        "articleSection": "posts",
+        "wordCount":  3219 ,
+        "image": ["https://gitee.com/boogie96/img/raw/master/img/733013-20171023161736816-1039069357.png"],
+        "author": {
+            "@type": "Person",
+            "description": "KISS——Keep it simple, stupid~",
+            "email": "boogies@163.com",
+            "image": "https://latteStudio.github.io/icons/apple-touch-icon.png",
+            "url": "latteStudio.github.io",
+            "name": "latteStudio"
+        },
+        "license": "[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)",
+        "publisher": {
+            "@type": "Organization",
+            "name": "latte Studio",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://latteStudio.github.io/icons/apple-touch-icon.png"
+            },
+            "url": "https://latteStudio.github.io/"
+        },
+        "mainEntityOfPage": {
+            "@type": "WebSite",
+            "@id": "https://latteStudio.github.io/"
+        }
+    }
+</script>
+
+    
+
+<meta name="twitter:card" content="summary_large_image" />
+
+
+
+    
+
+
+
+<meta property="og:title" content="tomcat之简介与安装" />
+<meta property="og:description" content="tomcat简介与安装步骤..." />
+<meta property="og:url" content="https://latteStudio.github.io/posts/tomcat%E4%B9%8B%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%89%E8%A3%85/" />
+<meta property="og:site_name" content="latte Studio" />
+<meta property="og:locale" content="zh" /><meta property="og:image" content="https://gitee.com/boogie96/img/raw/master/img/733013-20171023161736816-1039069357.png" />
+<meta property="og:type" content="article" />
+    <meta property="article:published_time" content="2020-09-06T14:03:58&#43;00:00" />
+    <meta property="article:modified_time" content="2020-10-19T19:42:57&#43;08:00" />
+    
+    <meta property="article:section" content="posts" />
+
+
+
+    
+</head>
+
+    <body>
+        <div class="container">
+            
+    <header class="header">
+        
+            <div class="header-wrapper">
+                <div class="header-inner single">
+                    
+    <div class="site-brand">
+        
+            <a href="/" class="brand">latte Studio</a>
+        
+    </div>
+
+                    <nav class="nav">
+    <ul class="menu" id="menu">
+        
+            
+        
+        
+        
+        
+            
+                <li class="menu-item"><a href="/posts/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon archive"><path d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z"/></svg><span class="menu-item-name">归档</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/categories/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon th"><path d="M149.333 56v80c0 13.255-10.745 24-24 24H24c-13.255 0-24-10.745-24-24V56c0-13.255 10.745-24 24-24h101.333c13.255 0 24 10.745 24 24zm181.334 240v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm32-240v80c0 13.255 10.745 24 24 24H488c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24zm-32 80V56c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.256 0 24.001-10.745 24.001-24zm-205.334 56H24c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24zM0 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H24c-13.255 0-24 10.745-24 24zm386.667-56H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zm0 160H488c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H386.667c-13.255 0-24 10.745-24 24v80c0 13.255 10.745 24 24 24zM181.333 376v80c0 13.255 10.745 24 24 24h101.333c13.255 0 24-10.745 24-24v-80c0-13.255-10.745-24-24-24H205.333c-13.255 0-24 10.745-24 24z"/></svg><span class="menu-item-name">分类</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/tags/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon tags"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"/></svg><span class="menu-item-name">标签</span></a>
+                </li>
+            
+        
+            
+                <li class="menu-item"><a href="/about/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" class="icon user-circle"><path d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 96c48.6 0 88 39.4 88 88s-39.4 88-88 88-88-39.4-88-88 39.4-88 88-88zm0 344c-58.7 0-111.3-26.6-146.5-68.2 18.8-35.4 55.6-59.8 98.5-59.8 2.4 0 4.8.4 7.1 1.1 13 4.2 26.6 6.9 40.9 6.9 14.3 0 28-2.7 40.9-6.9 2.3-.7 4.7-1.1 7.1-1.1 42.9 0 79.7 24.4 98.5 59.8C359.3 421.4 306.7 448 248 448z"/></svg><span class="menu-item-name">关于</span></a>
+                </li>
+            
+        
+            
+                
+                    
+                    
+                        <li class="menu-item">
+                            <a id="theme-switcher" href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-light"><path d="M193.2 104.5l48.8-97.5a18 18 0 0128 0l48.8 97.5 103.4 -34.5a18 18 0 0119.8 19.8l-34.5 103.4l97.5 48.8a18 18 0 010 28l-97.5 48.8 34.5 103.4a18 18 0 01-19.8 19.8l-103.4-34.5-48.8 97.5a18 18 0 01-28 0l-48.8-97.5l-103.4 34.5a18 18 0 01-19.8-19.8l34.5-103.4-97.5-48.8a18 18 0 010-28l97.5-48.8-34.5-103.4a18 18 0 0119.8-19.8zM256 128a128 128 0 10.01 0M256 160a96 96 0 10.01 0"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon theme-icon-dark"><path d="M27 412a256 256 0 10154-407a11.5 11.5 0 00-5 20a201.5 201.5 0 01-134 374a11.5 11.5 0 00-15 13"/></svg></a>
+                        </li>
+                    
+                
+            
+        
+            
+                
+            
+        
+    </ul>
+</nav>
+
+                    
+                </div>
+            </div>
+            
+    <input type="checkbox" id="nav-toggle" aria-hidden="true" />
+    <label for="nav-toggle" class="nav-toggle"></label>
+    <label for="nav-toggle" class="nav-curtain"></label>
+
+
+        
+    </header>
+
+
+
+
+            
+            
+    <main class="main single" id="main">
+    <div class="main-inner">
+
+        
+
+        <article class="content post h-entry" data-align="justify" data-type="posts" data-toc-num="true">
+
+            <h1 class="post-title p-name">tomcat之简介与安装</h1>
+
+            
+
+            
+                <div class="post-description p-summary">tomcat简介与安装步骤...</div>
+                
+            
+
+            
+                
+
+<div class="post-meta">
+    
+        
+        <time datetime="2020-09-06T14:03:58&#43;00:00" class="post-meta-item published dt-published"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"/></svg>&nbsp;2020.9.6</time>
+    
+    
+        
+        <time datetime="2020-10-19T19:42:57&#43;08:00" class="post-meta-item modified dt-updated"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon post-meta-icon"><path d="M400 64h-48V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H160V12c0-6.627-5.373-12-12-12h-40c-6.627 0-12 5.373-12 12v52H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 400H54a6 6 0 0 1-6-6V160h352v298a6 6 0 0 1-6 6zm-52.849-200.65L198.842 404.519c-4.705 4.667-12.303 4.637-16.971-.068l-75.091-75.699c-4.667-4.705-4.637-12.303.068-16.971l22.719-22.536c4.705-4.667 12.303-4.637 16.97.069l44.104 44.461 111.072-110.181c4.705-4.667 12.303-4.637 16.971.068l22.536 22.718c4.667 4.705 4.636 12.303-.069 16.97z"/></svg>&nbsp;2020.10.19</time>
+    
+    
+    
+        
+        
+        
+            
+                <span class="post-meta-item category"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M464 128H272l-54.63-54.63c-6-6-14.14-9.37-22.63-9.37H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V176c0-26.51-21.49-48-48-48zm0 272H48V112h140.12l54.63 54.63c6 6 14.14 9.37 22.63 9.37H464v224z"/></svg>&nbsp;<a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-link p-category">运维</a>/<a href="/categories/web%E6%9C%8D%E5%8A%A1/" class="category-link p-category">web服务</a></span>
+            
+        
+    
+    
+        
+        <span class="post-meta-item wordcount"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"/></svg>&nbsp;3219</span>
+    
+    
+        
+        <span class="post-meta-item reading-time"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon post-meta-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"/></svg>&nbsp;7&nbsp;分钟</span>
+    
+    
+    
+</div>
+
+            
+
+            <nav class="contents">
+  <h2 id="contents" class="contents-title">目录</h2><ol class="toc">
+    <li><a id="contents:java与jdk" href="#java与jdk">java与jdk</a></li>
+    <li><a id="contents:jsp与servlet" href="#jsp与servlet">jsp与servlet</a></li>
+    <li><a id="contents:web服务器与应用程序服务器" href="#web服务器与应用程序服务器">web服务器与应用程序服务器</a></li>
+    <li><a id="contents:tomcat体系结构" href="#tomcat体系结构">tomcat体系结构</a></li>
+  </ol>
+
+  <ol>
+    <li><a id="contents:安装jdk" href="#安装jdk">安装jdk</a>
+      <ol>
+        <li><a id="contents:jdk安装方法" href="#jdk安装方法">jdk安装方法</a></li>
+      </ol>
+    </li>
+    <li><a id="contents:安装tomcat" href="#安装tomcat">安装tomcat</a></li>
+  </ol>
+</nav><div class="post-body e-content">
+              <h1 id="tomcat简介"><a href="#tomcat简介" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tomcat简介" class="headings">tomcat简介</a></h1>
+<h2 id="java与jdk"><a href="#java与jdk" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:java与jdk" class="headings">java与jdk</a></h2>
+<p>c/c++程序针对特定的硬件平台编译为cpu直接运行的二进制；而java程序面向的是jvm，由中间层jvm代为翻译为特定硬件平台的集群语言，通过中间层实现了<code>write once, run anywhere</code></p>
+<p><strong>c/c++类的语言，需要自己针对不同硬件平台做对应修改，而java不需要，方便各平台之间的移植，适合大型程序，牺牲了一定效率，但减少了针对不同硬件平台的开发工作；</strong></p>
+<p><strong>1、java程序执行过程</strong></p>
+<ol>
+<li>java程序被java编译器javac编译为java字节码：.class文件；</li>
+<li>字节码文件，再由java虚拟机jvm翻译为二进制的机器语言；</li>
+</ol>
+<pre><code class="language-.java源码-》（经由javac编译）-》.class字节码文件-》（经由jvm执行）-》特定cpu能执行的二进制机器语言；" data-lang=".java源码-》（经由javac编译）-》.class字节码文件-》（经由jvm执行）-》特定cpu能执行的二进制机器语言；">.java源码-》（经由javac编译）-》.class字节码文件-》（经由jvm执行）-》特定cpu能执行的二进制机器语言；
+
+</code></pre><p><strong>2、jvm、jre、jdk</strong></p>
+<ul>
+<li>jvm是java虚拟机，负责将java字节码翻译成对应硬件平台的语言；</li>
+<li>jre，jvm+运行时依赖的库</li>
+<li>jdk，jvm+运行时依赖的库+开发调试工具</li>
+<li>jave se：java标准版，包含jdk</li>
+<li>jave ee：java企业版，java标准版基础上+企业应用用到的类库；</li>
+</ul>
+<h2 id="jsp与servlet"><a href="#jsp与servlet" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:jsp与servlet" class="headings">jsp与servlet</a></h2>
+<ul>
+<li>applet：
+<ul>
+<li>早期，java实现web，是由客户端将程序下载到本机执行，1，不安全；</li>
+<li>2，客户端需要java环境</li>
+</ul>
+</li>
+<li>servlet
+<ul>
+<li>改进，servlet将应用程序放在服务端，客户端向服务端发请求，由服务端执行后返回结果，servlet的类库可以解析处理http协议</li>
+<li>1，servlet方式：java应用代码和html代码组合在一起，组织方式较差</li>
+<li>2，需要开发懂java和html</li>
+</ul>
+</li>
+<li>jsp
+<ul>
+<li>再改进，jsp是继承了servlet类库的类库，但能够使得html和java代码结合较好</li>
+<li>1，java代码嵌入到html代码，组合为.jsp文件，</li>
+<li>2，通过jasper组件，再翻译为servlet代码执行</li>
+<li>3，jsp本质还是servlet</li>
+</ul>
+</li>
+<li>java程序进程
+<ul>
+<li>一个java程序进程需要一个jvm进程；java程序进程自己是线程的</li>
+<li>tomcat，利用servlet可以处理动态和静态请求，但为了效率，一般将静态请求前置到前端的静态web服务：httpd和nginx等</li>
+</ul>
+</li>
+</ul>
+<h2 id="web服务器与应用程序服务器"><a href="#web服务器与应用程序服务器" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:web服务器与应用程序服务器" class="headings">web服务器与应用程序服务器</a></h2>
+<ul>
+<li>web服务器：一般指处理http协议，提供静态请求的服务；如httpd，nginx</li>
+<li>应用程序服务器：一般指接收前面web转发来的动态请求，处理后交由web服务器，和静态内容一起封装后，返回给客户端；如tomcat、jboss、weblogic，php的有php-fpm等</li>
+</ul>
+<h2 id="tomcat体系结构"><a href="#tomcat体系结构" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tomcat体系结构" class="headings">tomcat体系结构</a></h2>
+<p>**tomcat组成：**jdk加上jsp和servlet类库实现的java ee；主要用于web应用开发；</p>
+<ul>
+<li>server：tomcat实例，定义服务监听端口
+<ul>
+<li>service1，封装conector和container，
+<ul>
+<li>connector1：连接器，接收客户端请求，转给container处理，并返回container处理后数据给客户端，【请求与响应的中转站，唯一出入口】</li>
+<li>connector2...</li>
+<li>container：【上级容器范围内唯一】包含4个子容器，用于分析、处理请求、构建响应给connector进而转给客户端
+<ul>
+<li>engine：【唯一】定义servlet引擎，
+<ul>
+<li>host：定义虚拟主机，类比nginx虚拟主机；
+<ul>
+<li>context：定义webapp，一个context就是一个webapp，类比nginx的location，【如nginx有2个location分别为wordpress和discuz，分别配置后端tomcat的2个webapp为wordpress和discuz，】
+<ul>
+<li>wrapper：【唯一】最底层的容器，负责管理一个servlet</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>service2</li>
+<li>service3</li>
+<li>...</li>
+</ul>
+</li>
+</ul>
+<p>结构图如下：</p>
+<p><img src="https://gitee.com/boogie96/img/raw/master/img/733013-20171023161736816-1039069357.png" alt="img"></p>
+<pre><code>&lt;server&gt; # 一个tomcat实例，就是一个server
+	&lt;service&gt; # 一个server内部，可以有多个service
+		&lt;connector /&gt;
+		&lt;connector /&gt;
+		... # 一个service内可以有多个connector
+
+		&lt;engine&gt; # 一个service内有唯一的engine
+			&lt;host&gt; # 一个engine内可有多个host---虚拟主机
+				&lt;context&gt; # 一个host可以有多个context
+					wrapper # 一个context唯一的一个wrapper
+				&lt;/context&gt;
+				
+				&lt;context&gt;
+				&lt;/contex&gt;
+				
+			&lt;/host&gt;
+			
+			&lt;host&gt;
+			&lt;/host&gt;
+		&lt;/engine&gt;
+	&lt;/service&gt;
+	
+	&lt;service&gt;
+		...
+	&lt;/service&gt;
+	
+	&lt;service&gt;
+		...
+	&lt;/service&gt;
+&lt;/server&gt;
+</code></pre><h1 id="tomcat安装"><a href="#tomcat安装" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:tomcat安装" class="headings">tomcat安装</a></h1>
+<h2 id="安装jdk"><a href="#安装jdk" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装jdk" class="headings">安装jdk</a></h2>
+<h3 id="jdk安装方法"><a href="#jdk安装方法" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:jdk安装方法" class="headings">jdk安装方法</a></h3>
+<p>jdk有2大版本，开源的openjdk，以及oracle公司的oraclejdk；</p>
+<ul>
+<li>利用yum源，安装yum源中的openjdk</li>
+<li>下载oracle官方的oraclejdk，直接用其rpm包安装；</li>
+</ul>
+<p>tomcat自身是java程序，需要jdk环境支撑运行；即tomcat依赖jdk环境；</p>
+<p>安装版本选择</p>
+<ul>
+<li>openjdk
+<ul>
+<li>yum直接安装</li>
+<li>官方rpm包安装</li>
+</ul>
+</li>
+<li>oracle jdk
+<ul>
+<li>官方rpm包安装</li>
+</ul>
+</li>
+</ul>
+<p><code>实验采用，oraclejdk 8，tomcat 8.5</code></p>
+<p>1，下载oracle官方的rpm包，直接安装即可</p>
+<p><a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html" target="_blank" rel="noopener">https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html</a></p>
+<pre><code>[root@host2 src]# yum localinstall -y jdk-8u261-linux-x64.rpm 
+
+</code></pre><p>2，安装后目录</p>
+<p>默认安装目录为/usr/java，通过2个软连接，可以方便实现版本的切换；版本为jdk8的第261次更新；</p>
+<pre><code>[root@host2 src]# cd /usr/java/
+[root@host2 java]# ll
+total 0
+lrwxrwxrwx 1 root root  16 Sep  2 14:40 default -&gt; /usr/java/latest
+drwxr-xr-x 9 root root 286 Sep  2 14:40 jdk1.8.0_261-amd64
+lrwxrwxrwx 1 root root  28 Sep  2 14:40 latest -&gt; /usr/java/jdk1.8.0_261-amd64
+
+[root@host2 default]# ll
+total 25648
+drwxr-xr-x 2 root root     4096 Sep  2 14:40 bin
+-rw-r--r-- 1 root root     3244 Jun 18 14:55 COPYRIGHT
+drwxr-xr-x 3 root root      132 Sep  2 14:40 include
+-rw-r--r-- 1 root root  5219010 Jun 18 12:03 javafx-src.zip
+-rw-r--r-- 1 root root      195 Jun 18 14:55 jmc.txt
+drwxr-xr-x 6 root root      198 Sep  2 14:40 jre
+drwxr-xr-x 4 root root       31 Sep  2 14:40 legal
+drwxr-xr-x 4 root root      223 Sep  2 14:40 lib
+-rw-r--r-- 1 root root       44 Jun 18 14:55 LICENSE
+drwxr-xr-x 4 root root       47 Sep  2 14:40 man
+-rw-r--r-- 1 root root      159 Jun 18 14:55 README.html
+-rw-r--r-- 1 root root      424 Jun 18 14:55 release
+-rw-r--r-- 1 root root 21005583 Jun 18 14:55 src.zip
+-rw-r--r-- 1 root root      190 Jun 18 12:03 THIRDPARTYLICENSEREADME-JAVAFX.txt
+-rw-r--r-- 1 root root      190 Jun 18 14:55 THIRDPARTYLICENSEREADME.txt
+
+
+# 查看版本信息；
+[root@host2 java]# java -version
+java version &quot;1.8.0_261&quot;
+Java(TM) SE Runtime Environment (build 1.8.0_261-b12)
+Java HotSpot(TM) 64-Bit Server VM (build 25.261-b12, mixed mode)
+</code></pre><p>3，配置java_home等环境变量</p>
+<pre><code># 安装后即可以找到java命令的原因，安装过程中自动做了软链接到默认PATH路径下
+[root@host2 default]# which java
+/usr/bin/java
+[root@host2 default]# ll /usr/bin/java
+java            javadoc         javah           javapackager    javaws
+javac           javafxpackager  javap           java-rmi.cgi    
+[root@host2 default]# ll /usr/bin/java
+lrwxrwxrwx 1 root root 22 Sep  2 14:40 /usr/bin/java -&gt; /etc/alternatives/java
+[root@host2 default]# ll /etc/alternatives/java
+lrwxrwxrwx 1 root root 37 Sep  2 14:40 /etc/alternatives/java -&gt; /usr/java/jdk1.8.0_261-amd64/bin/java
+
+# 配置变量
+[root@host2 default]# cat /etc/profile.d/java.sh 
+export JAVA_HOME=/usr/java/latest
+export PATH=$JAVA_HOME/bin/:$PATH
+
+[root@host2 default]# source /etc/profile.d/java.sh 
+[root@host2 default]# which java
+/usr/java/latest/bin/java
+</code></pre><h2 id="安装tomcat"><a href="#安装tomcat" class="anchor-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon anchor-icon"><path d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"/></svg></a><a href="#contents:安装tomcat" class="headings">安装tomcat</a></h2>
+<p>1，下载官网8.5版本的最新二进制版本，在安装jdk后，解压，做软链接</p>
+<pre><code>[root@host2 src]# tar -xf apache-tomcat-8.5.57.tar.gz -C /usr/local/
+[root@host2 src]# ll /usr/local/
+total 0
+drwxr-xr-x  9 root root 220 Sep  2 14:56 apache-tomcat-8.5.57
+drwxr-xr-x. 2 root root   6 Apr 11  2018 bin
+drwxr-xr-x. 2 root root   6 Apr 11  2018 etc
+drwxr-xr-x. 2 root root   6 Apr 11  2018 games
+drwxr-xr-x. 2 root root   6 Apr 11  2018 include
+drwxr-xr-x. 2 root root   6 Apr 11  2018 lib
+drwxr-xr-x. 2 root root   6 Apr 11  2018 lib64
+drwxr-xr-x. 2 root root   6 Apr 11  2018 libexec
+drwxr-xr-x. 2 root root   6 Apr 11  2018 sbin
+drwxr-xr-x. 5 root root  49 Aug  8 11:58 share
+drwxr-xr-x. 2 root root  72 Sep  2 14:39 src
+[root@host2 src]# ln -sv /usr/local/apache-tomcat-8.5.57/ /usr/local/tomcat
+‘/usr/local/tomcat’ -&gt; ‘/usr/local/apache-tomcat-8.5.57/’
+</code></pre><p>2，程序目录</p>
+<pre><code>[root@host2 src]# ll /usr/local/tomcat/
+total 124
+drwxr-x--- 2 root root  4096 Sep  2 14:56 bin # 启停脚本，有linux平台的.sh脚本，也又windows平台的.bat脚本
+-rw-r----- 1 root root 19318 Jul  1 05:53 BUILDING.txt
+drwx------ 2 root root   238 Jul  1 05:53 conf
+-rw-r----- 1 root root  5408 Jul  1 05:53 CONTRIBUTING.md
+drwxr-x--- 2 root root  4096 Sep  2 14:56 lib
+-rw-r----- 1 root root 57011 Jul  1 05:53 LICENSE
+drwxr-x--- 2 root root     6 Jul  1 05:49 logs # 日志目录
+-rw-r----- 1 root root  1726 Jul  1 05:53 NOTICE
+-rw-r----- 1 root root  3255 Jul  1 05:53 README.md
+-rw-r----- 1 root root  7136 Jul  1 05:53 RELEASE-NOTES
+-rw-r----- 1 root root 16262 Jul  1 05:53 RUNNING.txt
+drwxr-x--- 2 root root    30 Sep  2 14:56 temp # 临时目录
+drwxr-x--- 7 root root    81 Jul  1 05:50 webapps # 放web程序的根目录
+drwxr-x--- 2 root root     6 Jul  1 05:49 work # 存放编译后的class文件的目录
+
+</code></pre><p>3，启停脚本</p>
+<pre><code>bin下的catalina.sh可以管理tomcat的启停
+
+[root@host2 bin]# ./catalina.sh -h
+Using CATALINA_BASE:   /usr/local/tomcat
+Using CATALINA_HOME:   /usr/local/tomcat
+Using CATALINA_TMPDIR: /usr/local/tomcat/temp
+Using JRE_HOME:        /usr/java/latest
+...
+
+[root@host2 bin]# ./catalina.sh start
+# 监听在8080端口
+</code></pre><p>4，conf配置文件</p>
+<pre><code>[root@host2 tomcat]# ll conf/
+total 224
+drwxr-x--- 3 root root     23 Sep  2 15:04 Catalina
+-rw------- 1 root root  13446 Jul  1 05:53 catalina.policy
+-rw------- 1 root root   7661 Jul  1 05:53 catalina.properties
+-rw------- 1 root root   1338 Jul  1 05:53 context.xml
+-rw------- 1 root root   1149 Jul  1 05:53 jaspic-providers.xml
+-rw------- 1 root root   2313 Jul  1 05:53 jaspic-providers.xsd
+-rw------- 1 root root   3916 Jul  1 05:53 logging.properties
+-rw------- 1 root root   7588 Jul  1 05:53 server.xml
+# 主配置文件
+-rw------- 1 root root   2164 Jul  1 05:53 tomcat-users.xml
+# 监控界面用户登陆认证配置
+-rw------- 1 root root   2558 Jul  1 05:53 tomcat-users.xsd
+-rw------- 1 root root 171879 Jul  1 05:53 web.xml
+# webapp提供默认属性配置文件，启动tomcat时，会先找对应webapp目录下的/WEB-INF/web.xml文件加载属性信息，找不到的话，会利用该文件做默认配置，
+
+# web.xml文件定义了默认页面
+[root@host2 tomcat]# grep -C 1 index conf/web.xml 
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+        &lt;welcome-file&gt;index.htm&lt;/welcome-file&gt;
+        &lt;welcome-file&gt;index.jsp&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+
+</code></pre><p>5，设置环境变量</p>
+<div class="highlight"><div class="chroma">
+<div class="table-container"><table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="o">[</span>root@host2 tomcat<span class="o">]</span><span class="c1"># cat /etc/profile.d/tomcat.sh </span>
+<span class="nb">export</span> <span class="nv">CATALINA_HOME</span><span class="o">=</span>/usr/local/tomcat
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$CATALINA_HOME</span>/bin:<span class="nv">$PATH</span>
+
+<span class="o">[</span>root@host2 tomcat<span class="o">]</span><span class="c1"># source /etc/profile.d/tomcat.sh </span>
+</code></pre></td></tr></table></div>
+</div>
+</div><p>6，检查版本信息</p>
+<pre><code>[root@host2 tomcat]# version.sh 
+Using CATALINA_BASE:   /usr/local/tomcat
+Using CATALINA_HOME:   /usr/local/tomcat
+Using CATALINA_TMPDIR: /usr/local/tomcat/temp
+Using JRE_HOME:        /usr/java/latest
+Using CLASSPATH:       /usr/local/tomcat/bin/bootstrap.jar:/usr/local/tomcat/bin/tomcat-juli.jar
+Server version: Apache Tomcat/8.5.57
+Server built:   Jun 30 2020 21:49:10 UTC
+Server number:  8.5.57.0
+OS Name:        Linux
+OS Version:     3.10.0-862.el7.x86_64
+Architecture:   amd64
+JVM Version:    1.8.0_261-b12
+JVM Vendor:     Oracle Corporation
+
+</code></pre><p>7，启动测试</p>
+<pre><code>[root@host2 tomcat]# catalina.sh start
+Using CATALINA_BASE:   /usr/local/tomcat
+Using CATALINA_HOME:   /usr/local/tomcat
+Using CATALINA_TMPDIR: /usr/local/tomcat/temp
+Using JRE_HOME:        /usr/java/latest
+Using CLASSPATH:       /usr/local/tomcat/bin/bootstrap.jar:/usr/local/tomcat/bin/tomcat-juli.jar
+Tomcat started.
+
+# 默认监听8080端口
+# 以及8005，管理端口；
+[root@host2 tomcat]# curl -I http://localhost:8080
+HTTP/1.1 200 
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Wed, 02 Sep 2020 07:23:06 GMT
+</code></pre>
+            </div>
+
+            
+    
+    
+        <ul class="post-copyright">
+            <li class="copyright-item author"><span class="copyright-item-text">作者</span>：<a href="latteStudio.github.io" class="p-author h-card" target="_blank" rel="noopener">latteStudio</a></li>
+            
+                
+                
+                
+                
+                <li class="copyright-item link"><span class="copyright-item-text">链接</span>：<a href="/posts/tomcat%E4%B9%8B%E7%AE%80%E4%BB%8B%E4%B8%8E%E5%AE%89%E8%A3%85/" target="_blank" rel="noopener">https://latteStudio.github.io/posts/tomcat之简介与安装/</a></li>
+            
+            <li class="copyright-item license"><span class="copyright-item-text">许可</span>：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></li>
+            
+        </ul>
+    
+
+
+
+        </article>
+
+        
+
+        
+    <div class="updated-badge-container">
+        <span title="Updated @ 2020-10-19 19:42:57 CST" style="cursor:help">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="20" class="updated-badge"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="130" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path class="updated-badge-left" d="M0 0h55v20H0z"/><path class="updated-badge-right" d="M55 0h75v20H55z"/><path fill="url(#b)" d="M0 0h130v20H0z"/></g><g fill="#fff" text-anchor="middle" font-size="110"><text x="285" y="150" fill="#010101" fill-opacity=".3" textLength="450" transform="scale(.1)">updated</text><text x="285" y="140" textLength="450" transform="scale(.1)">updated</text><text x="915" y="150" fill="#010101" fill-opacity=".3" textLength="650" transform="scale(.1)">2020-10-19</text><text x="915" y="140" textLength="650" transform="scale(.1)">2020-10-19</text></g></svg>
+        </span></div>
+
+
+
+        
+
+
+        <div class="post-share">
+
+        
+
+        <div class="share-items">
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+            
+
+        </div>
+
+    </div>
+
+
+
+
+        
+    
+    
+        <div class="related-posts">
+            <h2 class="related-title">相关文章：<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon related-icon"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg></h2>
+            <ul class="related-list">
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E4%B8%8E%E9%9D%99%E6%80%81web%E7%BB%93%E5%90%88%E9%85%8D%E7%BD%AE/" class="related-link">tomcat之与静态web结合</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E5%9B%BE%E5%BD%A2%E7%AE%A1%E7%90%86%E4%B8%8E%E8%BA%AB%E4%BB%BD%E8%AE%A4%E8%AF%81/" class="related-link">tomcat之图形管理与身份认证</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8Bweb%E9%85%8D%E7%BD%AE%E4%B8%8E%E4%B8%BB%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/" class="related-link">tomcat之web配置与主配置文件详解</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/tomcat%E4%B9%8B%E5%A4%84%E7%90%86%E8%BF%9E%E6%8E%A5%E8%BF%87%E7%A8%8B/" class="related-link">tomcat之处理连接过程</a>
+                    </li>
+                
+                    <li class="related-item">
+                        <a href="/posts/nginx%E4%B9%8B%E4%B8%83%E5%B1%82%E4%BB%A3%E7%90%86/" class="related-link">nginx之七层代理</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+
+
+        
+    
+        <div class="post-tags">
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/tomcat/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>tomcat</a>
+                
+            
+                
+                
+                
+                
+                    
+                    <a href="/tags/tomcat%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" rel="tag" class="post-tags-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon tag-icon"><path d="M0 252.118V48C0 21.49 21.49 0 48 0h204.118a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882L293.823 497.941c-18.745 18.745-49.137 18.745-67.882 0L14.059 286.059A48 48 0 0 1 0 252.118zM112 64c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48z"/></svg>tomcat体系结构</a>
+                
+            
+        </div>
+    
+
+
+
+        
+
+
+        
+
+
+        
+    
+        
+        
+    
+    
+    
+    
+        <ul class="post-nav">
+            
+                <li class="post-nav-prev">
+                    <a href="/posts/tomcat%E4%B9%8B%E5%A4%84%E7%90%86%E8%BF%9E%E6%8E%A5%E8%BF%87%E7%A8%8B/" rel="prev">&lt; tomcat之处理连接过程</a>
+                </li>
+            
+            
+                <li class="post-nav-next">
+                    <a href="/posts/nginx%E4%B9%8B%E9%80%9A%E7%94%A8%E5%9B%9B%E5%B1%82%E4%BB%A3%E7%90%86/" rel="next">nginx之四层通用代理 &gt;</a>
+                </li>
+            
+        </ul>
+    
+
+
+
+        
+
+
+    </div>
+</main>
+
+
+            
+    <div id="back-to-top" class="back-to-top">
+        <a href="#"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon arrow-up"><path d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z"/></svg></a>
+    </div>
+
+
+            
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="site-info">©&nbsp;2019–2021&nbsp;<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon footer-icon"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/></svg>&nbsp;latteStudio</div><div class="powered-by">Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" rel="noopener">Hugo</a> | Theme is <a href="https://github.com/reuixiy/hugo-theme-meme" target="_blank" rel="noopener">MemE</a></div>
+
+            
+
+
+            
+        </div>
+    </footer>
+
+
+        </div>
+        
+
+        
+
+
+
+
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@latest/dist/medium-zoom.min.js"></script>
+
+<script>
+    mediumZoom(document.querySelectorAll('div.post-body img'), {
+        background: 'hsla(var(--color-bg-h), var(--color-bg-s), var(--color-bg-l), 0.95)'
+    })
+</script>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/instant.page@5.1.0/instantpage.min.js" type="module" defer></script>
+
+
+
+
+
+
+
+    </body>
+</html>
